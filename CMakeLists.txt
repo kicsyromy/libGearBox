@@ -21,12 +21,7 @@ FILE(GLOB_RECURSE SEQ_HEADERS "${PROJECT_SOURCE_DIR}/3rdparty/sequential/*.h")
 add_custom_target(seq_headers SOURCES ${SEQ_HEADERS})
 
 # Add C++ Requests dependency
-#set(USE_SYSTEM_CURL   "ON")
-#set(INSECURE_CURL     "ON")
-#set(BUILD_CPR_TESTS   "OFF")
-#set(GENERATE_COVERAGE "OFF")
-#include_directories("${PROJECT_SOURCE_DIR}/3rdparty/cpr/include")
-#add_subdirectory(3rdparty/cpr)
+add_definitions(-DINSECURE_CURL)
 include_directories("${PROJECT_SOURCE_DIR}/3rdparty/cpr/include")
 include_directories("${PROJECT_SOURCE_DIR}/3rdparty/cpr/include/cpr")
 aux_source_directory(${PROJECT_SOURCE_DIR}/3rdparty/cpr/cpr CPR_SOURCES)
@@ -43,19 +38,9 @@ include_directories("${PROJECT_SOURCE_DIR}/3rdparty/json/src")
 #Add sequential dependency
 include_directories("${PROJECT_SOURCE_DIR}/3rdparty/sequential")
 
-# Generate configuration file with the proper version number
-#configure_file(
-#    "${PROJECT_SOURCE_DIR}/conf/mo_config.h.in"
-#    "${PROJECT_BINARY_DIR}/mo_config.h"
-#    @ONLY
-#)
-
 # Specify project include directories
 include_directories("${PROJECT_SOURCE_DIR}/src/inc")
 include_directories("${PROJECT_SOURCE_DIR}/pub")
-
-# Add the build dir as include path for mo_config.h
-#include_directories("${PROJECT_BINARY_DIR}")
 
 # Define the source directories
 aux_source_directory(${PROJECT_SOURCE_DIR}/src LIBRT_SOURCES)
@@ -82,13 +67,3 @@ install(
     DIRECTORY ${librt_PUBLIC_HEADERS}/
     DESTINATION include/librt
 )
-
-#install(
-#    FILES ${PROJECT_BINARY_DIR}/mo_config.h
-#    DESTINATION include/librt
-#)
-
-#install(
-#    FILES ${PROJECT_BINARY_DIR}/pkgconfig/libmo.pc
-#    DESTINATION lib/pkgconfig
-#)
