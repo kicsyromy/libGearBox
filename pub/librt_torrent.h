@@ -30,6 +30,12 @@ namespace librt
             SearchForExistingFiles
         };
 
+        enum class LocalDataAction
+        {
+            KeepFiles,
+            DeleteFiles
+        };
+
         struct File
         {
             enum class Priority
@@ -70,6 +76,7 @@ namespace librt
         void stop();
         void verify();
         void askForMorePeers();
+        void remove(LocalDataAction action = LocalDataAction::KeepFiles);
 
     public:
         std::int32_t id() const;

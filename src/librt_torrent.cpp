@@ -109,6 +109,17 @@ void Torrent::askForMorePeers()
         LOG_ERROR("Invalid session while requesting \"torrent-reannounce\" for id '{}'", this->id());
 }
 
+void Torrent::remove(LocalDataAction action)
+{
+    nlohmann::json request;
+    request["ids"] = { this->id() };
+    request["delete-local-data"] = (action == LocalDataAction::DeleteFiles);
+    if (auto session = priv_->session_.lock())
+        session->sendRequest(request, "torrent-remove");
+    else
+        LOG_ERROR("Invalid session while requesting \"torrent-remove\" for id '{}'", this->id());
+}
+
 int32_t Torrent::id() const
 {
     return priv_->get_id();
@@ -132,6 +143,11 @@ double Torrent::percentDone() const
 double Torrent::uploadRatio() const
 {
     return priv_->get_uploadRatio();
+}
+
+std::uint64_t Torrent::bytesUploaded() const
+{
+    return priv_->get_uploadedEver();
 }
 
 uint64_t Torrent::downloadSpeed() const
@@ -213,9 +229,4 @@ void Torrent::setDownloadDir(const std::string &path, MoveType move)
         session->sendRequest(jsonFormat.output(), "torrent-set-location");
     else
         LOG_ERROR("Invalid session while requesting \"torrent-set-location\" for id '{}'", this->id());
-}
-
-std::uint64_t Torrent::bytesUploaded() const
-{
-    return priv_->get_uploadedEver();
 }
