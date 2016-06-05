@@ -120,6 +120,46 @@ void Torrent::remove(LocalDataAction action)
         LOG_ERROR("Invalid session while requesting \"torrent-remove\" for id '{}'", this->id());
 }
 
+void Torrent::queueMoveUp()
+{
+    nlohmann::json request;
+    request["ids"] = { this->id() };
+    if (auto session = priv_->session_.lock())
+        session->sendRequest("queue-move-up", request);
+    else
+        LOG_ERROR("Invalid session while requesting \"queue-move-up\" for id '{}'", this->id());
+}
+
+void Torrent::queueMoveDown()
+{
+    nlohmann::json request;
+    request["ids"] = { this->id() };
+    if (auto session = priv_->session_.lock())
+        session->sendRequest("queue-move-down", request);
+    else
+        LOG_ERROR("Invalid session while requesting \"queue-move-down\" for id '{}'", this->id());
+}
+
+void Torrent::queueMoveTop()
+{
+    nlohmann::json request;
+    request["ids"] = { this->id() };
+    if (auto session = priv_->session_.lock())
+        session->sendRequest("queue-move-top", request);
+    else
+        LOG_ERROR("Invalid session while requesting \"queue-move-top\" for id '{}'", this->id());
+}
+
+void Torrent::queueMoveBottom()
+{
+    nlohmann::json request;
+    request["ids"] = { this->id() };
+    if (auto session = priv_->session_.lock())
+        session->sendRequest("queue-move-bottom", request);
+    else
+        LOG_ERROR("Invalid session while requesting \"queue-move-bottom\" for id '{}'", this->id());
+}
+
 int32_t Torrent::id() const
 {
     return priv_->get_id();

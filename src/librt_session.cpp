@@ -173,8 +173,6 @@ std::vector<Torrent> Session::torrents() const
     requestValues["fields"] = fields;
     session::Response response(std::move(priv_->sendRequest("torrent-get", requestValues)));
 
-    LOG_DEBUG("Result: {}", response.get_result());
-
     JsonFormat jsonFormat;
     jsonFormat.fromJson(response.get_arguments());
     sequential::from_format(jsonFormat, torrentResponse);

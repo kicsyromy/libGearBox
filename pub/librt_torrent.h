@@ -77,6 +77,10 @@ namespace librt
         void verify();
         void askForMorePeers();
         void remove(LocalDataAction action = LocalDataAction::KeepFiles);
+        void queueMoveUp();
+        void queueMoveDown();
+        void queueMoveTop();
+        void queueMoveBottom();
 
     public:
         std::int32_t id() const;
