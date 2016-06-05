@@ -58,7 +58,7 @@ namespace librt
                        const char *password);
 
     public:
-        session::Response sendRequest(nlohmann::json arguments, const std::string &method,
+        session::Response sendRequest(const std::string &method, nlohmann::json arguments = nlohmann::json(),
                                       bool *error = nullptr, std::string *errorString = nullptr);
 
     private:

@@ -52,7 +52,7 @@ SessionPrivate::SessionPrivate(const char *url,
 {
 }
 
-session::Response SessionPrivate::sendRequest(nlohmann::json arguments, const std::string &method, bool *error, std::string *errorString)
+session::Response SessionPrivate::sendRequest(const std::string &method, nlohmann::json arguments, bool *error, std::string *errorString)
 {
     session::Request  request(arguments, method, SESSION_TAG);
     session::Response response;
@@ -148,7 +148,7 @@ Session::Session(const char *url,
 
 Session::Statistics Session::statistics() const
 {
-    session::Response response(std::move(priv_->sendRequest(nlohmann::json(), "session-stats")));
+    session::Response response(std::move(priv_->sendRequest("session-stats")));
     session::Statistics stats;
     JsonFormat jsonFormat(response.get_arguments());
     sequential::from_format(jsonFormat, stats);
@@ -171,7 +171,7 @@ std::vector<Torrent> Session::torrents() const
     const auto &fields = TorrentPrivate::attribute_names();
     nlohmann::json requestValues;
     requestValues["fields"] = fields;
-    session::Response response(std::move(priv_->sendRequest(requestValues, "torrent-get")));
+    session::Response response(std::move(priv_->sendRequest("torrent-get", requestValues)));
 
     LOG_DEBUG("Result: {}", response.get_result());
 

@@ -64,7 +64,7 @@ void Torrent::start()
     nlohmann::json request;
     request["ids"] = { this->id() };
     if (auto session = priv_->session_.lock())
-        session->sendRequest(request, "torrent-start");
+        session->sendRequest("torrent-start", request);
     else
         LOG_ERROR("Invalid session while requesting \"torrent-start\" for id '{}'", this->id());
 }
@@ -74,7 +74,7 @@ void Torrent::startNow()
     nlohmann::json request;
     request["ids"] = { this->id() };
     if (auto session = priv_->session_.lock())
-        session->sendRequest(request, "torrent-start-now");
+        session->sendRequest("torrent-start-now", request);
     else
         LOG_ERROR("Invalid session while requesting \"torrent-start-now\" for id '{}'", this->id());
 }
@@ -84,7 +84,7 @@ void Torrent::stop()
     nlohmann::json request;
     request["ids"] = { this->id() };
     if (auto session = priv_->session_.lock())
-        session->sendRequest(request, "torrent-stop");
+        session->sendRequest("torrent-stop", request);
     else
         LOG_ERROR("Invalid session while requesting \"torrent-stop\" for id '{}'", this->id());
 }
@@ -94,7 +94,7 @@ void Torrent::verify()
     nlohmann::json request;
     request["ids"] = { this->id() };
     if (auto session = priv_->session_.lock())
-        session->sendRequest(request, "torrent-verify");
+        session->sendRequest("torrent-verify", request);
     else
         LOG_ERROR("Invalid session while requesting \"torrent-verify\" for id '{}'", this->id());
 }
@@ -104,7 +104,7 @@ void Torrent::askForMorePeers()
     nlohmann::json request;
     request["ids"] = { this->id() };
     if (auto session = priv_->session_.lock())
-        session->sendRequest(request, "torrent-reannounce");
+        session->sendRequest("torrent-reannounce", request);
     else
         LOG_ERROR("Invalid session while requesting \"torrent-reannounce\" for id '{}'", this->id());
 }
@@ -115,7 +115,7 @@ void Torrent::remove(LocalDataAction action)
     request["ids"] = { this->id() };
     request["delete-local-data"] = (action == LocalDataAction::DeleteFiles);
     if (auto session = priv_->session_.lock())
-        session->sendRequest(request, "torrent-remove");
+        session->sendRequest("torrent-remove", request);
     else
         LOG_ERROR("Invalid session while requesting \"torrent-remove\" for id '{}'", this->id());
 }
@@ -206,7 +206,7 @@ void Torrent::setQueuePosition(int32_t position)
     request["ids"] = { this->id() };
     request["queuePosition"] = position;
     if (auto session = priv_->session_.lock())
-        session->sendRequest(request, "torrent-set");
+        session->sendRequest("torrent-set", request);
     else
         LOG_ERROR("Invalid session while requesting \"torrent-set\" for id '{}'", this->id());
 }
@@ -226,7 +226,7 @@ void Torrent::setDownloadDir(const std::string &path, MoveType move)
     sequential::to_format(jsonFormat, moveRequest);
 
     if (auto session = priv_->session_.lock())
-        session->sendRequest(jsonFormat.output(), "torrent-set-location");
+        session->sendRequest("torrent-set-location", jsonFormat.output());
     else
         LOG_ERROR("Invalid session while requesting \"torrent-set-location\" for id '{}'", this->id());
 }
