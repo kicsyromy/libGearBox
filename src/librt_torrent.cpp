@@ -9,29 +9,38 @@
 using namespace librt;
 
 TorrentPrivate::TorrentPrivate() :
-    attributes()
+    attributes(),
+    session_()
 {
 }
 
 TorrentPrivate::TorrentPrivate(TorrentPrivate &&other) :
-    attributes(std::move(other.attributes))
+    attributes(std::move(other.attributes)),
+    session_(other.session_)
 {
+    other.session_.reset();
 }
 
 TorrentPrivate &TorrentPrivate::operator =(TorrentPrivate &&other)
 {
     attributes = std::move(other.attributes);
+    session_ = other.session_;
+    other.session_.reset();
+
     return *this;
 }
 
 TorrentPrivate::TorrentPrivate(const TorrentPrivate &other) :
-    attributes(other.attributes)
+    attributes(other.attributes),
+    session_(other.session_)
 {
 }
 
 TorrentPrivate &TorrentPrivate::operator =(const TorrentPrivate &other)
 {
     attributes = other.attributes;
+    session_ = other.session_;
+
     return *this;
 }
 
@@ -54,35 +63,50 @@ void Torrent::start()
 {
     nlohmann::json request;
     request["ids"] = { this->id() };
-    session::sendRequest(request, "torrent-start");
+    if (auto session = priv_->session_.lock())
+        session->sendRequest(request, "torrent-start");
+    else
+        LOG_ERROR("Invalid session while requesting \"torrent-start\" for id '{}'", this->id());
 }
 
 void Torrent::startNow()
 {
     nlohmann::json request;
     request["ids"] = { this->id() };
-    session::sendRequest(request, "torrent-start-now");
+    if (auto session = priv_->session_.lock())
+        session->sendRequest(request, "torrent-start-now");
+    else
+        LOG_ERROR("Invalid session while requesting \"torrent-start-now\" for id '{}'", this->id());
 }
 
 void Torrent::stop()
 {
     nlohmann::json request;
     request["ids"] = { this->id() };
-    session::sendRequest(request, "torrent-stop");
+    if (auto session = priv_->session_.lock())
+        session->sendRequest(request, "torrent-stop");
+    else
+        LOG_ERROR("Invalid session while requesting \"torrent-stop\" for id '{}'", this->id());
 }
 
 void Torrent::verify()
 {
     nlohmann::json request;
     request["ids"] = { this->id() };
-    session::sendRequest(request, "torrent-verify");
+    if (auto session = priv_->session_.lock())
+        session->sendRequest(request, "torrent-verify");
+    else
+        LOG_ERROR("Invalid session while requesting \"torrent-verify\" for id '{}'", this->id());
 }
 
 void Torrent::askForMorePeers()
 {
     nlohmann::json request;
     request["ids"] = { this->id() };
-    session::sendRequest(request, "torrent-reannounce");
+    if (auto session = priv_->session_.lock())
+        session->sendRequest(request, "torrent-reannounce");
+    else
+        LOG_ERROR("Invalid session while requesting \"torrent-reannounce\" for id '{}'", this->id());
 }
 
 int32_t Torrent::id() const
@@ -165,7 +189,10 @@ void Torrent::setQueuePosition(int32_t position)
     nlohmann::json request;
     request["ids"] = { this->id() };
     request["queuePosition"] = position;
-    session::sendRequest(request, "torrent-set");
+    if (auto session = priv_->session_.lock())
+        session->sendRequest(request, "torrent-set");
+    else
+        LOG_ERROR("Invalid session while requesting \"torrent-set\" for id '{}'", this->id());
 }
 
 std::string Torrent::downloadDir() const
@@ -182,7 +209,10 @@ void Torrent::setDownloadDir(const std::string &path, MoveType move)
     moveRequest.set_move((move == Torrent::MoveType::MoveToNewLocation) ? true : false);
     sequential::to_format(jsonFormat, moveRequest);
 
-    session::sendRequest(jsonFormat.output(), "torrent-set-location");
+    if (auto session = priv_->session_.lock())
+        session->sendRequest(jsonFormat.output(), "torrent-set-location");
+    else
+        LOG_ERROR("Invalid session while requesting \"torrent-set-location\" for id '{}'", this->id());
 }
 
 std::uint64_t Torrent::bytesUploaded() const

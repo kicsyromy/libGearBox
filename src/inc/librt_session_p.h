@@ -46,10 +46,28 @@ namespace librt
             ATTRIBUTE(std::int32_t, uploadSpeed)
             INIT_ATTRIBUTES(activeTorrentCount, downloadSpeed, pausedTorrentCount, torrentCount, uploadSpeed)
         };
-
-        Response sendRequest(nlohmann::json arguments, const std::string &method,
-                             bool *error = nullptr, std::string *errorString = nullptr);
     }
+
+    class SessionPrivate
+    {
+    public:
+        SessionPrivate(const char *url,
+                       const char *path,
+                       bool authenticationRequired,
+                       const char *username,
+                       const char *password);
+
+    public:
+        session::Response sendRequest(nlohmann::json arguments, const std::string &method,
+                                      bool *error = nullptr, std::string *errorString = nullptr);
+
+    private:
+        std::string url_;
+        std::string path_;
+        bool authenticationRequired_;
+        std::string username_;
+        std::string password_;
+    };
 }
 
 #endif // LIBRT_SESSION_P_H

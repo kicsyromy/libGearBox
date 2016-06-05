@@ -4,10 +4,12 @@
 
 #include <formats/json_format.h>
 #include <cpr/cpr.h>
+#include <fmt/format.h>
 
 #include "librt_session_p.h"
 #include "librt_torrent_p.h"
 
+#define DEBUG_BUILD
 #include "librt_logger_p.h"
 
 using nlohmann::json;
@@ -37,19 +39,30 @@ namespace
     }
 }
 
-session::Response session::sendRequest(nlohmann::json arguments, const std::string &method, bool *error, std::string *errorString)
+SessionPrivate::SessionPrivate(const char *url,
+               const char *path,
+               bool authenticationRequired,
+               const char *username,
+               const char *password) :
+    url_(url),
+    path_(path),
+    authenticationRequired_(authenticationRequired),
+    username_(username),
+    password_(password)
+{
+}
+
+session::Response SessionPrivate::sendRequest(nlohmann::json arguments, const std::string &method, bool *error, std::string *errorString)
 {
     session::Request  request(arguments, method, SESSION_TAG);
     session::Response response;
     JsonFormat jsonFormat;
     sequential::to_format(jsonFormat, request);
 
-    if (error != nullptr)
-        *error = true;
-    if (errorString != nullptr)
-        *errorString = "Unknown Error";
+    bool isError = false;
+    std::string errorStr("Unknown Error");
 
-    LOG_DEBUG("Requesting: \n{}", jsonFormat.output().dump(4));
+    LOG_DEBUG("Requesting \"{}\": \n{}", method, jsonFormat.output().dump(4));
 
     /* As per the Transmission documentation:                                   */
     /* Most Transmission RPC servers require a X-Transmission-Session-Id        */
@@ -60,35 +73,79 @@ session::Response session::sendRequest(nlohmann::json arguments, const std::stri
     /* right X-Transmission-Session-Id in its own headers.                      */
     /* So, the correct way to handle a 409 response is to update your           */
     /* X-Transmission-Session-Id and to resend the previous request.            */
-    for (std::uint8_t it = 0; it < RETRY_COUNT; ++it)
+    bool finished = false;
+    for (std::uint8_t it = 0; (it < RETRY_COUNT) && (!isError) && (!finished); ++it)
     {
-        if (result.status_code == 409)
+        cpr::Response result;
+        if (authenticationRequired_)
         {
-            sessionId = getSessionId(result.text);
+            result = cpr::Post(fmt::format("{}{}", url_, path_),
+                               cpr::Authentication{username_, password_},
+                               cpr::Header{{"X-Transmission-Session-Id", sessionId}},
+                               cpr::Body(jsonFormat.output().dump()));
         }
         else
         {
-            jsonFormat.parse(result.text);
-            sequential::from_format(jsonFormat, response);
-            if (error != nullptr)
-                *error = false;
-            break;
+            result = cpr::Post(fmt::format("{}{}", url_, path_),
+                               cpr::Header{{"X-Transmission-Session-Id", sessionId}},
+                               cpr::Body(jsonFormat.output().dump()));
+        }
+
+        switch (result.status_code)
+        {
+        case 409:
+            {
+                sessionId = getSessionId(result.text);
+                break;
+            }
+        case 405:
+            {
+                isError = true;
+                errorStr = "Method not allowed";
+                LOG_DEBUG("Error in request: 405: Method not allowed");
+                break;
+            }
+        case 200:
+            {
+                jsonFormat.parse(result.text);
+                sequential::from_format(jsonFormat, response);
+                finished = true;
+                break;
+            }
+        default:
+            {
+                isError = true;
+                break;
+            }
         }
     }
 
     const auto &result = response.get_result();
     if (result != "success" && !result.empty())
     {
-        if (error != nullptr)
-            *error = true;
-        if (errorString != nullptr)
-            *errorString = result;
+        LOG_DEBUG("Error in request: {}", result);
+        isError = true;
+        errorStr = std::move(result);
     }
+
+    if (error != nullptr)
+        *error = isError;
+    if (errorString != nullptr)
+        *errorString = std::move(errorStr);
 
     return std::move(response);
 }
 
-std::vector<Torrent> librt::session::getTorrents()
+Session::Session(const char *url,
+                 const char *path,
+                 Authentication authentication,
+                 const char *username,
+                 const char *password) :
+    priv_(new SessionPrivate(url, path, authentication ==  Authentication::Required, username, password))
+{
+}
+
+std::vector<Torrent> Session::getTorrents()
 {
     std::vector<Torrent> retValue;
     std::vector<TorrentPrivate> torrents;
@@ -97,7 +154,7 @@ std::vector<Torrent> librt::session::getTorrents()
     const auto &fields = TorrentPrivate::attribute_names();
     nlohmann::json requestValues;
     requestValues["fields"] = fields;
-    session::Response response(std::move(sendRequest(requestValues, "torrent-get")));
+    session::Response response(std::move(priv_->sendRequest(requestValues, "torrent-get")));
 
     LOG_DEBUG("Result: {}", response.get_result());
 
@@ -107,7 +164,9 @@ std::vector<Torrent> librt::session::getTorrents()
     torrents = torrentResponse.get_torrents();
     for (TorrentPrivate &torrentPriv: torrents)
     {
-        retValue.emplace_back(new TorrentPrivate(std::move(torrentPriv)));
+        auto torrent = new TorrentPrivate(std::move(torrentPriv));
+        torrent->session_ = this->priv_;
+        retValue.emplace_back(torrent);
     }
 
     return std::move(retValue);

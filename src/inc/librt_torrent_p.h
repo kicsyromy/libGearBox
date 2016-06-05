@@ -4,10 +4,12 @@
 #include <cstdint>
 #include <vector>
 #include <string>
+#include <memory>
 
 #include <sequential.h>
 
 #include "librt_file_p.h"
+#include "librt_session_p.h"
 
 namespace librt
 {
@@ -80,6 +82,9 @@ namespace librt
         TorrentPrivate &operator =(TorrentPrivate &&other);
         TorrentPrivate(const TorrentPrivate &other);
         TorrentPrivate &operator =(const TorrentPrivate &other);
+
+    public:
+        std::weak_ptr<SessionPrivate> session_;
     };
 }
 
