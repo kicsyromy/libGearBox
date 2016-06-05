@@ -22,6 +22,15 @@ namespace librt
             None
         };
 
+        struct Statistics
+        {
+            std::int32_t totalTorrentCount;
+            std::int32_t activeTorrentCount;
+            std::int32_t pausedTorrentCount;
+            std::int32_t downloadSpeed;
+            std::int32_t uploadSpeed;
+        };
+
     public:
         Session(const char *url,
                 const char *path = DEFAULT_PATH,
@@ -29,7 +38,8 @@ namespace librt
                 const char *username = "",
                 const char *password = "");
     public:
-        std::vector<librt::Torrent> getTorrents();
+        Statistics statistics() const;
+        std::vector<librt::Torrent> torrents() const;
 
     private:
         std::shared_ptr<SessionPrivate> priv_;

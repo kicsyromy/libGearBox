@@ -110,6 +110,15 @@ session::Response SessionPrivate::sendRequest(nlohmann::json arguments, const st
                 jsonFormat.parse(result.text);
                 sequential::from_format(jsonFormat, response);
                 finished = true;
+
+                const auto &result = response.get_result();
+                if (result != "success" && !result.empty())
+                {
+                    LOG_DEBUG("Error in request: {}", result);
+                    isError = true;
+                    errorStr = std::move(result);
+                }
+
                 break;
             }
         default:
@@ -118,14 +127,6 @@ session::Response SessionPrivate::sendRequest(nlohmann::json arguments, const st
                 break;
             }
         }
-    }
-
-    const auto &result = response.get_result();
-    if (result != "success" && !result.empty())
-    {
-        LOG_DEBUG("Error in request: {}", result);
-        isError = true;
-        errorStr = std::move(result);
     }
 
     if (error != nullptr)
@@ -145,7 +146,23 @@ Session::Session(const char *url,
 {
 }
 
-std::vector<Torrent> Session::getTorrents()
+Session::Statistics Session::statistics() const
+{
+    session::Response response(std::move(priv_->sendRequest(nlohmann::json(), "session-stats")));
+    session::Statistics stats;
+    JsonFormat jsonFormat(response.get_arguments());
+    sequential::from_format(jsonFormat, stats);
+
+    return {
+        stats.get_torrentCount(),
+        stats.get_activeTorrentCount(),
+        stats.get_pausedTorrentCount(),
+        stats.get_downloadSpeed(),
+        stats.get_uploadSpeed()
+    };
+}
+
+std::vector<Torrent> Session::torrents() const
 {
     std::vector<Torrent> retValue;
     std::vector<TorrentPrivate> torrents;
