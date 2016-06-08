@@ -150,6 +150,11 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
     return std::move(response);
 }
 
+Session::Session() :
+    priv_(new SessionPrivate("", "", false, "", ""))
+{
+}
+
 Session::Session(const std::string &url,
                  const std::string &path,
                  Authentication authentication,

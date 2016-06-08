@@ -32,6 +32,8 @@ namespace librt
         };
 
     public:
+        Session();
+
         Session(const std::string &url,
                 const std::string &path = DEFAULT_PATH,
                 Authentication authentication = Authentication::None,
