@@ -50,12 +50,20 @@ namespace librt
 
     class SessionPrivate
     {
+        friend class Session;
+
     public:
-        SessionPrivate(const char *url,
-                       const char *path,
+        SessionPrivate(const std::string &url,
+                       const std::string &path,
                        bool authenticationRequired,
-                       const char *username,
-                       const char *password);
+                       const std::string &username,
+                       const std::string &password);
+
+        SessionPrivate(std::string &&url,
+                       std::string &&path,
+                       bool authenticationRequired,
+                       std::string &&username,
+                       std::string &&password);
 
     public:
         session::Response sendRequest(const std::string &method, nlohmann::json arguments = nlohmann::json(),

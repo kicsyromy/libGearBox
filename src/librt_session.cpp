@@ -39,11 +39,24 @@ namespace
     }
 }
 
-SessionPrivate::SessionPrivate(const char *url,
-               const char *path,
-               bool authenticationRequired,
-               const char *username,
-               const char *password) :
+SessionPrivate::SessionPrivate(const std::string &url,
+                               const std::string &path,
+                               bool authenticationRequired,
+                               const std::string &username,
+                               const std::string &password) :
+    url_(url),
+    path_(path),
+    authenticationRequired_(authenticationRequired),
+    username_(username),
+    password_(password)
+{
+}
+
+SessionPrivate::SessionPrivate(std::string &&url,
+                               std::string &&path,
+                               bool authenticationRequired,
+                               std::string &&username,
+                               std::string &&password) :
     url_(url),
     path_(path),
     authenticationRequired_(authenticationRequired),
@@ -137,11 +150,20 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
     return std::move(response);
 }
 
-Session::Session(const char *url,
-                 const char *path,
+Session::Session(const std::string &url,
+                 const std::string &path,
                  Authentication authentication,
-                 const char *username,
-                 const char *password) :
+                 const std::string &username,
+                 const std::string &password) :
+    priv_(new SessionPrivate(url, path, authentication ==  Authentication::Required, username, password))
+{
+}
+
+Session::Session(std::string &&url,
+                 std::string &&path,
+                 Authentication authentication,
+                 std::string &&username,
+                 std::string &&password) :
     priv_(new SessionPrivate(url, path, authentication ==  Authentication::Required, username, password))
 {
 }
@@ -185,4 +207,69 @@ std::vector<Torrent> Session::torrents() const
     }
 
     return std::move(retValue);
+}
+
+std::string Session::url() const
+{
+    return priv_->url_;
+}
+
+void Session::setUrl(const std::string &url)
+{
+    priv_->url_ = url;
+}
+
+void Session::setUrl(std::string &&url)
+{
+    priv_->url_ = url;
+}
+
+std::string Session::path() const
+{
+    return priv_->path_;
+}
+
+void Session::setPath(const std::string &path)
+{
+    priv_->path_ = path;
+}
+
+void Session::setPath(std::string &&path)
+{
+    priv_->path_ = path;
+}
+
+bool Session::authenticationRequired() const
+{
+    return priv_->authenticationRequired_;
+}
+
+void Session::setAuthentication(Session::Authentication authentication)
+{
+    priv_->authenticationRequired_ = (authentication == Session::Authentication::Required);
+}
+
+std::string Session::username() const
+{
+    return priv_->username_;
+}
+
+void Session::setUsername(const std::string &username)
+{
+    priv_->username_ = username;
+}
+
+void Session::setUsername(std::string &&username)
+{
+    priv_->username_ = username;
+}
+
+void Session::setPassword(const std::string &password)
+{
+    priv_->password_ = password;
+}
+
+void Session::setPassword(std::string &&password)
+{
+    priv_->password_ = password;
 }

@@ -60,7 +60,7 @@ include_directories("${PROJECT_SOURCE_DIR}/pub")
 aux_source_directory(${PROJECT_SOURCE_DIR}/src LIBRT_SOURCES)
 
 # Specify the target
-add_library(rt SHARED ${LIBRT_SOURCES} ${FMT_SOURCE} ${CPR_SOURCES})
+add_library(rt STATIC ${LIBRT_SOURCES} ${FMT_SOURCE} ${CPR_SOURCES})
 
 # Create aditional files with versioning
 set_target_properties(rt PROPERTIES VERSION ${librt_VERSION_MAJOR}.${librt_VERSION_MINOR}.${librt_VERSION_PATCH} SOVERSION ${librt_VERSION_MAJOR})

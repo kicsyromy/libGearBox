@@ -32,14 +32,36 @@ namespace librt
         };
 
     public:
-        Session(const char *url,
-                const char *path = DEFAULT_PATH,
+        Session(const std::string &url,
+                const std::string &path = DEFAULT_PATH,
                 Authentication authentication = Authentication::None,
-                const char *username = "",
-                const char *password = "");
+                const std::string &username = "",
+                const std::string &password = "");
+
+        Session(std::string &&url,
+                std::string &&path = DEFAULT_PATH,
+                Authentication authentication = Authentication::None,
+                std::string &&username = "",
+                std::string &&password = "");
+
     public:
         Statistics statistics() const;
         std::vector<librt::Torrent> torrents() const;
+
+    public:
+        std::string url() const;
+        void setUrl(const std::string &url);
+        void setUrl(std::string &&url);
+        std::string path() const;
+        void setPath(const std::string &path);
+        void setPath(std::string &&path);
+        bool authenticationRequired() const;
+        void setAuthentication(Authentication authentication);
+        std::string username() const;
+        void setUsername(const std::string &username);
+        void setUsername(std::string &&username);
+        void setPassword(const std::string &password);
+        void setPassword(std::string &&password);
 
     private:
         std::shared_ptr<SessionPrivate> priv_;
