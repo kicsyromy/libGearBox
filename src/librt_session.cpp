@@ -151,7 +151,7 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
 }
 
 Session::Session() :
-    priv_(new SessionPrivate("", "", false, "", ""))
+    priv_(new SessionPrivate("", DEFAULT_PATH, false, "", ""))
 {
 }
 
