@@ -36,12 +36,14 @@ namespace librt
 
         Session(const std::string &url,
                 const std::string &path = DEFAULT_PATH,
+                std::int8_t port = -1,
                 Authentication authentication = Authentication::None,
                 const std::string &username = "",
                 const std::string &password = "");
 
         Session(std::string &&url,
                 std::string &&path = DEFAULT_PATH,
+                int8_t port = -1,
                 Authentication authentication = Authentication::None,
                 std::string &&username = "",
                 std::string &&password = "");

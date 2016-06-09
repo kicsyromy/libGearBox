@@ -55,12 +55,14 @@ namespace librt
     public:
         SessionPrivate(const std::string &url,
                        const std::string &path,
+                       std::int8_t port,
                        bool authenticationRequired,
                        const std::string &username,
                        const std::string &password);
 
         SessionPrivate(std::string &&url,
                        std::string &&path,
+                       std::int8_t port,
                        bool authenticationRequired,
                        std::string &&username,
                        std::string &&password);
@@ -72,6 +74,7 @@ namespace librt
     private:
         std::string url_;
         std::string path_;
+        std::int8_t port_;
         bool authenticationRequired_;
         std::string username_;
         std::string password_;

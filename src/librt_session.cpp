@@ -41,11 +41,13 @@ namespace
 
 SessionPrivate::SessionPrivate(const std::string &url,
                                const std::string &path,
+                               int8_t port,
                                bool authenticationRequired,
                                const std::string &username,
                                const std::string &password) :
     url_(url),
     path_(path),
+    port_(port),
     authenticationRequired_(authenticationRequired),
     username_(username),
     password_(password)
@@ -54,11 +56,13 @@ SessionPrivate::SessionPrivate(const std::string &url,
 
 SessionPrivate::SessionPrivate(std::string &&url,
                                std::string &&path,
+                               int8_t port,
                                bool authenticationRequired,
                                std::string &&username,
                                std::string &&password) :
     url_(url),
     path_(path),
+    port_(port),
     authenticationRequired_(authenticationRequired),
     username_(username),
     password_(password)
@@ -92,14 +96,14 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
         cpr::Response result;
         if (authenticationRequired_)
         {
-            result = cpr::Post(fmt::format("{}{}", url_, path_),
+            result = cpr::Post(fmt::format("{}{}{}{}", url_, path_, port_ > 0 ? ":", fmt::format("{}", port_) : "", ""),
                                cpr::Authentication{username_, password_},
                                cpr::Header{{"X-Transmission-Session-Id", sessionId}},
                                cpr::Body(jsonFormat.output().dump()));
         }
         else
         {
-            result = cpr::Post(fmt::format("{}{}", url_, path_),
+            result = cpr::Post(fmt::format("{}{}{}{}", url_, path_, port_ > 0 ? ":", fmt::format("{}", port_) : "", ""),
                                cpr::Header{{"X-Transmission-Session-Id", sessionId}},
                                cpr::Body(jsonFormat.output().dump()));
         }
@@ -151,25 +155,27 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
 }
 
 Session::Session() :
-    priv_(new SessionPrivate("", DEFAULT_PATH, false, "", ""))
+    priv_(new SessionPrivate("", DEFAULT_PATH, -1,  false, "", ""))
 {
 }
 
 Session::Session(const std::string &url,
                  const std::string &path,
+                 std::int8_t port,
                  Authentication authentication,
                  const std::string &username,
                  const std::string &password) :
-    priv_(new SessionPrivate(url, path, authentication ==  Authentication::Required, username, password))
+    priv_(new SessionPrivate(url, path, port, authentication ==  Authentication::Required, username, password))
 {
 }
 
 Session::Session(std::string &&url,
                  std::string &&path,
+                 std::int8_t port,
                  Authentication authentication,
                  std::string &&username,
                  std::string &&password) :
-    priv_(new SessionPrivate(url, path, authentication ==  Authentication::Required, username, password))
+    priv_(new SessionPrivate(url, path, port, authentication ==  Authentication::Required, username, password))
 {
 }
 
