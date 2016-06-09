@@ -250,6 +250,16 @@ void Session::setPath(std::string &&path)
     priv_->path_ = path;
 }
 
+int8_t Session::port() const
+{
+    return priv_->port_;
+}
+
+void Session::setPort(int8_t port)
+{
+    priv_->port_ = port;
+}
+
 bool Session::authenticationRequired() const
 {
     return priv_->authenticationRequired_;

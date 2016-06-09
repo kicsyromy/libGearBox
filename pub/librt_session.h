@@ -59,6 +59,8 @@ namespace librt
         std::string path() const;
         void setPath(const std::string &path);
         void setPath(std::string &&path);
+        std::int8_t port() const;
+        void setPort(std::int8_t port);
         bool authenticationRequired() const;
         void setAuthentication(Authentication authentication);
         std::string username() const;
