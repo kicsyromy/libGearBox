@@ -285,6 +285,11 @@ void Session::setUsername(std::string &&username)
     priv_->username_ = username;
 }
 
+std::string Session::password() const
+{
+    return priv_->password_;
+}
+
 void Session::setPassword(const std::string &password)
 {
     priv_->password_ = password;

@@ -66,6 +66,7 @@ namespace librt
         std::string username() const;
         void setUsername(const std::string &username);
         void setUsername(std::string &&username);
+        std::string password() const;
         void setPassword(const std::string &password);
         void setPassword(std::string &&password);
 
