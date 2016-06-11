@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "librt_torrent.h"
+#include "librt_return_type.h"
 
 namespace librt
 {
@@ -49,8 +50,10 @@ namespace librt
                 std::string &&password = "");
 
     public:
-        Statistics statistics() const;
-        std::vector<librt::Torrent> torrents() const;
+        std::int32_t timeout() const;
+        void setTimeout(int32_t value);
+        ReturnType<Statistics> statistics() const;
+        ReturnType<std::vector<librt::Torrent>> torrents() const;
 
     public:
         std::string url() const;
@@ -69,6 +72,9 @@ namespace librt
         std::string password() const;
         void setPassword(const std::string &password);
         void setPassword(std::string &&password);
+
+    public:
+        Error lastError() const;
 
     private:
         std::shared_ptr<SessionPrivate> priv_;

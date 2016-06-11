@@ -6,7 +6,7 @@
 #include <sequential.h>
 #include <json.hpp>
 
-#include "librt_torrent.h"
+#include "librt_error.h"
 
 namespace librt
 {
@@ -32,9 +32,18 @@ namespace librt
             ATTRIBUTE(std::uint16_t, tag)
             INIT_ATTRIBUTES(arguments, result, tag)
 
-            Response() : attributes() {}
-            Response(Response &&other) : attributes(std::move(other.attributes)) {}
-            Response &operator =(Response &&other) { attributes = std::move(other.attributes); return *this; }
+            Response() : attributes(), error() {}
+            Response(Response &&other) :
+                attributes(std::move(other.attributes)),
+                error(std::move(other.error))
+            {}
+            Response &operator =(Response &&other)
+            {
+                attributes = std::move(other.attributes); return *this;
+                error = std::move(other.error);
+            }
+
+            Error error;
         };
 
         struct Statistics
@@ -68,8 +77,7 @@ namespace librt
                        std::string &&password);
 
     public:
-        session::Response sendRequest(const std::string &method, nlohmann::json arguments = nlohmann::json(),
-                                      bool *error = nullptr, std::string *errorString = nullptr);
+        session::Response sendRequest(const std::string &method, nlohmann::json arguments = nlohmann::json());
 
     private:
         std::string url_;
@@ -78,6 +86,7 @@ namespace librt
         bool authenticationRequired_;
         std::string username_;
         std::string password_;
+        std::int32_t timeout_;
     };
 }
 

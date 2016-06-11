@@ -6,6 +6,8 @@
 #include <string>
 #include <memory>
 
+#include "librt_error.h"
+
 namespace librt
 {
     class TorrentPrivate;
@@ -71,16 +73,16 @@ namespace librt
         bool operator  <(const Torrent &other) const;
 
     public:
-        void start();
-        void startNow();
-        void stop();
-        void verify();
-        void askForMorePeers();
-        void remove(LocalDataAction action = LocalDataAction::KeepFiles);
-        void queueMoveUp();
-        void queueMoveDown();
-        void queueMoveTop();
-        void queueMoveBottom();
+        Error start();
+        Error startNow();
+        Error stop();
+        Error verify();
+        Error askForMorePeers();
+        Error remove(LocalDataAction action = LocalDataAction::KeepFiles);
+        Error queueMoveUp();
+        Error queueMoveDown();
+        Error queueMoveTop();
+        Error queueMoveBottom();
 
     public:
         std::int32_t id() const;
@@ -97,13 +99,13 @@ namespace librt
         const std::vector<File> files() const;
 
         std::int32_t queuePosition() const;
-        void setQueuePosition(std::int32_t position);
+        Error setQueuePosition(std::int32_t position);
 
         std::string downloadDir() const;
-        void setDownloadDir(const std::string &path, MoveType move = MoveType::SearchForExistingFiles);
+        Error setDownloadDir(const std::string &path, MoveType move = MoveType::SearchForExistingFiles);
 
     private:
-        std::shared_ptr<TorrentPrivate> priv_;
+        std::unique_ptr<TorrentPrivate> priv_;
     };
 }
 

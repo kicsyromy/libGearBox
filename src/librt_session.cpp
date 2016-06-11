@@ -1,6 +1,7 @@
 #include "librt_session.h"
 
 #include <string>
+#include "utility"
 
 #include <formats/json_format.h>
 #include <cpr/cpr.h>
@@ -17,8 +18,13 @@ using namespace librt;
 
 namespace
 {
-    constexpr std::uint16_t SESSION_TAG = 33872;
-    constexpr std::uint8_t  RETRY_COUNT = 5;
+    constexpr std::uint16_t SESSION_TAG    = 33872;
+    constexpr std::uint8_t  RETRY_COUNT    = 5;
+    constexpr std::int32_t DEFAULT_TIMEOUT = 5000;
+
+    constexpr std::int32_t STATUS_OK                 = 200;
+    constexpr std::int32_t STATUS_RETRY              = 409;
+    constexpr std::int32_t STATUS_METHOD_NOT_ALLOWED = 405;
 
     std::string sessionId;
 
@@ -50,7 +56,8 @@ SessionPrivate::SessionPrivate(const std::string &url,
     port_(port),
     authenticationRequired_(authenticationRequired),
     username_(username),
-    password_(password)
+    password_(password),
+    timeout_(DEFAULT_TIMEOUT)
 {
 }
 
@@ -65,19 +72,17 @@ SessionPrivate::SessionPrivate(std::string &&url,
     port_(port),
     authenticationRequired_(authenticationRequired),
     username_(username),
-    password_(password)
+    password_(password),
+    timeout_(DEFAULT_TIMEOUT)
 {
 }
 
-session::Response SessionPrivate::sendRequest(const std::string &method, nlohmann::json arguments, bool *error, std::string *errorString)
+session::Response SessionPrivate::sendRequest(const std::string &method, nlohmann::json arguments)
 {
     session::Request  request(arguments, method, SESSION_TAG);
     session::Response response;
     JsonFormat jsonFormat;
     sequential::to_format(jsonFormat, request);
-
-    bool isError = false;
-    std::string errorStr("Unknown Error");
 
     LOG_DEBUG("Requesting \"{}\": \n{}", method, jsonFormat.output().dump(4));
 
@@ -90,8 +95,7 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
     /* right X-Transmission-Session-Id in its own headers.                      */
     /* So, the correct way to handle a 409 response is to update your           */
     /* X-Transmission-Session-Id and to resend the previous request.            */
-    bool finished = false;
-    for (std::uint8_t it = 0; (it < RETRY_COUNT) && (!isError) && (!finished); ++it)
+    for (std::uint8_t it = 0; it < RETRY_COUNT; ++it)
     {
         cpr::Response result;
         if (authenticationRequired_)
@@ -99,57 +103,65 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
             result = cpr::Post(fmt::format("{}{}{}{}", url_, path_, port_ > 0 ? ":", fmt::format("{}", port_) : "", ""),
                                cpr::Authentication{username_, password_},
                                cpr::Header{{"X-Transmission-Session-Id", sessionId}},
+                               cpr::Timeout{timeout_},
                                cpr::Body(jsonFormat.output().dump()));
         }
         else
         {
             result = cpr::Post(fmt::format("{}{}{}{}", url_, path_, port_ > 0 ? ":", fmt::format("{}", port_) : "", ""),
                                cpr::Header{{"X-Transmission-Session-Id", sessionId}},
+                               cpr::Timeout{timeout_},
                                cpr::Body(jsonFormat.output().dump()));
         }
 
-        switch (result.status_code)
+        if (result.error)
         {
-        case 409:
-            {
-                sessionId = getSessionId(result.text);
-                break;
-            }
-        case 405:
-            {
-                isError = true;
-                errorStr = "Method not allowed";
-                LOG_DEBUG("Error in request: 405: Method not allowed");
-                break;
-            }
-        case 200:
-            {
-                jsonFormat.parse(result.text);
-                sequential::from_format(jsonFormat, response);
-                finished = true;
+            response.error = std::make_pair(
+                        static_cast<Error::Code>(result.error.code),
+                        std::move(result.error.message)
+                    );
+            break;
+        }
 
-                const auto &result = response.get_result();
-                if (result != "success" && !result.empty())
-                {
-                    LOG_DEBUG("Error in request: {}", result);
-                    isError = true;
-                    errorStr = std::move(result);
-                }
+        if (result.status_code == STATUS_RETRY)
+        {
+            sessionId = getSessionId(result.text);
+            continue;
+        }
 
-                break;
-            }
-        default:
+        if (result.status_code == STATUS_METHOD_NOT_ALLOWED)
+        {
+            response.error = std::make_pair(
+                        Error::Code::TransmissionMethodNotAllowed,
+                        std::move("Method not allowed")
+                    );
+            break;
+        }
+
+        if (result.status_code == STATUS_OK)
+        {
+            jsonFormat.parse(result.text);
+            sequential::from_format(jsonFormat, response);
+
+            auto &result = response.get_result();
+            if (result != "success" && !result.empty())
             {
-                isError = true;
-                break;
+                response.error = std::make_pair(Error::Code::TransmissionUnknownError, std::move(result));
             }
+
+            break;
+        }
+        else
+        {
+            response.error = std::make_pair(Error::Code::TransmissionUnknownError, std::move("Unknown error"));
+            break;
         }
     }
 
-    if (error != nullptr)
-        *error = isError;
-    if (errorString != nullptr)
-        *errorString = std::move(errorStr);
+    if (response.error)
+        LOG_ERROR("Error in request: {} {}",
+                  static_cast<int>(response.error.errorCode()),
+                  response.error.message());
 
     return std::move(response);
 }
@@ -179,23 +191,43 @@ Session::Session(std::string &&url,
 {
 }
 
-Session::Statistics Session::statistics() const
+std::int32_t Session::timeout() const
 {
-    session::Response response(std::move(priv_->sendRequest("session-stats")));
-    session::Statistics stats;
-    JsonFormat jsonFormat(response.get_arguments());
-    sequential::from_format(jsonFormat, stats);
-
-    return {
-        stats.get_torrentCount(),
-        stats.get_activeTorrentCount(),
-        stats.get_pausedTorrentCount(),
-        stats.get_downloadSpeed(),
-        stats.get_uploadSpeed()
-    };
+    return priv_->timeout_;
 }
 
-std::vector<Torrent> Session::torrents() const
+void Session::setTimeout(std::int32_t value)
+{
+    priv_->timeout_ = value;
+}
+
+ReturnType<Session::Statistics> Session::statistics() const
+{
+    Session::Statistics retValue;
+    session::Response response(std::move(priv_->sendRequest("session-stats")));
+    if (!response.error)
+    {
+        session::Statistics stats;
+        JsonFormat jsonFormat(response.get_arguments());
+        sequential::from_format(jsonFormat, stats);
+        retValue = {
+            stats.get_torrentCount(),
+            stats.get_activeTorrentCount(),
+            stats.get_pausedTorrentCount(),
+            stats.get_downloadSpeed(),
+            stats.get_uploadSpeed()
+        };
+    }
+
+    return std::move(
+        ReturnType<Session::Statistics>(
+            std::move(response.error),
+            std::move(retValue)
+        )
+    );
+}
+
+ReturnType<std::vector<Torrent>> Session::torrents() const
 {
     std::vector<Torrent> retValue;
     std::vector<TorrentPrivate> torrents;
@@ -206,18 +238,26 @@ std::vector<Torrent> Session::torrents() const
     requestValues["fields"] = fields;
     session::Response response(std::move(priv_->sendRequest("torrent-get", requestValues)));
 
-    JsonFormat jsonFormat;
-    jsonFormat.fromJson(response.get_arguments());
-    sequential::from_format(jsonFormat, torrentResponse);
-    torrents = torrentResponse.get_torrents();
-    for (TorrentPrivate &torrentPriv: torrents)
+    if (!response.error)
     {
-        auto torrent = new TorrentPrivate(std::move(torrentPriv));
-        torrent->session_ = this->priv_;
-        retValue.emplace_back(torrent);
+        JsonFormat jsonFormat;
+        jsonFormat.fromJson(response.get_arguments());
+        sequential::from_format(jsonFormat, torrentResponse);
+        torrents = torrentResponse.get_torrents();
+        for (TorrentPrivate &torrentPriv: torrents)
+        {
+            auto torrent = new TorrentPrivate(std::move(torrentPriv));
+            torrent->session_ = this->priv_;
+            retValue.emplace_back(torrent);
+        }
     }
 
-    return std::move(retValue);
+    return std::move(
+        ReturnType<std::vector<Torrent>>(
+            std::move(response.error),
+            std::move(retValue)
+        )
+    );
 }
 
 std::string Session::url() const
