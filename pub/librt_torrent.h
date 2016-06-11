@@ -105,7 +105,7 @@ namespace librt
         Error setDownloadDir(const std::string &path, MoveType move = MoveType::SearchForExistingFiles);
 
     private:
-        std::unique_ptr<TorrentPrivate> priv_;
+        std::shared_ptr<TorrentPrivate> priv_;
     };
 }
 
