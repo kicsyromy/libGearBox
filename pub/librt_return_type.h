@@ -1,9 +1,11 @@
 #include "librt_error.h"
 
+#include <librt_global.h>
+
 namespace librt
 {
     template <typename T>
-    struct ReturnType
+    struct LIBRT_API ReturnType
     {
         ReturnType(Error &&error, T &&value) :
             error(std::move(error)),
@@ -11,6 +13,6 @@ namespace librt
         {}
         Error error;
         T value;
-        inline operator T &() { return value; }
+        inline operator T() { return std::move(value); }
     };
 }

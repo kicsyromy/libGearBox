@@ -4,6 +4,8 @@
 #include <vector>
 #include <memory>
 
+#include <librt_global.h>
+
 #include "librt_torrent.h"
 #include "librt_return_type.h"
 
@@ -11,7 +13,7 @@ namespace librt
 {
     class SessionPrivate;
 
-    class Session
+    class LIBRT_API Session
     {
     public:
         static constexpr const char * DEFAULT_PATH = "/transmission/rpc";
@@ -34,6 +36,8 @@ namespace librt
 
     public:
         Session();
+        Session(Session &&other);
+        Session &operator =(Session &&other);
 
         Session(const std::string &url,
                 const std::string &path = DEFAULT_PATH,
@@ -78,6 +82,9 @@ namespace librt
 
     private:
         std::shared_ptr<SessionPrivate> priv_;
+
+    private:
+        DISABLE_COPY(Session)
     };
 }
 

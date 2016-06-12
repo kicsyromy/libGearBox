@@ -3,9 +3,11 @@
 
 #include <string>
 
+#include <librt_global.h>
+
 namespace librt
 {
-    class Error
+    class LIBRT_API Error
     {
     public:
         enum class Code
@@ -49,6 +51,9 @@ namespace librt
     private:
         Error::Code errorCode_;
         std::string message_;
+
+    private:
+        DISABLE_COPY(Error)
     };
 }
 

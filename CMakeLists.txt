@@ -17,10 +17,14 @@ endif()
 # Version number
 set(librt_VERSION_MAJOR 0)
 set(librt_VERSION_MINOR 0)
-set(librt_VERSION_PATCH 1)
+set(librt_VERSION_PATCH 2)
 
 set(librt_PRIVATE_HEADERS "${PROJECT_SOURCE_DIR}/src/inc")
 set(librt_PUBLIC_HEADERS  "${PROJECT_SOURCE_DIR}/pub")
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions(-DDEBUG_BUILD)
+endif()
 
 # Hack for Qt Creator to show the headers in the project file tree
 FILE(GLOB_RECURSE PRIVATE_HEADERS "${librt_PRIVATE_HEADERS}/*.h")

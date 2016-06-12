@@ -6,13 +6,15 @@
 #include <string>
 #include <memory>
 
+#include <librt_global.h>
+
 #include "librt_error.h"
 
 namespace librt
 {
     class TorrentPrivate;
 
-    class Torrent
+    class LIBRT_API Torrent
     {
     public:
         enum class Status

@@ -10,7 +10,6 @@
 #include "librt_session_p.h"
 #include "librt_torrent_p.h"
 
-#define DEBUG_BUILD
 #include "librt_logger_p.h"
 
 using nlohmann::json;
@@ -169,6 +168,16 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
 Session::Session() :
     priv_(new SessionPrivate("", DEFAULT_PATH, -1,  false, "", ""))
 {
+}
+
+Session::Session(Session &&other) :
+    priv_(std::move(other.priv_))
+{
+}
+
+Session &Session::operator =(Session &&other)
+{
+    priv_= std::move(other.priv_);
 }
 
 Session::Session(const std::string &url,
