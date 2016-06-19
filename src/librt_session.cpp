@@ -46,7 +46,7 @@ namespace
 
 SessionPrivate::SessionPrivate(const std::string &url,
                                const std::string &path,
-                               int8_t port,
+                               std::int32_t port,
                                bool authenticationRequired,
                                const std::string &username,
                                const std::string &password) :
@@ -62,7 +62,7 @@ SessionPrivate::SessionPrivate(const std::string &url,
 
 SessionPrivate::SessionPrivate(std::string &&url,
                                std::string &&path,
-                               int8_t port,
+                               std::int32_t port,
                                bool authenticationRequired,
                                std::string &&username,
                                std::string &&password) :
@@ -182,7 +182,7 @@ Session &Session::operator =(Session &&other)
 
 Session::Session(const std::string &url,
                  const std::string &path,
-                 std::int8_t port,
+                 std::int32_t port,
                  Authentication authentication,
                  const std::string &username,
                  const std::string &password) :
@@ -192,7 +192,7 @@ Session::Session(const std::string &url,
 
 Session::Session(std::string &&url,
                  std::string &&path,
-                 std::int8_t port,
+                 std::int32_t port,
                  Authentication authentication,
                  std::string &&username,
                  std::string &&password) :
@@ -299,12 +299,12 @@ void Session::setPath(std::string &&path)
     priv_->path_ = path;
 }
 
-int8_t Session::port() const
+std::int32_t Session::port() const
 {
     return priv_->port_;
 }
 
-void Session::setPort(int8_t port)
+void Session::setPort(std::int32_t port)
 {
     priv_->port_ = port;
 }

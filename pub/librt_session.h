@@ -41,14 +41,14 @@ namespace librt
 
         Session(const std::string &url,
                 const std::string &path = DEFAULT_PATH,
-                std::int8_t port = -1,
+                std::int32_t port = -1,
                 Authentication authentication = Authentication::None,
                 const std::string &username = "",
                 const std::string &password = "");
 
         Session(std::string &&url,
                 std::string &&path = DEFAULT_PATH,
-                int8_t port = -1,
+                std::int32_t port = -1,
                 Authentication authentication = Authentication::None,
                 std::string &&username = "",
                 std::string &&password = "");
@@ -66,8 +66,8 @@ namespace librt
         std::string path() const;
         void setPath(const std::string &path);
         void setPath(std::string &&path);
-        std::int8_t port() const;
-        void setPort(std::int8_t port);
+        std::int32_t port() const;
+        void setPort(std::int32_t port);
         bool authenticationRequired() const;
         void setAuthentication(Authentication authentication);
         std::string username() const;
