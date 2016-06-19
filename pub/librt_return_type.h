@@ -1,6 +1,8 @@
-#include "librt_error.h"
+#ifndef LIBRT_RETURN_TYPE_H
+#define LIBRT_RETURN_TYPE_H
 
 #include <librt_global.h>
+#include <librt_error.h>
 
 namespace librt
 {
@@ -16,3 +18,5 @@ namespace librt
         inline operator T() { return std::move(value); }
     };
 }
+
+#endif // LIBRT_RETURN_TYPE_H

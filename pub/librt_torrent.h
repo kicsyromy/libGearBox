@@ -7,8 +7,7 @@
 #include <memory>
 
 #include <librt_global.h>
-
-#include "librt_error.h"
+#include <librt_return_type.h>
 
 namespace librt
 {
@@ -98,7 +97,7 @@ namespace librt
         Status status() const;
         std::uint64_t size() const;
         std::int32_t eta() const;
-        const std::vector<File> files() const;
+        ReturnType<std::vector<File>> files() const;
 
         std::int32_t queuePosition() const;
         Error setQueuePosition(std::int32_t position);

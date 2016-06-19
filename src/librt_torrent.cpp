@@ -323,24 +323,63 @@ int32_t Torrent::eta() const
     return priv_->get_eta();
 }
 
-const std::vector<Torrent::File> Torrent::files() const
+ReturnType<std::vector<Torrent::File>> Torrent::files() const
 {
     std::vector<Torrent::File> result;
-    const auto &files = priv_->get_files();
-    const auto &fileStats = priv_->get_fileStats();
-    const auto length = files.size();
-    for (std::size_t it = 0; it < length; ++it)
+    std::vector<TorrentPrivate::Files> torrentFiles;
+    TorrentPrivate::Files::Response torrentResponse;
+
+    TorrentPrivate::Files::Request fileRequest;
+    fileRequest.set_ids({this->id()});
+    JsonFormat jsonFileRequest;
+    sequential::to_format(jsonFileRequest, fileRequest);
+
+    Error error;
+    if (auto session = priv_->session_.lock())
     {
-        result.emplace_back(
-            files.at(it).get_name(),
-            files.at(it).get_bytesCompleted(),
-            files.at(it).get_length(),
-            fileStats.at(it).get_wanted(),
-            static_cast<Torrent::File::Priority>(fileStats.at(it).get_priority())
-        );
+        session::Response response(std::move(session->sendRequest("torrent-get", jsonFileRequest.output())));
+
+        if (!response.error)
+        {
+            JsonFormat jsonFormat;
+            jsonFormat.fromJson(response.get_arguments());
+            sequential::from_format(jsonFormat, torrentResponse);
+            torrentFiles  = torrentResponse.get_torrents();
+            for (TorrentPrivate::Files &tf: torrentFiles)
+            {
+                const auto &files = tf.get_files();
+                const auto &fileStats = tf.get_fileStats();
+                const auto length = files.size();
+
+                for (std::size_t it = 0; it < length; ++it)
+                {
+                    result.emplace_back(
+                        files.at(it).get_name(),
+                        files.at(it).get_bytesCompleted(),
+                        files.at(it).get_length(),
+                        fileStats.at(it).get_wanted(),
+                        static_cast<Torrent::File::Priority>(fileStats.at(it).get_priority())
+                    );
+                }
+            }
+        }
+        else
+        {
+            error = std::move(response.error);
+        }
+    }
+    else
+    {
+        LOG_ERROR("Invalid session while requesting file list for id '{}'", this->id());
+        error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
     }
 
-    return std::move(result);
+    return std::move(
+        ReturnType<std::vector<Torrent::File>>(
+            std::move(error),
+            std::move(result)
+        )
+    );
 }
 
 int32_t Torrent::queuePosition() const

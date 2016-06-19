@@ -28,8 +28,6 @@ namespace librt
         ATTRIBUTE(std::string, downloadDir)
         ATTRIBUTE(std::int32_t, eta)
         ATTRIBUTE(std::int32_t, queuePosition)
-        ATTRIBUTE(std::vector<File>, files)
-        ATTRIBUTE(std::vector<FileStat>, fileStats)
         INIT_ATTRIBUTES(
                 id,
                 name,
@@ -43,25 +41,37 @@ namespace librt
                 totalSize,
                 downloadDir,
                 eta,
-                queuePosition,
-                files,
-                fileStats
+                queuePosition
         )
-
     public:
-        struct Request
+        struct Files
         {
-            ATTRIBUTE(std::vector<std::string>, fields)
-            ATTRIBUTE(std::vector<std::int32_t>, ids)
-            INIT_ATTRIBUTES(fields, ids)
+            ATTRIBUTE(std::vector<File>, files)
+            ATTRIBUTE(std::vector<FileStat>, fileStats)
+            INIT_ATTRIBUTES(files, fileStats)
 
-            Request()
+            struct Request
             {
-                sequential::attribute::set_value<Request::fields>(
-                            *this, std::move(::librt::TorrentPrivate::attribute_names()));
-            }
+                ATTRIBUTE(std::vector<std::string>, fields)
+                ATTRIBUTE(std::vector<std::int32_t>, ids)
+                INIT_ATTRIBUTES(fields, ids)
+
+                Request()
+                {
+                    sequential::attribute::set_value<Request::fields>(
+                        *this, std::move(::librt::TorrentPrivate::Files::attribute_names())
+                    );
+                }
+            };
+
+            struct Response
+            {
+                ATTRIBUTE(std::vector<TorrentPrivate::Files>, torrents)
+                INIT_ATTRIBUTES(torrents)
+            };
         };
 
+    public:
         struct Response
         {
             ATTRIBUTE(std::vector<TorrentPrivate>, torrents)
