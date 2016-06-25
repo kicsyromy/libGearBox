@@ -8,7 +8,7 @@ Error::Error() :
 {
 }
 
-Error::Error(Error::Code errorCode, std::__cxx11::string &&message) :
+Error::Error(Error::Code errorCode, std::string &&message) :
     errorCode_(errorCode),
     message_(message)
 {
