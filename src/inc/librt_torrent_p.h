@@ -75,7 +75,8 @@ namespace librt
         struct Response
         {
             ATTRIBUTE(std::vector<TorrentPrivate>, torrents)
-            INIT_ATTRIBUTES(torrents)
+            ATTRIBUTE(std::vector<std::int32_t>, removed)
+            INIT_ATTRIBUTES(torrents, removed)
         };
 
         struct MoveRequest

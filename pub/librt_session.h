@@ -58,6 +58,7 @@ namespace librt
         void setTimeout(int32_t value);
         ReturnType<Statistics> statistics() const;
         ReturnType<std::vector<librt::Torrent>> torrents() const;
+        ReturnType<std::vector<std::int32_t>> recentlyRemoved() const;
 
     public:
         std::string url() const;

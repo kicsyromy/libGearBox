@@ -7,7 +7,7 @@
     do { \
     std::string log = fmt::format(__VA_ARGS__); \
     fmt::print(stderr, \
-            "librt: INFO: {}: {}: {}: {}\n", \
+            "librt: INFO: {}: {}: {}:\n{}\n", \
             &__FILE__[strrchr(__FILE__, '/') - __FILE__ + 1], \
             __PRETTY_FUNCTION__, \
             __LINE__, \
@@ -20,7 +20,7 @@
     do { \
     std::string log = fmt::format(__VA_ARGS__); \
     fmt::print(stderr, \
-            "librt: WARNING: {}: {}: {}: {}\n", \
+            "librt: WARNING: {}: {}: {}:\n{}\n", \
             &__FILE__[strrchr(__FILE__, '/') - __FILE__ + 1], \
             __PRETTY_FUNCTION__, \
             __LINE__, \
@@ -31,7 +31,7 @@
     do { \
     std::string log = fmt::format(__VA_ARGS__); \
     fmt::print(stderr, \
-            "librt: ERROR: {}: {}: {}: {}\n", \
+            "librt: ERROR: {}: {}: {}:\n{}\n", \
             &__FILE__[strrchr(__FILE__, '/') - __FILE__ + 1], \
             __PRETTY_FUNCTION__, \
             __LINE__, \
@@ -42,7 +42,7 @@
     do { \
     std::string log = fmt::format(__VA_ARGS__); \
     fmt::print(stderr, \
-            "librt: FATAL: {}: {}: {}: {}\n", \
+            "librt: FATAL: {}: {}: {}:\n{}\n", \
             &__FILE__[strrchr(__FILE__, '/') - __FILE__ + 1], \
             __PRETTY_FUNCTION__, \
             __LINE__, \
@@ -55,7 +55,7 @@
     do { \
     std::string log = fmt::format(__VA_ARGS__); \
     fmt::print(stderr, \
-            "librt: DEBUG: {}: {}: {}: {}\n", \
+            "librt: DEBUG: {}: {}: {}:\n{}\n", \
             &__FILE__[strrchr(__FILE__, '/') - __FILE__ + 1], \
             __PRETTY_FUNCTION__, \
             __LINE__, \

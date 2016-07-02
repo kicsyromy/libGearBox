@@ -84,6 +84,7 @@ namespace librt
         Error queueMoveDown();
         Error queueMoveTop();
         Error queueMoveBottom();
+        Error update();
 
     public:
         std::int32_t id() const;

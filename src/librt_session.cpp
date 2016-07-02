@@ -158,9 +158,17 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
     }
 
     if (response.error)
-        LOG_ERROR("Error in request: {} {}",
+        LOG_ERROR("Error '{} {}' while issuing method call '{}' with arguments\n'{}'",
                   static_cast<int>(response.error.errorCode()),
-                  response.error.message());
+                  response.error.message(),
+                  method,
+                  arguments.dump(4));
+    else
+        LOG_DEBUG("Method call '{}' result '{}' for tag '{}':\n{}",
+                  method,
+                  response.get_result(),
+                  response.get_tag(),
+                  response.get_arguments().dump(4));
 
     return std::move(response);
 }
@@ -265,6 +273,33 @@ ReturnType<std::vector<Torrent>> Session::torrents() const
         ReturnType<std::vector<Torrent>>(
             std::move(response.error),
             std::move(retValue)
+        )
+    );
+}
+
+ReturnType<std::vector<std::int32_t>> Session::recentlyRemoved() const
+{
+    std::vector<std::int32_t> ids;
+    TorrentPrivate::Response torrentResponse;
+
+    const auto &fields = TorrentPrivate::attribute_names();
+    nlohmann::json requestValues;
+    requestValues["ids"] = "recently-active";
+    requestValues["fields"] = fields;
+    session::Response response(std::move(priv_->sendRequest("torrent-get", requestValues)));
+
+    if (!response.error)
+    {
+        JsonFormat jsonFormat;
+        jsonFormat.fromJson(response.get_arguments());
+        sequential::from_format(jsonFormat, torrentResponse);
+        ids = torrentResponse.get_removed();
+    }
+
+    return std::move(
+        ReturnType<std::vector<std::int32_t>>(
+            std::move(response.error),
+            std::move(ids)
         )
     );
 }

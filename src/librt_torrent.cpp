@@ -268,6 +268,43 @@ Error Torrent::queueMoveBottom()
     return error;
 }
 
+Error Torrent::update()
+{
+    nlohmann::json request;
+    request["ids"] = { this->id() };
+    request["fields"] = TorrentPrivate::attribute_names();
+
+    Error error;
+    if (auto session = priv_->session_.lock())
+    {
+        auto response = std::move(session->sendRequest("torrent-get", request));
+        error = std::move(response.error);
+        if (!error)
+        {
+            JsonFormat jsonFormat;
+            TorrentPrivate::Response torrentResponse;
+            std::vector<TorrentPrivate> torrents;
+
+            jsonFormat.fromJson(response.get_arguments());
+            sequential::from_format(jsonFormat, torrentResponse);
+            torrents = torrentResponse.get_torrents();
+            for (TorrentPrivate &torrentPriv: torrents)
+            {
+                auto torrent = std::make_shared<TorrentPrivate>(std::move(torrentPriv));
+                torrent->session_ = priv_->session_;
+                priv_ = torrent;
+            }
+        }
+    }
+    else
+    {
+        LOG_ERROR("Invalid session while requesting \"queue-move-bottom\" for id '{}'", this->id());
+        error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+    }
+
+    return error;
+}
+
 int32_t Torrent::id() const
 {
     return priv_->get_id();
