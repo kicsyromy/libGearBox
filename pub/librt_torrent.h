@@ -24,7 +24,8 @@ namespace librt
             DownloadWait   = 3,
             Download       = 4,
             SeedWait       = 5,
-            Seed           = 6
+            Seed           = 6,
+            Invalid        = 255
         };
 
         enum class MoveType
@@ -74,6 +75,9 @@ namespace librt
         bool operator  <(const Torrent &other) const;
 
     public:
+        bool valid() const;
+
+    public:
         Error start();
         Error startNow();
         Error stop();
@@ -108,6 +112,9 @@ namespace librt
 
     private:
         std::shared_ptr<TorrentPrivate> priv_;
+
+    private:
+        friend class Session;
     };
 }
 

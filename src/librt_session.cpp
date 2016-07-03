@@ -304,6 +304,49 @@ ReturnType<std::vector<std::int32_t>> Session::recentlyRemoved() const
     );
 }
 
+Error Session::updateTorrentStats(std::vector<librt::Torrent> &torrents)
+{
+    std::vector<std::int32_t> ids;
+    ids.reserve(torrents.size());
+    for (auto &t: torrents)
+        ids.push_back(t.id());
+
+    TorrentPrivate::Response torrentResponse;
+
+    const auto &fields = TorrentPrivate::attribute_names();
+    nlohmann::json requestValues;
+    requestValues["ids"] = ids;
+    requestValues["fields"] = fields;
+    session::Response response(std::move(priv_->sendRequest("torrent-get", requestValues)));
+
+    if (!response.error)
+    {
+        JsonFormat jsonFormat;
+        jsonFormat.fromJson(response.get_arguments());
+        sequential::from_format(jsonFormat, torrentResponse);
+
+        auto &updatedTorrents = torrentResponse.get_torrents();
+        for (auto &t: torrents)
+        {
+            bool found = false;
+            for (auto &torrentPriv: updatedTorrents)
+            {
+                if (torrentPriv.get_id() == t.id())
+                {
+                    auto torrent = new TorrentPrivate(std::move(torrentPriv));
+                    torrent->session_ = this->priv_;
+                    t.priv_.reset(torrent);
+                    break;
+                }
+            }
+            if (!found)
+                t.priv_.reset();
+        }
+    }
+
+    return std::move(response.error);
+}
+
 std::string Session::url() const
 {
     return priv_->url_;

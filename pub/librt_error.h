@@ -32,7 +32,8 @@ namespace librt
             TransmissionMethodNotAllowed,
             TransmissionUnknownError,
 
-            libRTInvalidSession
+            libRTInvalidSession,
+            libRTInvalidTorrent
         };
 
     public:

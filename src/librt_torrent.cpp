@@ -13,7 +13,8 @@ using namespace librt;
 
 namespace
 {
-    constexpr const char *INVALID_SESSION = "Invalid session";
+    constexpr const char *INVALID_SESSION { "Invalid session" };
+    constexpr const char *INVALID_TORRENT { "Invalid torrent" };
 }
 
 TorrentPrivate::TorrentPrivate() :
@@ -67,21 +68,35 @@ bool Torrent::operator <(const Torrent &other) const
     return (priv_->get_queuePosition() < other.priv_->get_queuePosition());
 }
 
+bool Torrent::valid() const
+{
+    return (priv_.get() != nullptr);
+}
+
 Error Torrent::start()
 {
-    nlohmann::json request;
-    request["ids"] = { this->id() };
-
     Error error;
-    if (auto session = priv_->session_.lock())
+
+    if (valid())
     {
-        auto response = std::move(session->sendRequest("torrent-start", request));
-        error = std::move(response.error);
+        nlohmann::json request;
+        request["ids"] = { this->id() };
+
+        if (auto session = priv_->session_.lock())
+        {
+            auto response = std::move(session->sendRequest("torrent-start", request));
+            error = std::move(response.error);
+        }
+        else
+        {
+            LOG_ERROR("Invalid session while requesting \"torrent-start\" for id '{}'", this->id());
+            error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        }
     }
     else
     {
-        LOG_ERROR("Invalid session while requesting \"torrent-start\" for id '{}'", this->id());
-        error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        LOG_ERROR("Invalid torrent while requesting \"torrent-start\"");
+        error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
     }
 
     return error;
@@ -89,19 +104,28 @@ Error Torrent::start()
 
 Error Torrent::startNow()
 {
-    nlohmann::json request;
-    request["ids"] = { this->id() };
-
     Error error;
-    if (auto session = priv_->session_.lock())
+
+    if (valid())
     {
-        auto response = std::move(session->sendRequest("torrent-start-now", request));
-        error = std::move(response.error);
+        nlohmann::json request;
+        request["ids"] = { this->id() };
+
+        if (auto session = priv_->session_.lock())
+        {
+            auto response = std::move(session->sendRequest("torrent-start-now", request));
+            error = std::move(response.error);
+        }
+        else
+        {
+            LOG_ERROR("Invalid session while requesting \"torrent-start-now\" for id '{}'", this->id());
+            error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        }
     }
     else
     {
-        LOG_ERROR("Invalid session while requesting \"torrent-start-now\" for id '{}'", this->id());
-        error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        LOG_ERROR("Invalid torrent while requesting \"torrent-start-now\"");
+        error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
     }
 
     return error;
@@ -109,19 +133,28 @@ Error Torrent::startNow()
 
 Error Torrent::stop()
 {
-    nlohmann::json request;
-    request["ids"] = { this->id() };
-
     Error error;
-    if (auto session = priv_->session_.lock())
+
+    if (valid())
     {
-        auto response = std::move(session->sendRequest("torrent-stop", request));
-        error = std::move(response.error);
+        nlohmann::json request;
+        request["ids"] = { this->id() };
+
+        if (auto session = priv_->session_.lock())
+        {
+            auto response = std::move(session->sendRequest("torrent-stop", request));
+            error = std::move(response.error);
+        }
+        else
+        {
+            LOG_ERROR("Invalid session while requesting \"torrent-stop\" for id '{}'", this->id());
+            error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        }
     }
     else
     {
-        LOG_ERROR("Invalid session while requesting \"torrent-stop\" for id '{}'", this->id());
-        error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        LOG_ERROR("Invalid torrent while requesting \"torrent-stop\"");
+        error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
     }
 
     return error;
@@ -129,19 +162,28 @@ Error Torrent::stop()
 
 Error Torrent::verify()
 {
-    nlohmann::json request;
-    request["ids"] = { this->id() };
-
     Error error;
-    if (auto session = priv_->session_.lock())
+
+    if (valid())
     {
-        auto response = std::move(session->sendRequest("torrent-verify", request));
-        error = std::move(response.error);
+        nlohmann::json request;
+        request["ids"] = { this->id() };
+
+        if (auto session = priv_->session_.lock())
+        {
+            auto response = std::move(session->sendRequest("torrent-verify", request));
+            error = std::move(response.error);
+        }
+        else
+        {
+            LOG_ERROR("Invalid session while requesting \"torrent-verify\" for id '{}'", this->id());
+            error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        }
     }
     else
     {
-        LOG_ERROR("Invalid session while requesting \"torrent-verify\" for id '{}'", this->id());
-        error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        LOG_ERROR("Invalid torrent while requesting \"torrent-verify\"");
+        error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
     }
 
     return error;
@@ -149,19 +191,28 @@ Error Torrent::verify()
 
 Error Torrent::askForMorePeers()
 {
-    nlohmann::json request;
-    request["ids"] = { this->id() };
-
     Error error;
-    if (auto session = priv_->session_.lock())
+
+    if (valid())
     {
-        auto response = std::move(session->sendRequest("torrent-reannounce", request));
-        error = std::move(response.error);
+        nlohmann::json request;
+        request["ids"] = { this->id() };
+
+        if (auto session = priv_->session_.lock())
+        {
+            auto response = std::move(session->sendRequest("torrent-reannounce", request));
+            error = std::move(response.error);
+        }
+        else
+        {
+            LOG_ERROR("Invalid session while requesting \"torrent-reannounce\" for id '{}'", this->id());
+            error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        }
     }
     else
     {
-        LOG_ERROR("Invalid session while requesting \"torrent-reannounce\" for id '{}'", this->id());
-        error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        LOG_ERROR("Invalid torrent while requesting \"torrent-reannounce\"");
+        error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
     }
 
     return error;
@@ -169,20 +220,29 @@ Error Torrent::askForMorePeers()
 
 Error Torrent::remove(LocalDataAction action)
 {
-    nlohmann::json request;
-    request["ids"] = { this->id() };
-    request["delete-local-data"] = (action == LocalDataAction::DeleteFiles);
-
     Error error;
-    if (auto session = priv_->session_.lock())
+
+    if (valid())
     {
-        auto response = std::move(session->sendRequest("torrent-remove", request));
-        error = std::move(response.error);
+        nlohmann::json request;
+        request["ids"] = { this->id() };
+        request["delete-local-data"] = (action == LocalDataAction::DeleteFiles);
+
+        if (auto session = priv_->session_.lock())
+        {
+            auto response = std::move(session->sendRequest("torrent-remove", request));
+            error = std::move(response.error);
+        }
+        else
+        {
+            LOG_ERROR("Invalid session while requesting \"torrent-remove\" for id '{}'", this->id());
+            error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        }
     }
     else
     {
-        LOG_ERROR("Invalid session while requesting \"torrent-remove\" for id '{}'", this->id());
-        error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        LOG_ERROR("Invalid torrent while requesting \"torrent-remove\"");
+        error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
     }
 
     return error;
@@ -190,19 +250,28 @@ Error Torrent::remove(LocalDataAction action)
 
 Error Torrent::queueMoveUp()
 {
-    nlohmann::json request;
-    request["ids"] = { this->id() };
-
     Error error;
-    if (auto session = priv_->session_.lock())
+
+    if (valid())
     {
-        auto response =std::move(session->sendRequest("queue-move-up", request));
-        error = std::move(response.error);
+        nlohmann::json request;
+        request["ids"] = { this->id() };
+
+        if (auto session = priv_->session_.lock())
+        {
+            auto response =std::move(session->sendRequest("queue-move-up", request));
+            error = std::move(response.error);
+        }
+        else
+        {
+            LOG_ERROR("Invalid session while requesting \"queue-move-up\" for id '{}'", this->id());
+            error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        }
     }
     else
     {
-        LOG_ERROR("Invalid session while requesting \"queue-move-up\" for id '{}'", this->id());
-        error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        LOG_ERROR("Invalid torrent while requesting \"queue-move-up\"");
+        error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
     }
 
     return error;
@@ -210,19 +279,28 @@ Error Torrent::queueMoveUp()
 
 Error Torrent::queueMoveDown()
 {
-    nlohmann::json request;
-    request["ids"] = { this->id() };
-
     Error error;
-    if (auto session = priv_->session_.lock())
+
+    if (valid())
     {
-        auto response = std::move(session->sendRequest("queue-move-down", request));
-        error = std::move(response.error);
+        nlohmann::json request;
+        request["ids"] = { this->id() };
+
+        if (auto session = priv_->session_.lock())
+        {
+            auto response = std::move(session->sendRequest("queue-move-down", request));
+            error = std::move(response.error);
+        }
+        else
+        {
+            LOG_ERROR("Invalid session while requesting \"queue-move-down\" for id '{}'", this->id());
+            error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        }
     }
     else
     {
-        LOG_ERROR("Invalid session while requesting \"queue-move-down\" for id '{}'", this->id());
-        error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        LOG_ERROR("Invalid torrent while requesting \"queue-move-down\"");
+        error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
     }
 
     return error;
@@ -230,19 +308,28 @@ Error Torrent::queueMoveDown()
 
 Error Torrent::queueMoveTop()
 {
-    nlohmann::json request;
-    request["ids"] = { this->id() };
-
     Error error;
-    if (auto session = priv_->session_.lock())
+
+    if (valid())
     {
-        auto response = std::move(session->sendRequest("queue-move-top", request));
-        error = std::move(response.error);
+        nlohmann::json request;
+        request["ids"] = { this->id() };
+
+        if (auto session = priv_->session_.lock())
+        {
+            auto response = std::move(session->sendRequest("queue-move-top", request));
+            error = std::move(response.error);
+        }
+        else
+        {
+            LOG_ERROR("Invalid session while requesting \"queue-move-top\" for id '{}'", this->id());
+            error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        }
     }
     else
     {
-        LOG_ERROR("Invalid session while requesting \"queue-move-top\" for id '{}'", this->id());
-        error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        LOG_ERROR("Invalid torrent while requesting \"queue-move-top\"");
+        error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
     }
 
     return error;
@@ -250,19 +337,28 @@ Error Torrent::queueMoveTop()
 
 Error Torrent::queueMoveBottom()
 {
-    nlohmann::json request;
-    request["ids"] = { this->id() };
-
     Error error;
-    if (auto session = priv_->session_.lock())
+
+    if (valid())
     {
-        auto response = std::move(session->sendRequest("queue-move-bottom", request));
-        error = std::move(response.error);
+        nlohmann::json request;
+        request["ids"] = { this->id() };
+
+        if (auto session = priv_->session_.lock())
+        {
+            auto response = std::move(session->sendRequest("queue-move-bottom", request));
+            error = std::move(response.error);
+        }
+        else
+        {
+            LOG_ERROR("Invalid session while requesting \"queue-move-bottom\" for id '{}'", this->id());
+            error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        }
     }
     else
     {
-        LOG_ERROR("Invalid session while requesting \"queue-move-bottom\" for id '{}'", this->id());
-        error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        LOG_ERROR("Invalid torrent while requesting \"queue-move-top\"");
+        error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
     }
 
     return error;
@@ -270,36 +366,45 @@ Error Torrent::queueMoveBottom()
 
 Error Torrent::update()
 {
-    nlohmann::json request;
-    request["ids"] = { this->id() };
-    request["fields"] = TorrentPrivate::attribute_names();
-
     Error error;
-    if (auto session = priv_->session_.lock())
-    {
-        auto response = std::move(session->sendRequest("torrent-get", request));
-        error = std::move(response.error);
-        if (!error)
-        {
-            JsonFormat jsonFormat;
-            TorrentPrivate::Response torrentResponse;
-            std::vector<TorrentPrivate> torrents;
 
-            jsonFormat.fromJson(response.get_arguments());
-            sequential::from_format(jsonFormat, torrentResponse);
-            torrents = torrentResponse.get_torrents();
-            for (TorrentPrivate &torrentPriv: torrents)
+    if (valid())
+    {
+        nlohmann::json request;
+        request["ids"] = { this->id() };
+        request["fields"] = TorrentPrivate::attribute_names();
+
+        if (auto session = priv_->session_.lock())
+        {
+            auto response = std::move(session->sendRequest("torrent-get", request));
+            error = std::move(response.error);
+            if (!error)
             {
-                auto torrent = std::make_shared<TorrentPrivate>(std::move(torrentPriv));
-                torrent->session_ = priv_->session_;
-                priv_ = torrent;
+                JsonFormat jsonFormat;
+                TorrentPrivate::Response torrentResponse;
+                std::vector<TorrentPrivate> torrents;
+
+                jsonFormat.fromJson(response.get_arguments());
+                sequential::from_format(jsonFormat, torrentResponse);
+                torrents = torrentResponse.get_torrents();
+                for (TorrentPrivate &torrentPriv: torrents)
+                {
+                    auto torrent = std::make_shared<TorrentPrivate>(std::move(torrentPriv));
+                    torrent->session_ = priv_->session_;
+                    priv_ = torrent;
+                }
             }
+        }
+        else
+        {
+            LOG_ERROR("Invalid session while requesting update for id '{}'", this->id());
+            error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
         }
     }
     else
     {
-        LOG_ERROR("Invalid session while requesting \"queue-move-bottom\" for id '{}'", this->id());
-        error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        LOG_ERROR("Invalid torrent while requesting update");
+        error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
     }
 
     return error;
@@ -307,108 +412,117 @@ Error Torrent::update()
 
 int32_t Torrent::id() const
 {
-    return priv_->get_id();
+    return valid() ? priv_->get_id() : -1;
 }
 
 std::string Torrent::name() const
 {
-    return priv_->get_name();
+    return valid() ? priv_->get_name() : "";
 }
 
 uint64_t Torrent::bytesDownloaded() const
 {
-    return priv_->get_haveValid();
+    return valid() ? priv_->get_haveValid() : 0;
 }
 
 double Torrent::percentDone() const
 {
-    return priv_->get_percentDone();
+    return valid() ? priv_->get_percentDone() : 0;
 }
 
 double Torrent::uploadRatio() const
 {
-    return priv_->get_uploadRatio();
+    return valid() ? priv_->get_uploadRatio() : 0;
 }
 
 std::uint64_t Torrent::bytesUploaded() const
 {
-    return priv_->get_uploadedEver();
+    return valid() ? priv_->get_uploadedEver() : 0;
 }
 
 uint64_t Torrent::downloadSpeed() const
 {
-    return priv_->get_rateDownload();
+    return valid() ? priv_->get_rateDownload() : 0;
 }
 
 uint64_t Torrent::uploadSpeed() const
 {
-    return priv_->get_rateUpload();
+    return valid() ? priv_->get_rateUpload() : 0;
 }
 
 Torrent::Status Torrent::status() const
 {
-    return static_cast<Torrent::Status>(priv_->get_status());
+    return valid() ? static_cast<Torrent::Status>(priv_->get_status()) : Torrent::Status::Invalid;
 }
 
 uint64_t Torrent::size() const
 {
-    return priv_->get_totalSize();
+    return valid() ? priv_->get_totalSize() : 0;
 }
 
 int32_t Torrent::eta() const
 {
-    return priv_->get_eta();
+    return valid() ? priv_->get_eta() : 0;
 }
 
 ReturnType<std::vector<Torrent::File>> Torrent::files() const
 {
     std::vector<Torrent::File> result;
-    std::vector<TorrentPrivate::Files> torrentFiles;
-    TorrentPrivate::Files::Response torrentResponse;
-
-    TorrentPrivate::Files::Request fileRequest;
-    fileRequest.set_ids({this->id()});
-    JsonFormat jsonFileRequest;
-    sequential::to_format(jsonFileRequest, fileRequest);
-
     Error error;
-    if (auto session = priv_->session_.lock())
+
+    if (valid())
     {
-        session::Response response(std::move(session->sendRequest("torrent-get", jsonFileRequest.output())));
+        std::vector<TorrentPrivate::Files> torrentFiles;
+        TorrentPrivate::Files::Response torrentResponse;
 
-        if (!response.error)
+        TorrentPrivate::Files::Request fileRequest;
+        fileRequest.set_ids({this->id()});
+        JsonFormat jsonFileRequest;
+        sequential::to_format(jsonFileRequest, fileRequest);
+
+        if (auto session = priv_->session_.lock())
         {
-            JsonFormat jsonFormat;
-            jsonFormat.fromJson(response.get_arguments());
-            sequential::from_format(jsonFormat, torrentResponse);
-            torrentFiles  = torrentResponse.get_torrents();
-            for (TorrentPrivate::Files &tf: torrentFiles)
-            {
-                const auto &files = tf.get_files();
-                const auto &fileStats = tf.get_fileStats();
-                const auto length = files.size();
+            session::Response response(std::move(session->sendRequest("torrent-get", jsonFileRequest.output())));
 
-                for (std::size_t it = 0; it < length; ++it)
+            if (!response.error)
+            {
+                JsonFormat jsonFormat;
+                jsonFormat.fromJson(response.get_arguments());
+                sequential::from_format(jsonFormat, torrentResponse);
+                torrentFiles  = torrentResponse.get_torrents();
+                for (TorrentPrivate::Files &tf: torrentFiles)
                 {
-                    result.emplace_back(
-                        files.at(it).get_name(),
-                        files.at(it).get_bytesCompleted(),
-                        files.at(it).get_length(),
-                        fileStats.at(it).get_wanted(),
-                        static_cast<Torrent::File::Priority>(fileStats.at(it).get_priority())
-                    );
+                    const auto &files = tf.get_files();
+                    const auto &fileStats = tf.get_fileStats();
+                    const auto length = files.size();
+
+                    for (std::size_t it = 0; it < length; ++it)
+                    {
+                        result.emplace_back(
+                            files.at(it).get_name(),
+                            files.at(it).get_bytesCompleted(),
+                            files.at(it).get_length(),
+                            fileStats.at(it).get_wanted(),
+                            static_cast<Torrent::File::Priority>(fileStats.at(it).get_priority())
+                        );
+                    }
                 }
+            }
+            else
+            {
+                error = std::move(response.error);
             }
         }
         else
         {
-            error = std::move(response.error);
+            LOG_ERROR("Invalid session while requesting file list for id '{}'", this->id());
+            error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
         }
     }
     else
     {
-        LOG_ERROR("Invalid session while requesting file list for id '{}'", this->id());
-        error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        LOG_ERROR("Invalid torrent while requesting file list");
+        error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
     }
 
     return std::move(
@@ -421,25 +535,34 @@ ReturnType<std::vector<Torrent::File>> Torrent::files() const
 
 int32_t Torrent::queuePosition() const
 {
-    return priv_->get_queuePosition();
+    return valid() ? priv_->get_queuePosition() : -1;
 }
 
 Error Torrent::setQueuePosition(int32_t position)
 {
-    nlohmann::json request;
-    request["ids"] = { this->id() };
-    request["queuePosition"] = position;
-
     Error error;
-    if (auto session = priv_->session_.lock())
+
+    if (valid())
     {
-        auto response = std::move(session->sendRequest("torrent-set", request));
-        error = std::move(response.error);
+        nlohmann::json request;
+        request["ids"] = { this->id() };
+        request["queuePosition"] = position;
+
+        if (auto session = priv_->session_.lock())
+        {
+            auto response = std::move(session->sendRequest("torrent-set", request));
+            error = std::move(response.error);
+        }
+        else
+        {
+            LOG_ERROR("Invalid session while requesting \"torrent-set\" for id '{}'", this->id());
+            error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        }
     }
     else
     {
-        LOG_ERROR("Invalid session while requesting \"torrent-set\" for id '{}'", this->id());
-        error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        LOG_ERROR("Invalid torrent while requesting \"torrent-set\" with queue-position '{}'", position);
+        error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
     }
 
     return error;
@@ -447,28 +570,37 @@ Error Torrent::setQueuePosition(int32_t position)
 
 std::string Torrent::downloadDir() const
 {
-    return priv_->get_downloadDir();
+    return valid() ? priv_->get_downloadDir() : "";
 }
 
 Error Torrent::setDownloadDir(const std::string &path, MoveType move)
 {
-    JsonFormat jsonFormat;
-    TorrentPrivate::MoveRequest moveRequest;
-    moveRequest.set_ids({this->id()});
-    moveRequest.set_location(path);
-    moveRequest.set_move((move == Torrent::MoveType::MoveToNewLocation) ? true : false);
-    sequential::to_format(jsonFormat, moveRequest);
-
     Error error;
-    if (auto session = priv_->session_.lock())
+
+    if (valid())
     {
-        auto response = std::move(session->sendRequest("torrent-set-location", jsonFormat.output()));
-        error = std::move(response.error);
+        JsonFormat jsonFormat;
+        TorrentPrivate::MoveRequest moveRequest;
+        moveRequest.set_ids({this->id()});
+        moveRequest.set_location(path);
+        moveRequest.set_move((move == Torrent::MoveType::MoveToNewLocation) ? true : false);
+        sequential::to_format(jsonFormat, moveRequest);
+
+        if (auto session = priv_->session_.lock())
+        {
+            auto response = std::move(session->sendRequest("torrent-set-location", jsonFormat.output()));
+            error = std::move(response.error);
+        }
+        else
+        {
+            LOG_ERROR("Invalid session while requesting \"torrent-set-location\" for id '{}'", this->id());
+            error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        }
     }
     else
     {
-        LOG_ERROR("Invalid session while requesting \"torrent-set-location\" for id '{}'", this->id());
-        error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        LOG_ERROR("Invalid torrent while requesting \"torrent-set-location\" to '{}'", path);
+        error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
     }
 
     return error;
