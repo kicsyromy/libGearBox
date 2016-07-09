@@ -7,7 +7,7 @@
 namespace librt
 {
     template <typename T>
-    struct LIBRT_API ReturnType
+    struct ReturnType
     {
         ReturnType(Error &&error, T &&value) :
             error(std::move(error)),

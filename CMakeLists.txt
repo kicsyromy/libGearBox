@@ -2,20 +2,6 @@ cmake_minimum_required(VERSION 2.8.12)
 project(librt)
 add_definitions(-DRT_LIB)
 
-# Make sure compiler support C++14 standard
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
-CHECK_CXX_COMPILER_FLAG("-std=c++1y" COMPILER_SUPPORTS_CXX1Y)
-if(COMPILER_SUPPORTS_CXX14)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-elseif(COMPILER_SUPPORTS_CXX1Y)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
-else()
-    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++14 support. Please use a different C++ compiler.")
-endif()
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-
 # Version number
 set(librt_VERSION_MAJOR 0)
 set(librt_VERSION_MINOR 0)
@@ -26,6 +12,7 @@ set(librt_PUBLIC_HEADERS  "${PROJECT_SOURCE_DIR}/pub")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DDEBUG_BUILD)
+    message(STATUS "-- Building with debug informaton and logging")
 endif()
 
 # Hack for Qt Creator to show the headers in the project file tree
@@ -38,8 +25,28 @@ add_custom_target(json_headers SOURCES ${JSON_HEADERS})
 FILE(GLOB_RECURSE SEQ_HEADERS "${PROJECT_SOURCE_DIR}/3rdparty/sequential/*.h")
 add_custom_target(seq_headers SOURCES ${SEQ_HEADERS})
 
-# Add CURL Requests dependency
-find_package(CURL)
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(CURL_INCLUDE_DIRS 3rdparty/curl/include)
+	set(CURL_LIBRARIES    "${PROJECT_SOURCE_DIR}/3rdparty/curl/lib/libcurl.lib" "${PROJECT_SOURCE_DIR}/3rdparty/curl/lib/libssh2.lib")
+else()
+    # Make sure compiler support C++14 standard
+    include(CheckCXXCompilerFlag)
+    CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
+    CHECK_CXX_COMPILER_FLAG("-std=c++1y" COMPILER_SUPPORTS_CXX1Y)
+    if(COMPILER_SUPPORTS_CXX14)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+    elseif(COMPILER_SUPPORTS_CXX1Y)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
+    else()
+        message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++14 support. Please use a different C++ compiler.")
+    endif()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+
+	# Search for CURL in system paths
+    find_package(CURL)
+endif()
+
+# Add CURL dependency
 include_directories("${CURL_INCLUDE_DIRS}")
 
 # Add C++ Format dependency
@@ -62,10 +69,10 @@ aux_source_directory(${PROJECT_SOURCE_DIR}/src LIBRT_SOURCES)
 # Specify the target
 if (BUILD_SHARED STREQUAL "YES")
     add_library(rt SHARED ${LIBRT_SOURCES} ${FMT_SOURCE})
-    message("-- Building shared library")
+    message(STATUS "-- Building shared library")
 else()
     add_library(rt STATIC ${LIBRT_SOURCES} ${FMT_SOURCE})
-    message("-- Building static library")
+    message(STATUS "-- Building static library")
 endif()
 # Se the apropriate compiler flags based on output from pkg-config
 target_link_libraries(rt ${CURL_LIBRARIES})

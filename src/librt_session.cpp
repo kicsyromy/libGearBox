@@ -259,7 +259,7 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
         {
             response.error = std::make_pair(
                         Error::Code::TransmissionMethodNotAllowed,
-                        std::move("Method not allowed")
+				        std::move(std::string{ "Method not allowed" })
                     );
             break;
         }
@@ -279,7 +279,7 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
         }
         else
         {
-            response.error = std::make_pair(Error::Code::TransmissionUnknownError, std::move("Unknown error"));
+			response.error = std::make_pair(Error::Code::TransmissionUnknownError, std::move(std::string{ "Unknown error" }));
             break;
         }
     }
@@ -313,6 +313,8 @@ Session::Session(Session &&other) :
 Session &Session::operator =(Session &&other)
 {
     priv_= std::move(other.priv_);
+
+	return *this;
 }
 
 Session::Session(const std::string &url,

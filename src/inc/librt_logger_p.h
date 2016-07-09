@@ -3,6 +3,10 @@
 
 #include <fmt/format.h>
 
+#ifndef __PRETTY_FUNCTION__
+#define __PRETTY_FUNCTION__ __FUNCTION__
+#endif
+
 #define LOG(...) \
     do { \
     std::string log = fmt::format(__VA_ARGS__); \
