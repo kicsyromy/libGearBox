@@ -1,10 +1,11 @@
 #include "librt_session.h"
 
 #include <string>
-#include "utility"
+#include <utility>
+
+#include <curl/curl.h>
 
 #include <formats/json_format.h>
-#include <cpr/cpr.h>
 #include <fmt/format.h>
 
 #include "librt_session_p.h"
@@ -42,6 +43,97 @@ namespace
 
         return std::move(sessionId);
     }
+
+    struct cURL
+    {
+        cURL()
+        {
+            curl_global_init(CURL_GLOBAL_ALL);
+            handle = curl_easy_init();
+            curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, &writeFunction);
+        }
+        ~cURL()
+        {
+            if (handle != nullptr) curl_easy_cleanup(handle);
+            curl_global_cleanup();
+        }
+
+        static librt::Error::Code errorCode(std::int32_t curlCode)
+        {
+            using librt::Error;
+            switch (curlCode) {
+                case CURLE_OK:
+                    return Error::Code::Ok;
+                case CURLE_UNSUPPORTED_PROTOCOL:
+                    return Error::Code::RequestUnsupportedProtocol;
+                case CURLE_URL_MALFORMAT:
+                    return Error::Code::RequestInvalidURLFormat;
+                case CURLE_COULDNT_RESOLVE_PROXY:
+                    return Error::Code::RequestProxyResolutionFailure;
+                case CURLE_COULDNT_RESOLVE_HOST:
+                    return Error::Code::RequestHostResolutionFailure;
+                case CURLE_COULDNT_CONNECT:
+                    return Error::Code::RequestConnectionFailure;
+                case CURLE_OPERATION_TIMEDOUT:
+                    return Error::Code::RequestOperationTimedout;
+                case CURLE_SSL_CONNECT_ERROR:
+                    return Error::Code::RequestSSLConnectError;
+                case CURLE_PEER_FAILED_VERIFICATION:
+                    return Error::Code::RequestSSLRemoteCertificateError;
+                case CURLE_GOT_NOTHING:
+                    return Error::Code::RequestEmptyResponse;
+                case CURLE_SSL_ENGINE_NOTFOUND:
+                    return Error::Code::RequestGenericSSLError;
+                case CURLE_SSL_ENGINE_SETFAILED:
+                    return Error::Code::RequestGenericSSLError;
+                case CURLE_SEND_ERROR:
+                    return Error::Code::RequestNetworkSendFailure;
+                case CURLE_RECV_ERROR:
+                    return Error::Code::RequestNetworkReceiveError;
+                case CURLE_SSL_CERTPROBLEM:
+                    return Error::Code::RequestSSLLocalCertificateError;
+                case CURLE_SSL_CIPHER:
+                    return Error::Code::RequestGenericSSLError;
+                case CURLE_SSL_CACERT:
+                    return Error::Code::RequestSSLCacertError;
+                case CURLE_USE_SSL_FAILED:
+                    return Error::Code::RequestGenericSSLError;
+                case CURLE_SSL_ENGINE_INITFAILED:
+                    return Error::Code::RequestGenericSSLError;
+                case CURLE_SSL_CACERT_BADFILE:
+                    return Error::Code::RequestSSLCacertError;
+                case CURLE_SSL_SHUTDOWN_FAILED:
+                    return Error::Code::RequestGenericSSLError;
+                case CURLE_SSL_CRL_BADFILE:
+                    return Error::Code::RequestSSLCacertError;
+                case CURLE_SSL_ISSUER_ERROR:
+                    return Error::Code::RequestSSLCacertError;
+                case CURLE_TOO_MANY_REDIRECTS:
+                    return Error::Code::Ok;
+                default:
+                    return Error::Code::RequestInternalError;
+            }
+        }
+
+        inline operator CURL *() { return handle; }
+
+        struct Result
+        {
+            std::int32_t status;
+            std::string text;
+            double elapsed;
+            librt::Error error;
+        };
+
+        static size_t writeFunction(void *ptr, size_t size, size_t nmemb, std::string *data)
+        {
+            data->append((char *)ptr, size * nmemb);
+            return size * nmemb;
+        }
+
+    private:
+        CURL *handle= nullptr;
+    };
 }
 
 SessionPrivate::SessionPrivate(const std::string &url,
@@ -96,39 +188,74 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
     /* X-Transmission-Session-Id and to resend the previous request.            */
     for (std::uint8_t it = 0; it < RETRY_COUNT; ++it)
     {
-        cpr::Response result;
+        cURL curl;
+        curl_easy_setopt(curl,
+                         CURLOPT_URL,
+                         fmt::format("{}{}{}{}", url_, path_, port_ > 0 ? ":", fmt::format("{}", port_) : "", "").c_str());
+
+        auto sessionIdHeader = curl_slist_append(nullptr, fmt::format("X-Transmission-Session-Id: {}", sessionId).c_str());
+        curl_easy_setopt(curl,
+                         CURLOPT_HTTPHEADER,
+                         sessionIdHeader);
+
+        curl_easy_setopt(curl,
+                         CURLOPT_TIMEOUT_MS,
+                         timeout_);
+
+        auto postData = jsonFormat.output().dump();
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, postData.size());
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postData.c_str());
+
         if (authenticationRequired_)
         {
-            result = cpr::Post(fmt::format("{}{}{}{}", url_, path_, port_ > 0 ? ":", fmt::format("{}", port_) : "", ""),
-                               cpr::Authentication{username_, password_},
-                               cpr::Header{{"X-Transmission-Session-Id", sessionId}},
-                               cpr::Timeout{timeout_},
-                               cpr::Body(jsonFormat.output().dump()));
+            curl_easy_setopt(curl,
+                             CURLOPT_USERPWD,
+                             fmt::format("{}:{}", username_, password_).c_str());
         }
-        else
+
+        if (ignoreSSLErrors_)
         {
-            result = cpr::Post(fmt::format("{}{}{}{}", url_, path_, port_ > 0 ? ":", fmt::format("{}", port_) : "", ""),
-                               cpr::Header{{"X-Transmission-Session-Id", sessionId}},
-                               cpr::Timeout{timeout_},
-                               cpr::Body(jsonFormat.output().dump()));
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
         }
+
+        std::string response_text;
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_text);
+
+        auto errCode = curl_easy_perform(curl);
+
+        long response_code;
+        double elapsed;
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+        curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &elapsed);
+
+        if (response_text.back() == '\n')
+        {
+            response_text = response_text.substr(0, response_text.length() - 1);
+        }
+
+        cURL::Result result {
+            static_cast<std::int32_t>(response_code),
+            response_text,
+            elapsed,
+            { cURL::errorCode(errCode), { curl_easy_strerror(errCode) } }
+        };
+
+        curl_slist_free_all(sessionIdHeader);
 
         if (result.error)
         {
-            response.error = std::make_pair(
-                        static_cast<Error::Code>(result.error.code),
-                        std::move(result.error.message)
-                    );
+            response.error = std::move(result.error);
             break;
         }
 
-        if (result.status_code == STATUS_RETRY)
+        if (result.status == STATUS_RETRY)
         {
             sessionId = getSessionId(result.text);
             continue;
         }
 
-        if (result.status_code == STATUS_METHOD_NOT_ALLOWED)
+        if (result.status == STATUS_METHOD_NOT_ALLOWED)
         {
             response.error = std::make_pair(
                         Error::Code::TransmissionMethodNotAllowed,
@@ -137,7 +264,7 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
             break;
         }
 
-        if (result.status_code == STATUS_OK)
+        if (result.status == STATUS_OK)
         {
             jsonFormat.parse(result.text);
             sequential::from_format(jsonFormat, response);
@@ -216,6 +343,11 @@ std::int32_t Session::timeout() const
 void Session::setTimeout(std::int32_t value)
 {
     priv_->timeout_ = value;
+}
+
+void Session::setSSLErrorHandling(Session::SSLErrorHandling value)
+{
+    priv_->ignoreSSLErrors_ = (value == Session::SSLErrorHandling::Ignore);
 }
 
 ReturnType<Session::Statistics> Session::statistics() const

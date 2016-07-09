@@ -25,6 +25,12 @@ namespace librt
             None
         };
 
+        enum class SSLErrorHandling
+        {
+            Acknowledge,
+            Ignore
+        };
+
         struct Statistics
         {
             std::int32_t totalTorrentCount;
@@ -56,6 +62,7 @@ namespace librt
     public:
         std::int32_t timeout() const;
         void setTimeout(int32_t value);
+        void setSSLErrorHandling(SSLErrorHandling value);
         ReturnType<Statistics> statistics() const;
         ReturnType<std::vector<librt::Torrent>> torrents() const;
         ReturnType<std::vector<std::int32_t>> recentlyRemoved() const;

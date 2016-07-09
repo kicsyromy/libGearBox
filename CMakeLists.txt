@@ -33,18 +33,12 @@ FILE(GLOB_RECURSE PRIVATE_HEADERS "${librt_PRIVATE_HEADERS}/*.h")
 add_custom_target(private_headers SOURCES ${PRIVATE_HEADERS})
 FILE(GLOB_RECURSE PUBLIC_HEADERS "${librt_PUBLIC_HEADERS}/*.h")
 add_custom_target(public_headers SOURCES ${PUBLIC_HEADERS})
-FILE(GLOB_RECURSE CPR_HEADERS "${PROJECT_SOURCE_DIR}/3rdparty/cpr/include/cpr/*.h")
-add_custom_target(cpr_headers SOURCES ${CPR_HEADERS})
 FILE(GLOB_RECURSE JSON_HEADERS "${PROJECT_SOURCE_DIR}/3rdparty/json/src/*.hpp")
 add_custom_target(json_headers SOURCES ${JSON_HEADERS})
 FILE(GLOB_RECURSE SEQ_HEADERS "${PROJECT_SOURCE_DIR}/3rdparty/sequential/*.h")
 add_custom_target(seq_headers SOURCES ${SEQ_HEADERS})
 
-# Add C++ Requests dependency
-add_definitions(-DINSECURE_CURL)
-include_directories("${PROJECT_SOURCE_DIR}/3rdparty/cpr/include")
-include_directories("${PROJECT_SOURCE_DIR}/3rdparty/cpr/include/cpr")
-aux_source_directory(${PROJECT_SOURCE_DIR}/3rdparty/cpr/cpr CPR_SOURCES)
+# Add CURL Requests dependency
 find_package(CURL)
 include_directories("${CURL_INCLUDE_DIRS}")
 
@@ -66,13 +60,17 @@ include_directories("${PROJECT_SOURCE_DIR}/pub")
 aux_source_directory(${PROJECT_SOURCE_DIR}/src LIBRT_SOURCES)
 
 # Specify the target
-add_library(rt STATIC ${LIBRT_SOURCES} ${FMT_SOURCE} ${CPR_SOURCES})
-
-# Create aditional files with versioning
-set_target_properties(rt PROPERTIES VERSION ${librt_VERSION_MAJOR}.${librt_VERSION_MINOR}.${librt_VERSION_PATCH} SOVERSION ${librt_VERSION_MAJOR})
-
+if (BUILD_SHARED STREQUAL "YES")
+    add_library(rt SHARED ${LIBRT_SOURCES} ${FMT_SOURCE})
+    message("-- Building shared library")
+else()
+    add_library(rt STATIC ${LIBRT_SOURCES} ${FMT_SOURCE})
+    message("-- Building static library")
+endif()
 # Se the apropriate compiler flags based on output from pkg-config
 target_link_libraries(rt ${CURL_LIBRARIES})
+# Create aditional files with versioning
+set_target_properties(rt PROPERTIES VERSION ${librt_VERSION_MAJOR}.${librt_VERSION_MINOR}.${librt_VERSION_PATCH} SOVERSION ${librt_VERSION_MAJOR})
 
 # Install binaries
 install(

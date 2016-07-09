@@ -87,6 +87,8 @@ namespace librt
         std::string username_;
         std::string password_;
         std::int32_t timeout_;
+
+        bool ignoreSSLErrors_;
     };
 }
 

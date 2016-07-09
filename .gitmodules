@@ -7,6 +7,3 @@
 [submodule "3rdparty/sequential"]
 	path = 3rdparty/sequential
 	url = https://github.com/kicsyromy/sequential.git
-[submodule "3rdparty/cpr"]
-	path = 3rdparty/cpr
-	url = https://github.com/whoshuu/cpr.git
