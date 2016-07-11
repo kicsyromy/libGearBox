@@ -53,6 +53,65 @@ TorrentPrivate &TorrentPrivate::operator =(const TorrentPrivate &other)
     return *this;
 }
 
+Torrent::File::File(const std::string &name,
+                    std::uint64_t bytesCompleted,
+                    std::uint64_t bytesTotal,
+                    bool wanted,
+                    Torrent::File::Priority priority) :
+    id_(0),
+    name_(name),
+    bytesCompleted_(bytesCompleted),
+    bytesTotal_(bytesTotal),
+    wanted_(wanted),
+    priority_(priority)
+{
+}
+
+Torrent::File::File(Torrent::File &&other) :
+    id_(other.id_),
+    name_(std::move(other.name_)),
+    bytesCompleted_(other.bytesCompleted_),
+    bytesTotal_(other.bytesTotal_),
+    wanted_(other.wanted_),
+    priority_(other.priority_)
+{
+}
+
+Torrent::File &Torrent::File::operator=(Torrent::File &&other)
+{
+    id_ = other.id_;
+    name_ = std::move(other.name_);
+    bytesCompleted_ = other.bytesCompleted_;
+    bytesTotal_ = other.bytesTotal_;
+    wanted_ = other.wanted_;
+    priority_ = other.priority_;
+}
+
+const std::string &Torrent::File::name() const
+{
+    return name_;
+}
+
+uint64_t Torrent::File::bytesCompleted() const
+{
+    return bytesCompleted_;
+}
+
+uint64_t Torrent::File::bytesTotal() const
+{
+    return bytesTotal_;
+}
+
+bool Torrent::File::wanted() const
+{
+    return wanted_;
+}
+
+Torrent::File::Priority Torrent::File::priority() const
+{
+    return priority_;
+}
+
 Torrent::Torrent(TorrentPrivate *priv) :
     priv_(priv)
 {
@@ -60,12 +119,12 @@ Torrent::Torrent(TorrentPrivate *priv) :
 
 bool Torrent::operator ==(const Torrent &other) const
 {
-    return (priv_->get_id() == other.priv_->get_id());
+    return valid() ? (priv_->get_id() == other.priv_->get_id()) : false;
 }
 
 bool Torrent::operator <(const Torrent &other) const
 {
-    return (priv_->get_queuePosition() < other.priv_->get_queuePosition());
+    return valid() ? (priv_->get_queuePosition() < other.priv_->get_queuePosition()) : false;
 }
 
 bool Torrent::valid() const
@@ -410,6 +469,76 @@ Error Torrent::update()
     return error;
 }
 
+Error Torrent::setWantedFiles(const std::vector<std::reference_wrapper<const File>> &files)
+{
+    Error error;
+
+    if (valid())
+    {
+        std::vector<std::size_t> indices;
+        indices.reserve(files.size());
+
+        for (const File &f: files)
+            indices.push_back(f.id_);
+
+        nlohmann::json request;
+        request["ids"] = { this->id() };
+        request["files-wanted"] = indices;
+
+        if (auto session = priv_->session_.lock())
+        {
+            error = std::move(session->sendRequest("torrent-set", request).error);
+        }
+        else
+        {
+            LOG_ERROR("Invalid session while updating wanted files for id '{}'", this->id());
+            error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        }
+    }
+    else
+    {
+        LOG_ERROR("Invalid torrent while updating wanted files");
+        error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
+    }
+
+    return std::move(error);
+}
+
+Error Torrent::setSkippedFiles(const std::vector<std::reference_wrapper<const File>> &files)
+{
+    Error error;
+
+    if (valid())
+    {
+        std::vector<std::size_t> indices;
+        indices.reserve(files.size());
+
+        for (const File &f: files)
+            indices.push_back(f.id_);
+
+        nlohmann::json request;
+        request["ids"] = { this->id() };
+        request["files-unwanted"] = indices;
+
+        if (auto session = priv_->session_.lock())
+        {
+            error = std::move(session->sendRequest("torrent-set", request).error);
+        }
+        else
+        {
+            LOG_ERROR("Invalid session while updating unwanted files for id '{}'", this->id());
+            error = std::make_pair(Error::Code::libRTInvalidSession, INVALID_SESSION);
+        }
+    }
+    else
+    {
+        LOG_ERROR("Invalid torrent while updating unwanted files");
+        error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
+    }
+
+    return std::move(error);
+}
+
 int32_t Torrent::id() const
 {
     return valid() ? priv_->get_id() : -1;
@@ -499,13 +628,15 @@ ReturnType<std::vector<Torrent::File>> Torrent::files() const
 
                     for (std::size_t it = 0; it < length; ++it)
                     {
-                        result.emplace_back(
+                        Torrent::File f {
                             files.at(it).get_name(),
                             files.at(it).get_bytesCompleted(),
                             files.at(it).get_length(),
                             fileStats.at(it).get_wanted(),
                             static_cast<Torrent::File::Priority>(fileStats.at(it).get_priority())
-                        );
+                        };
+                        f.id_ = it;
+                        result.push_back(std::move(f));
                     }
                 }
             }

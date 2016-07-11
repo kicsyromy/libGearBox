@@ -40,8 +40,9 @@ namespace librt
             DeleteFiles
         };
 
-        struct File
+        class File
         {
+        public:
             enum class Priority
             {
                 High,
@@ -49,22 +50,33 @@ namespace librt
                 Low
             };
 
+        public:
+            File(File &&other);
+            File &operator =(File &&other);
+
+        public:
+            const std::string &name() const;
+            std::uint64_t bytesCompleted() const;
+            std::uint64_t bytesTotal() const;
+            bool wanted() const;
+            Priority priority() const;
+
+        private:
             File(const std::string &name,
                  std::uint64_t bytesCompleted,
                  std::uint64_t bytesTotal,
                  bool wanted,
-                 Priority priority) :
-                name(name),
-                bytesCompleted(bytesCompleted),
-                bytesTotal(bytesTotal),
-                wanted(wanted),
-                priority(priority) {}
+                 Priority priority);
 
-            std::string name;
-            std::uint64_t bytesCompleted;
-            std::uint64_t bytesTotal;
-            bool wanted;
-            Priority priority;
+        private:
+            std::size_t id_;
+            std::string name_;
+            std::uint64_t bytesCompleted_;
+            std::uint64_t bytesTotal_;
+            bool wanted_;
+            Priority priority_;
+
+            friend class librt::Torrent;
         };
 
     public:
@@ -89,6 +101,8 @@ namespace librt
         Error queueMoveTop();
         Error queueMoveBottom();
         Error update();
+        Error setWantedFiles(const std::vector<std::reference_wrapper<const File>> &files);
+        Error setSkippedFiles(const std::vector<std::reference_wrapper<const File>> &files);
 
     public:
         std::int32_t id() const;
