@@ -189,9 +189,11 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
     for (std::uint8_t it = 0; it < RETRY_COUNT; ++it)
     {
         cURL curl;
+        std::string url = std::move(fmt::format("{}{}{}", url_, port_ > 0 ? fmt::format(":{}", port_) : "", path_).c_str());
         curl_easy_setopt(curl,
                          CURLOPT_URL,
-                         fmt::format("{}{}{}{}", url_, path_, port_ > 0 ? ":", fmt::format("{}", port_) : "", "").c_str());
+                         url.c_str());
+
 
         auto sessionIdHeader = curl_slist_append(nullptr, fmt::format("X-Transmission-Session-Id: {}", sessionId).c_str());
         curl_easy_setopt(curl,
@@ -266,6 +268,7 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
 
         if (result.status == STATUS_OK)
         {
+            LOG_DEBUG("{}", result.text);
             jsonFormat.parse(result.text);
             sequential::from_format(jsonFormat, response);
 
@@ -438,11 +441,11 @@ ReturnType<std::vector<std::int32_t>> Session::recentlyRemoved() const
     );
 }
 
-Error Session::updateTorrentStats(std::vector<librt::Torrent> &torrents)
+Error Session::updateTorrentStats(std::vector<std::reference_wrapper<Torrent>> &torrents)
 {
     std::vector<std::int32_t> ids;
     ids.reserve(torrents.size());
-    for (auto &t: torrents)
+    for (Torrent &t: torrents)
         ids.push_back(t.id());
 
     TorrentPrivate::Response torrentResponse;
@@ -460,7 +463,7 @@ Error Session::updateTorrentStats(std::vector<librt::Torrent> &torrents)
         sequential::from_format(jsonFormat, torrentResponse);
 
         auto &updatedTorrents = torrentResponse.get_torrents();
-        for (auto &t: torrents)
+        for (Torrent &t: torrents)
         {
             bool found = false;
             for (auto &torrentPriv: updatedTorrents)

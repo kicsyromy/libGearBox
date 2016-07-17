@@ -66,7 +66,7 @@ namespace librt
         ReturnType<Statistics> statistics() const;
         ReturnType<std::vector<librt::Torrent>> torrents() const;
         ReturnType<std::vector<std::int32_t>> recentlyRemoved() const;
-        Error updateTorrentStats(std::vector<librt::Torrent> &torrents);
+        Error updateTorrentStats(std::vector<std::reference_wrapper<Torrent>> &torrents);
 
     public:
         std::string url() const;
