@@ -12,7 +12,7 @@ set(librt_PUBLIC_HEADERS  "${PROJECT_SOURCE_DIR}/pub")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DDEBUG_BUILD)
-    message(STATUS "-- Building with debug informaton and logging")
+    message(STATUS "Building with debug informaton and logging")
 endif()
 
 # Hack for Qt Creator to show the headers in the project file tree
@@ -27,7 +27,7 @@ add_custom_target(seq_headers SOURCES ${SEQ_HEADERS})
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set(CURL_INCLUDE_DIRS 3rdparty/curl/include)
-	set(CURL_LIBRARIES    "${PROJECT_SOURCE_DIR}/3rdparty/curl/lib/libcurl.lib" "${PROJECT_SOURCE_DIR}/3rdparty/curl/lib/libssh2.lib")
+    set(CURL_LIBRARIES    "${PROJECT_SOURCE_DIR}/3rdparty/curl/lib/libcurl.lib" "${PROJECT_SOURCE_DIR}/3rdparty/curl/lib/libssh2.lib")
 else()
     # Make sure compiler support C++14 standard
     include(CheckCXXCompilerFlag)
@@ -42,7 +42,7 @@ else()
     endif()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
-	# Search for CURL in system paths
+    # Search for CURL in system paths
     find_package(CURL)
 endif()
 
@@ -69,10 +69,10 @@ aux_source_directory(${PROJECT_SOURCE_DIR}/src LIBRT_SOURCES)
 # Specify the target
 if (BUILD_SHARED STREQUAL "YES")
     add_library(rt SHARED ${LIBRT_SOURCES} ${FMT_SOURCE})
-    message(STATUS "-- Building shared library")
+    message(STATUS "Building shared library")
 else()
     add_library(rt STATIC ${LIBRT_SOURCES} ${FMT_SOURCE})
-    message(STATUS "-- Building static library")
+    message(STATUS "Building static library")
 endif()
 # Se the apropriate compiler flags based on output from pkg-config
 target_link_libraries(rt ${CURL_LIBRARIES})
