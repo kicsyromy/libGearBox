@@ -44,6 +44,9 @@ else()
 
     # Search for CURL in system paths
     find_package(CURL)
+    if(NOT CURL_FOUND)
+        message(FATAL_ERROR "Failed to find curl development libraries")
+    endif()
 endif()
 
 # Add CURL dependency
