@@ -13,6 +13,23 @@ namespace librt
             error(std::move(error)),
             value(std::move(value))
         {}
+
+        ReturnType(ReturnType &&other)
+        {
+            error = std::move(other.error);
+            value = std::move(other.value);
+        }
+
+        ReturnType &operator =(ReturnType &&other) noexcept(true)
+        {
+            error = std::move(other.error);
+            value = std::move(other.value);
+        }
+
+        ReturnType(const ReturnType &other) = delete;
+        ReturnType &operator =(const ReturnType &other) = delete;
+        ~ReturnType() noexcept(true) = default;
+
         Error error;
         T value;
         inline operator T() { return std::move(value); }

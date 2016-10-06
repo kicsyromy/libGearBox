@@ -373,11 +373,9 @@ ReturnType<Session::Statistics> Session::statistics() const
         };
     }
 
-    return std::move(
-        ReturnType<Session::Statistics>(
-            std::move(response.error),
-            std::move(retValue)
-        )
+    return ReturnType<Session::Statistics>(
+        std::move(response.error),
+        std::move(retValue)
     );
 }
 
@@ -406,11 +404,9 @@ ReturnType<std::vector<Torrent>> Session::torrents() const
         }
     }
 
-    return std::move(
-        ReturnType<std::vector<Torrent>>(
-            std::move(response.error),
-            std::move(retValue)
-        )
+    return ReturnType<std::vector<Torrent>>(
+        std::move(response.error),
+        std::move(retValue)
     );
 }
 
@@ -433,11 +429,9 @@ ReturnType<std::vector<std::int32_t>> Session::recentlyRemoved() const
         ids = torrentResponse.get_removed();
     }
 
-    return std::move(
-        ReturnType<std::vector<std::int32_t>>(
-            std::move(response.error),
-            std::move(ids)
-        )
+    return ReturnType<std::vector<std::int32_t>>(
+        std::move(response.error),
+        std::move(ids)
     );
 }
 

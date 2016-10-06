@@ -82,6 +82,13 @@ namespace librt
     public:
         explicit Torrent(TorrentPrivate *priv);
 
+        Torrent(const Torrent &) = delete;
+        Torrent &operator=(const Torrent &) noexcept(true) = delete;
+
+        Torrent(Torrent &&);
+        Torrent &operator=(Torrent &&) noexcept(true);
+        ~Torrent() noexcept(true);
+
     public:
         bool operator ==(const Torrent &other) const;
         bool operator  <(const Torrent &other) const;
@@ -125,7 +132,7 @@ namespace librt
         Error setDownloadDir(const std::string &path, MoveType move = MoveType::SearchForExistingFiles);
 
     private:
-        std::shared_ptr<TorrentPrivate> priv_;
+        std::unique_ptr<TorrentPrivate> priv_;
 
     private:
         friend class Session;

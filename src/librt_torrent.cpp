@@ -117,6 +117,10 @@ Torrent::Torrent(TorrentPrivate *priv) :
 {
 }
 
+Torrent::Torrent(Torrent &&) = default;
+Torrent &Torrent::operator=(Torrent &&) noexcept(true) = default;
+Torrent::~Torrent() noexcept(true) = default;
+
 bool Torrent::operator ==(const Torrent &other) const
 {
     return valid() ? (priv_->get_id() == other.priv_->get_id()) : false;
@@ -448,9 +452,9 @@ Error Torrent::update()
                 torrents = torrentResponse.get_torrents();
                 for (TorrentPrivate &torrentPriv: torrents)
                 {
-                    auto torrent = std::make_shared<TorrentPrivate>(std::move(torrentPriv));
+                    auto torrent = new TorrentPrivate(std::move(torrentPriv));
                     torrent->session_ = priv_->session_;
-                    priv_ = torrent;
+                    priv_.reset(torrent);
                 }
             }
         }
@@ -657,11 +661,9 @@ ReturnType<std::vector<Torrent::File>> Torrent::files() const
         error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
     }
 
-    return std::move(
-        ReturnType<std::vector<Torrent::File>>(
-            std::move(error),
-            std::move(result)
-        )
+    return ReturnType<std::vector<Torrent::File>>(
+        std::move(error),
+        std::move(result)
     );
 }
 
