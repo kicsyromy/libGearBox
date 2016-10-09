@@ -52,7 +52,7 @@ namespace librt
 
             struct Request
             {
-                ATTRIBUTE(std::vector<std::string>, fields)
+                ATTRIBUTE(std::vector<const char *>, fields)
                 ATTRIBUTE(std::vector<std::int32_t>, ids)
                 INIT_ATTRIBUTES(fields, ids)
 

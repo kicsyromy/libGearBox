@@ -32,7 +32,7 @@ namespace librt
 
         Error error;
         T value;
-        inline operator T() { return std::move(value); }
+        constexpr operator T() { return std::move(value); }
     };
 }
 
