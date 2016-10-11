@@ -33,15 +33,13 @@ namespace
         static constexpr std::uint8_t SESSION_ID_OFFSET = 27;
         static constexpr std::uint8_t SESSION_ID_LEN    = 48;
 
-        std::string sessionId;
-
         auto position = text.rfind("X-Transmission-Session-Id");
         if (position != std::string::npos)
         {
-            sessionId = text.substr(position + SESSION_ID_OFFSET, SESSION_ID_LEN);
+            return text.substr(position + SESSION_ID_OFFSET, SESSION_ID_LEN);
         }
 
-        return std::move(sessionId);
+        return {};
     }
 
     struct cURL

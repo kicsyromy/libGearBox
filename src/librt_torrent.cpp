@@ -133,7 +133,7 @@ bool Torrent::operator <(const Torrent &other) const
 
 bool Torrent::valid() const
 {
-    return (priv_.get() != nullptr);
+    return static_cast<bool>(priv_);
 }
 
 Error Torrent::start()
