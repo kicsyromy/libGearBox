@@ -46,7 +46,7 @@ namespace librt
     public:
         struct Files
         {
-            ATTRIBUTE(std::vector<File>, files)
+            ATTRIBUTE(std::vector<FileAttr>, files)
             ATTRIBUTE(std::vector<FileStat>, fileStats)
             INIT_ATTRIBUTES(files, fileStats)
 

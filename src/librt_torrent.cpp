@@ -53,65 +53,6 @@ TorrentPrivate &TorrentPrivate::operator =(const TorrentPrivate &other)
     return *this;
 }
 
-Torrent::File::File(const std::string &name,
-                    std::uint64_t bytesCompleted,
-                    std::uint64_t bytesTotal,
-                    bool wanted,
-                    Torrent::File::Priority priority) :
-    id_(0),
-    name_(name),
-    bytesCompleted_(bytesCompleted),
-    bytesTotal_(bytesTotal),
-    wanted_(wanted),
-    priority_(priority)
-{
-}
-
-Torrent::File::File(Torrent::File &&other) :
-    id_(other.id_),
-    name_(std::move(other.name_)),
-    bytesCompleted_(other.bytesCompleted_),
-    bytesTotal_(other.bytesTotal_),
-    wanted_(other.wanted_),
-    priority_(other.priority_)
-{
-}
-
-Torrent::File &Torrent::File::operator=(Torrent::File &&other)
-{
-    id_ = other.id_;
-    name_ = std::move(other.name_);
-    bytesCompleted_ = other.bytesCompleted_;
-    bytesTotal_ = other.bytesTotal_;
-    wanted_ = other.wanted_;
-    priority_ = other.priority_;
-}
-
-const std::string &Torrent::File::name() const
-{
-    return name_;
-}
-
-uint64_t Torrent::File::bytesCompleted() const
-{
-    return bytesCompleted_;
-}
-
-uint64_t Torrent::File::bytesTotal() const
-{
-    return bytesTotal_;
-}
-
-bool Torrent::File::wanted() const
-{
-    return wanted_;
-}
-
-Torrent::File::Priority Torrent::File::priority() const
-{
-    return priority_;
-}
-
 Torrent::Torrent(TorrentPrivate *priv) :
     priv_(priv)
 {
@@ -599,9 +540,9 @@ int32_t Torrent::eta() const
     return valid() ? priv_->get_eta() : 0;
 }
 
-ReturnType<std::vector<Torrent::File>> Torrent::files() const
+ReturnType<Folder> Torrent::files() const
 {
-    std::vector<Torrent::File> result;
+    Folder result((std::string(name())));
     Error error;
 
     if (valid())
@@ -632,15 +573,16 @@ ReturnType<std::vector<Torrent::File>> Torrent::files() const
 
                     for (std::size_t it = 0; it < length; ++it)
                     {
-                        Torrent::File f {
+                        Folder::addPath(
+                            result,
                             files.at(it).get_name(),
+                            it,
                             files.at(it).get_bytesCompleted(),
                             files.at(it).get_length(),
                             fileStats.at(it).get_wanted(),
-                            static_cast<Torrent::File::Priority>(fileStats.at(it).get_priority())
-                        };
-                        f.id_ = it;
-                        result.push_back(std::move(f));
+                            static_cast<File::Priority>(fileStats.at(it).get_priority()),
+                            File::MIMEType::Unknown
+                        );
                     }
                 }
             }
@@ -661,10 +603,10 @@ ReturnType<std::vector<Torrent::File>> Torrent::files() const
         error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
     }
 
-    return ReturnType<std::vector<Torrent::File>>(
+    return ReturnType<Folder> {
         std::move(error),
         std::move(result)
-    );
+    };
 }
 
 int32_t Torrent::queuePosition() const

@@ -5,7 +5,7 @@
 
 namespace librt
 {
-    struct File
+    struct FileAttr
     {
         ATTRIBUTE(std::uint64_t, bytesCompleted)
         ATTRIBUTE(std::uint64_t, length) /* size in bytes */

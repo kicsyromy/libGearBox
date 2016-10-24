@@ -3,15 +3,19 @@
 
 #include <cstdint>
 #include <vector>
+#include <map>
 #include <string>
 #include <memory>
 
+#include <librt_file.h>
+#include <librt_folder.h>
 #include <librt_global.h>
 #include <librt_return_type.h>
 
 namespace librt
 {
     class TorrentPrivate;
+    class FolderPrivate;
 
     class LIBRT_API Torrent
     {
@@ -38,45 +42,6 @@ namespace librt
         {
             KeepFiles,
             DeleteFiles
-        };
-
-        class File
-        {
-        public:
-            enum class Priority
-            {
-                High,
-                Normal,
-                Low
-            };
-
-        public:
-            File(File &&other);
-            File &operator =(File &&other);
-
-        public:
-            const std::string &name() const;
-            std::uint64_t bytesCompleted() const;
-            std::uint64_t bytesTotal() const;
-            bool wanted() const;
-            Priority priority() const;
-
-        private:
-            File(const std::string &name,
-                 std::uint64_t bytesCompleted,
-                 std::uint64_t bytesTotal,
-                 bool wanted,
-                 Priority priority);
-
-        private:
-            std::size_t id_;
-            std::string name_;
-            std::uint64_t bytesCompleted_;
-            std::uint64_t bytesTotal_;
-            bool wanted_;
-            Priority priority_;
-
-            friend class librt::Torrent;
         };
 
     public:
@@ -123,7 +88,7 @@ namespace librt
         Status status() const;
         std::uint64_t size() const;
         std::int32_t eta() const;
-        ReturnType<std::vector<File>> files() const;
+        ReturnType<Folder> files() const;
 
         std::int32_t queuePosition() const;
         Error setQueuePosition(std::int32_t position);
