@@ -88,7 +88,8 @@ namespace librt
         Status status() const;
         std::uint64_t size() const;
         std::int32_t eta() const;
-        ReturnType<Folder> files() const;
+        ReturnType<Folder> content() const;
+        ReturnType<std::vector<File>> files() const;
 
         std::int32_t queuePosition() const;
         Error setQueuePosition(std::int32_t position);
