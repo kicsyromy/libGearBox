@@ -580,8 +580,7 @@ ReturnType<Folder> Torrent::content() const
                             files.at(it).get_bytesCompleted(),
                             files.at(it).get_length(),
                             fileStats.at(it).get_wanted(),
-                            static_cast<File::Priority>(fileStats.at(it).get_priority()),
-                            File::MIMEType::Unknown
+                            static_cast<File::Priority>(fileStats.at(it).get_priority())
                         );
                     }
                 }
@@ -648,7 +647,6 @@ ReturnType<std::vector<File>> Torrent::files() const
                             files.at(it).get_length(),
                             fileStats.at(it).get_wanted(),
                             static_cast<File::Priority>(fileStats.at(it).get_priority()),
-                            File::MIMEType::Unknown
                         };
                         f.id_ = it;
                         result.push_back(std::move(f));

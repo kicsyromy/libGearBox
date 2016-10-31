@@ -33,9 +33,9 @@ namespace librt
         File *insert(File &&file);
 
     public:
-        static void addPath(Folder &root, const std::string &path, std::size_t torrentId,
+        static void addPath(Folder &root, const std::string &path, std::size_t id,
                             std::uint64_t bytesCompleted, std::uint64_t length,
-                            bool wanted, File::Priority priority, File::MIMEType type);
+                            bool wanted, File::Priority priority);
 
     private:
         std::string name_;

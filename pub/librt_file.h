@@ -20,9 +20,12 @@ namespace librt
             Low
         };
 
-        enum class MIMEType
+        struct MIMEType
         {
-            Unknown
+            int id;
+            const char * const name;
+            inline bool operator ==(const MIMEType &other) { return id == other.id; }
+            inline bool isValid() { return id >= 0; }
         };
 
     public:
@@ -45,8 +48,7 @@ namespace librt
              std::uint64_t bytesCompleted,
              std::uint64_t bytesTotal,
              bool wanted,
-             Priority priority,
-             MIMEType type);
+             Priority priority);
     private:
         std::size_t id_;
         std::string name_;

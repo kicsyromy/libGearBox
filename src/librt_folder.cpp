@@ -99,9 +99,9 @@ File *FolderPrivate::insert(File &&file)
     return f;
 }
 
-void FolderPrivate::addPath(Folder &root, const std::string &path, std::size_t torrentId,
+void FolderPrivate::addPath(Folder &root, const std::string &path, std::size_t id,
                             std::uint64_t bytesCompleted, std::uint64_t length,
-                            bool wanted, File::Priority priority, File::MIMEType type)
+                            bool wanted, File::Priority priority)
 {
     auto names = std::move(split(path, '/'));
     Folder *node = &root;
@@ -113,8 +113,8 @@ void FolderPrivate::addPath(Folder &root, const std::string &path, std::size_t t
             newNode = node->priv_->insert(std::move(names.at(it)));
         node = newNode;
     }
-    File *f = node->priv_->insert(File(std::move(names.at(0)), bytesCompleted, length, wanted, priority, type));
-    f->id_ = torrentId;
+    File *f = node->priv_->insert(File(std::move(names.at(0)), bytesCompleted, length, wanted, priority));
+    f->id_ = id;
 }
 
 Folder::Folder(std::string &&name) :
@@ -160,9 +160,9 @@ const std::vector<std::reference_wrapper<const File>> Folder::files() const
     return files;
 }
 
-void Folder::addPath(Folder &root, const std::string &path, std::size_t torrentId,
-                            std::uint64_t bytesCompleted, std::uint64_t length,
-                            bool wanted, File::Priority priority, File::MIMEType type)
+void Folder::addPath(Folder &root, const std::string &path, std::size_t id,
+                     std::uint64_t bytesCompleted, std::uint64_t length,
+                     bool wanted, File::Priority priority)
 {
-    root.priv_->addPath(root, path, torrentId, bytesCompleted, length, wanted, priority, type);
+    root.priv_->addPath(root, path, id, bytesCompleted, length, wanted, priority);
 }
