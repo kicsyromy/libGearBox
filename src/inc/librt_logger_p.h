@@ -3,19 +3,18 @@
 
 #include <fmt/format.h>
 
-#if defined(_WIN32)
-	#if defined(_MSC_VER)
-		#define __PRETTY_FUNCTION__ __FUNCTION__
-	#endif // _MSC_VER
-
-	#define PATH_SEPARATOR '\\'
+#ifdef PLATFORM_WINDOWS
+    #ifdef _MSC_VER
+        #define __PRETTY_FUNCTION__ __FUNCTION__
+    #endif // _MSC_VER
+    #define PATH_SEPARATOR '\\'
 #else
-	#define PATH_SEPARATOR '/'
-#endif // _WIN32
+    #define PATH_SEPARATOR '/'
+#endif // PLATFORM_WINDOWS
 
 #define LOG(...) \
     do { \
-    std::string log = std::move(fmt::format(__VA_ARGS__)); \
+    std::string log = fmt::format(__VA_ARGS__); \
     fmt::print(stderr, \
             "librt: INFO: {}: {}: {}:\n{}\n", \
             &__FILE__[strrchr(__FILE__, PATH_SEPARATOR) - __FILE__ + 1], \
@@ -28,7 +27,7 @@
 
 #define LOG_WARN(...) \
     do { \
-    std::string log = std::move(fmt::format(__VA_ARGS__)); \
+    std::string log = fmt::format(__VA_ARGS__)); \
     fmt::print(stderr, \
             "librt: WARNING: {}: {}: {}:\n{}\n", \
             &__FILE__[strrchr(__FILE__, PATH_SEPARATOR) - __FILE__ + 1], \
@@ -39,7 +38,7 @@
 
 #define LOG_ERROR(...) \
     do { \
-    std::string log = std::move(fmt::format(__VA_ARGS__)); \
+    std::string log = fmt::format(__VA_ARGS__); \
     fmt::print(stderr, \
             "librt: ERROR: {}: {}: {}:\n{}\n", \
             &__FILE__[strrchr(__FILE__, PATH_SEPARATOR) - __FILE__ + 1], \
@@ -50,7 +49,7 @@
 
 #define LOG_FATAL(...) \
     do { \
-    std::string log = std::move(fmt::format(__VA_ARGS__)); \
+    std::string log = fmt::format(__VA_ARGS__); \
     fmt::print(stderr, \
             "librt: FATAL: {}: {}: {}:\n{}\n", \
             &__FILE__[strrchr(__FILE__, PATH_SEPARATOR) - __FILE__ + 1], \
@@ -63,7 +62,7 @@
 #ifdef DEBUG_BUILD
 #define LOG_DEBUG(...) \
     do { \
-    std::string log = std::move(fmt::format(__VA_ARGS__)); \
+    std::string log = fmt::format(__VA_ARGS__); \
     fmt::print(stderr, \
             "librt: DEBUG: {}: {}: {}:\n{}\n", \
             __PRETTY_FUNCTION__, \

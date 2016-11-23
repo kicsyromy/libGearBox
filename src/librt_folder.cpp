@@ -1,5 +1,6 @@
 #include "librt_folder_p.h"
 #include "librt_folder.h"
+#include "librt_vla_p.h"
 
 #include <vector>
 #include <cstring>
@@ -28,7 +29,7 @@ namespace
     std::vector<std::string> split(const std::string &path, char separator)
     {
         const auto len = path.size();
-        char fullyQualifiedName[len + 1];
+        auto fullyQualifiedName = make_vla(char, len + 1);
         std::strncpy(fullyQualifiedName, path.c_str(), len);
         auto separatorPtr = find_char(fullyQualifiedName, len, separator);
 
@@ -103,14 +104,14 @@ void FolderPrivate::addPath(Folder &root, const std::string &path, std::size_t i
                             std::uint64_t bytesCompleted, std::uint64_t length,
                             bool wanted, File::Priority priority)
 {
-    auto names = std::move(split(path, '/'));
+    auto names = split(path, '/');
     Folder *node = &root;
     auto lastFolderIndex = names.empty() ? 0 : static_cast<int>(names.size()) - 1;
     for (int it = lastFolderIndex; it >= 1; --it)
     {
-        auto newNode = node->priv_->find(names.at(it));
+        auto newNode = node->priv_->find(names.at(static_cast<std::size_t>(it)));
         if (newNode == nullptr)
-            newNode = node->priv_->insert(std::move(names.at(it)));
+            newNode = node->priv_->insert(std::move(names.at(static_cast<std::size_t>(it))));
         node = newNode;
     }
     File *f = node->priv_->insert(File(std::move(names.at(0)), bytesCompleted, length, wanted, priority));
@@ -122,7 +123,7 @@ Folder::Folder(std::string &&name) :
 {
 }
 
-Folder::Folder(Folder &&) = default;
+Folder::Folder(Folder &&) noexcept(true) = default;
 Folder &Folder::operator=(Folder &&) noexcept(true) = default;
 Folder::~Folder() noexcept(true) = default;
 

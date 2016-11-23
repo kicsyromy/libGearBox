@@ -6,6 +6,16 @@
 #include <sequential.h>
 #include <json.hpp>
 
+#include "librt_http_interface_p.h"
+#if defined(PLATFORM_WINDOWS)
+#include "librt_http_win_p.h"
+#elif defined(PLATFORM_LINUX)
+#include "librt_http_linux_p.h"
+#elif defined(PLATFORM_MACOS)
+#else
+#error "Unsupported platform"
+#endif
+
 #include "librt_error.h"
 
 namespace librt
@@ -57,6 +67,14 @@ namespace librt
         };
     }
 
+#if defined(PLATFORM_WINDOWS)
+    using HttpRequestHandler = librt::http::Interface<librt::WinHttp>;
+#elif defined(PLATFORM_LINUX)
+    using HttpRequestHandler = librt::http::Interface<librt::CUrlHttp>;
+#elif defined(PLATFORM_MACOS)
+#else
+#error "Unsupported platform"
+#endif
     class SessionPrivate
     {
         friend class Session;
@@ -80,15 +98,8 @@ namespace librt
         session::Response sendRequest(const std::string &method, nlohmann::json arguments = nlohmann::json());
 
     private:
-        std::string url_;
-        std::string path_;
-        std::int32_t port_;
-        bool authenticationRequired_;
-        std::string username_;
-        std::string password_;
-        std::int32_t timeout_;
-
-        bool ignoreSSLErrors_;
+        std::string sessionId_;
+        HttpRequestHandler http_;
     };
 }
 

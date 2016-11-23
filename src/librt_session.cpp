@@ -3,14 +3,11 @@
 #include <string>
 #include <utility>
 
-#include <curl/curl.h>
-
 #include <formats/json_format.h>
 #include <fmt/format.h>
 
 #include "librt_session_p.h"
 #include "librt_torrent_p.h"
-
 #include "librt_logger_p.h"
 
 using nlohmann::json;
@@ -18,120 +15,10 @@ using namespace librt;
 
 namespace
 {
-    constexpr std::uint16_t SESSION_TAG    = 33872;
-    constexpr std::uint8_t  RETRY_COUNT    = 5;
-    constexpr std::int32_t DEFAULT_TIMEOUT = 5000;
-
-    constexpr std::int32_t STATUS_OK                 = 200;
-    constexpr std::int32_t STATUS_RETRY              = 409;
-    constexpr std::int32_t STATUS_METHOD_NOT_ALLOWED = 405;
-
-    std::string sessionId;
-
-    std::string getSessionId(const std::string &text)
-    {
-        static constexpr std::uint8_t SESSION_ID_OFFSET = 27;
-        static constexpr std::uint8_t SESSION_ID_LEN    = 48;
-
-        auto position = text.rfind("X-Transmission-Session-Id");
-        if (position != std::string::npos)
-        {
-            return text.substr(position + SESSION_ID_OFFSET, SESSION_ID_LEN);
-        }
-
-        return {};
-    }
-
-    struct cURL
-    {
-        cURL()
-        {
-            curl_global_init(CURL_GLOBAL_ALL);
-            handle = curl_easy_init();
-            curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, &writeFunction);
-        }
-        ~cURL()
-        {
-            if (handle != nullptr) curl_easy_cleanup(handle);
-            curl_global_cleanup();
-        }
-
-        static librt::Error::Code errorCode(std::int32_t curlCode)
-        {
-            using librt::Error;
-            switch (curlCode) {
-                case CURLE_OK:
-                    return Error::Code::Ok;
-                case CURLE_UNSUPPORTED_PROTOCOL:
-                    return Error::Code::RequestUnsupportedProtocol;
-                case CURLE_URL_MALFORMAT:
-                    return Error::Code::RequestInvalidURLFormat;
-                case CURLE_COULDNT_RESOLVE_PROXY:
-                    return Error::Code::RequestProxyResolutionFailure;
-                case CURLE_COULDNT_RESOLVE_HOST:
-                    return Error::Code::RequestHostResolutionFailure;
-                case CURLE_COULDNT_CONNECT:
-                    return Error::Code::RequestConnectionFailure;
-                case CURLE_OPERATION_TIMEDOUT:
-                    return Error::Code::RequestOperationTimedout;
-                case CURLE_SSL_CONNECT_ERROR:
-                    return Error::Code::RequestSSLConnectError;
-                case CURLE_PEER_FAILED_VERIFICATION:
-                    return Error::Code::RequestSSLRemoteCertificateError;
-                case CURLE_GOT_NOTHING:
-                    return Error::Code::RequestEmptyResponse;
-                case CURLE_SSL_ENGINE_NOTFOUND:
-                    return Error::Code::RequestGenericSSLError;
-                case CURLE_SSL_ENGINE_SETFAILED:
-                    return Error::Code::RequestGenericSSLError;
-                case CURLE_SEND_ERROR:
-                    return Error::Code::RequestNetworkSendFailure;
-                case CURLE_RECV_ERROR:
-                    return Error::Code::RequestNetworkReceiveError;
-                case CURLE_SSL_CERTPROBLEM:
-                    return Error::Code::RequestSSLLocalCertificateError;
-                case CURLE_SSL_CIPHER:
-                    return Error::Code::RequestGenericSSLError;
-                case CURLE_SSL_CACERT:
-                    return Error::Code::RequestSSLCacertError;
-                case CURLE_USE_SSL_FAILED:
-                    return Error::Code::RequestGenericSSLError;
-                case CURLE_SSL_ENGINE_INITFAILED:
-                    return Error::Code::RequestGenericSSLError;
-                case CURLE_SSL_CACERT_BADFILE:
-                    return Error::Code::RequestSSLCacertError;
-                case CURLE_SSL_SHUTDOWN_FAILED:
-                    return Error::Code::RequestGenericSSLError;
-                case CURLE_SSL_CRL_BADFILE:
-                    return Error::Code::RequestSSLCacertError;
-                case CURLE_SSL_ISSUER_ERROR:
-                    return Error::Code::RequestSSLCacertError;
-                case CURLE_TOO_MANY_REDIRECTS:
-                    return Error::Code::Ok;
-                default:
-                    return Error::Code::RequestInternalError;
-            }
-        }
-
-        inline operator CURL *() { return handle; }
-
-        struct Result
-        {
-            std::int32_t status;
-            std::string text;
-            double elapsed;
-            librt::Error error;
-        };
-
-        static size_t writeFunction(void *ptr, size_t size, size_t nmemb, std::string *data)
-        {
-            data->append((char *)ptr, size * nmemb);
-            return size * nmemb;
-        }
-
-    private:
-        CURL *handle= nullptr;
-    };
+    constexpr std::uint16_t SESSION_TAG     { 33872 };
+    constexpr std::int32_t  DEFAULT_TIMEOUT {  5000 };
+    constexpr std::int32_t  RETRY_COUNT     {     5 };
+    constexpr const char    USER_AGENT[29]  { "libRemoteTransmission v" LIBRT_VERISION_STR };
 }
 
 SessionPrivate::SessionPrivate(const std::string &url,
@@ -140,14 +27,17 @@ SessionPrivate::SessionPrivate(const std::string &url,
                                bool authenticationRequired,
                                const std::string &username,
                                const std::string &password) :
-    url_(url),
-    path_(path),
-    port_(port),
-    authenticationRequired_(authenticationRequired),
-    username_(username),
-    password_(password),
-    timeout_(DEFAULT_TIMEOUT)
+    sessionId_("dummy"),
+    http_(USER_AGENT)
 {
+    http_.setPort(port);
+    http_.setHost(url);
+    http_.setPath(path);
+    http_.setUsername(username);
+    http_.setPassword(password);
+    http_.setTimeout(std::chrono::milliseconds(DEFAULT_TIMEOUT));
+    if (!authenticationRequired)
+        http_.disableAuthentication();
 }
 
 SessionPrivate::SessionPrivate(std::string &&url,
@@ -156,14 +46,17 @@ SessionPrivate::SessionPrivate(std::string &&url,
                                bool authenticationRequired,
                                std::string &&username,
                                std::string &&password) :
-    url_(url),
-    path_(path),
-    port_(port),
-    authenticationRequired_(authenticationRequired),
-    username_(username),
-    password_(password),
-    timeout_(DEFAULT_TIMEOUT)
+    sessionId_("dummy"),
+    http_(USER_AGENT)
 {
+    http_.setPort(port);
+    http_.setHost(std::forward<std::string>(url));
+    http_.setPath(std::forward<std::string>(path));
+    http_.setUsername(std::forward<std::string>(username));
+    http_.setPassword(std::forward<std::string>(password));
+    http_.setTimeout(std::chrono::milliseconds(DEFAULT_TIMEOUT));
+    if (!authenticationRequired)
+        http_.disableAuthentication();
 }
 
 session::Response SessionPrivate::sendRequest(const std::string &method, nlohmann::json arguments)
@@ -174,6 +67,8 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
     sequential::to_format(jsonFormat, request);
 
     LOG_DEBUG("Requesting \"{}\": \n{}", method, jsonFormat.output().dump(4));
+    auto r = http_.createRequest();
+    r.setBody(jsonFormat.output().dump());
 
     /* As per the Transmission documentation:                                   */
     /* Most Transmission RPC servers require a X-Transmission-Session-Id        */
@@ -184,90 +79,37 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
     /* right X-Transmission-Session-Id in its own headers.                      */
     /* So, the correct way to handle a 409 response is to update your           */
     /* X-Transmission-Session-Id and to resend the previous request.            */
-    for (std::uint8_t it = 0; it < RETRY_COUNT; ++it)
+    for (std::int32_t it = 0; it < RETRY_COUNT; ++it)
     {
-        cURL curl;
-        std::string url = std::move(fmt::format("{}{}{}", url_, port_ > 0 ? fmt::format(":{}", port_) : "", path_).c_str());
-        curl_easy_setopt(curl,
-                         CURLOPT_URL,
-                         url.c_str());
-
-
-        auto sessionIdHeader = curl_slist_append(nullptr, fmt::format("X-Transmission-Session-Id: {}", sessionId).c_str());
-        curl_easy_setopt(curl,
-                         CURLOPT_HTTPHEADER,
-                         sessionIdHeader);
-
-        curl_easy_setopt(curl,
-                         CURLOPT_TIMEOUT_MS,
-                         timeout_);
-
-        auto postData = jsonFormat.output().dump();
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, postData.size());
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postData.c_str());
-
-        if (authenticationRequired_)
-        {
-            curl_easy_setopt(curl,
-                             CURLOPT_USERPWD,
-                             fmt::format("{}:{}", username_, password_).c_str());
-        }
-
-        if (ignoreSSLErrors_)
-        {
-            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-        }
-
-        std::string response_text;
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_text);
-
-        auto errCode = curl_easy_perform(curl);
-
-        long response_code;
-        double elapsed;
-        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-        curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &elapsed);
-
-        if (response_text.back() == '\n')
-        {
-            response_text = response_text.substr(0, response_text.length() - 1);
-        }
-
-        cURL::Result result {
-            static_cast<std::int32_t>(response_code),
-            response_text,
-            elapsed,
-            { cURL::errorCode(errCode), { curl_easy_strerror(errCode) } }
-        };
-
-        curl_slist_free_all(sessionIdHeader);
+        r.setHeader({ "X-Transmission-Session-Id", sessionId_ });
+        auto result = r.send();
 
         if (result.error)
         {
-            response.error = std::move(result.error);
+            LOG_DEBUG("Error: {}", static_cast<std::string>(result.error));
+            response.error = librt::Error(librt::Error::Code::TransmissionUnknownError, "Some dummy error until I can figure out how to convert between types");
             break;
         }
 
-        if (result.status == STATUS_RETRY)
+        if (result.status == librt::http::Status::Conflict)
         {
-            sessionId = getSessionId(result.text);
+            sessionId_ = result.response.headers["X-Transmission-Session-Id"];
             continue;
         }
 
-        if (result.status == STATUS_METHOD_NOT_ALLOWED)
+        if (result.status == librt::http::Status::MethodNotAllowed)
         {
             response.error = std::make_pair(
-                        Error::Code::TransmissionMethodNotAllowed,
-				        std::move(std::string{ "Method not allowed" })
-                    );
+                Error::Code::TransmissionMethodNotAllowed,
+                std::string{ "Method not allowed" }
+            );
             break;
         }
 
-        if (result.status == STATUS_OK)
+        if (result.status == librt::http::Status::OK)
         {
-            LOG_DEBUG("{}", result.text);
-            jsonFormat.parse(result.text);
+            LOG_DEBUG("{}", result.response.text);
+            jsonFormat.parse(result.response.text);
             sequential::from_format(jsonFormat, response);
 
             auto &result = response.get_result();
@@ -280,7 +122,7 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
         }
         else
         {
-			response.error = std::make_pair(Error::Code::TransmissionUnknownError, std::move(std::string{ "Unknown error" }));
+            response.error = std::make_pair(Error::Code::TransmissionUnknownError, std::string{ "Unknown error" });
             break;
         }
     }
@@ -298,7 +140,7 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
                   response.get_tag(),
                   response.get_arguments().dump(4));
 
-    return std::move(response);
+    return response;
 }
 
 Session::Session() :
@@ -315,7 +157,7 @@ Session &Session::operator =(Session &&other)
 {
     priv_= std::move(other.priv_);
 
-	return *this;
+    return *this;
 }
 
 Session::Session(const std::string &url,
@@ -338,25 +180,10 @@ Session::Session(std::string &&url,
 {
 }
 
-std::int32_t Session::timeout() const
-{
-    return priv_->timeout_;
-}
-
-void Session::setTimeout(std::int32_t value)
-{
-    priv_->timeout_ = value;
-}
-
-void Session::setSSLErrorHandling(Session::SSLErrorHandling value)
-{
-    priv_->ignoreSSLErrors_ = (value == Session::SSLErrorHandling::Ignore);
-}
-
 ReturnType<Session::Statistics> Session::statistics() const
 {
     Session::Statistics retValue;
-    session::Response response(std::move(priv_->sendRequest("session-stats")));
+    session::Response response(priv_->sendRequest("session-stats"));
     if (!response.error)
     {
         session::Statistics stats;
@@ -386,7 +213,7 @@ ReturnType<std::vector<Torrent>> Session::torrents() const
     const auto &fields = TorrentPrivate::attribute_names();
     nlohmann::json requestValues;
     requestValues["fields"] = fields;
-    session::Response response(std::move(priv_->sendRequest("torrent-get", requestValues)));
+    session::Response response(priv_->sendRequest("torrent-get", requestValues));
 
     if (!response.error)
     {
@@ -417,7 +244,7 @@ ReturnType<std::vector<std::int32_t>> Session::recentlyRemoved() const
     nlohmann::json requestValues;
     requestValues["ids"] = "recently-active";
     requestValues["fields"] = fields;
-    session::Response response(std::move(priv_->sendRequest("torrent-get", requestValues)));
+    session::Response response(priv_->sendRequest("torrent-get", requestValues));
 
     if (!response.error)
     {
@@ -446,7 +273,7 @@ Error Session::updateTorrentStats(std::vector<std::reference_wrapper<Torrent>> &
     nlohmann::json requestValues;
     requestValues["ids"] = ids;
     requestValues["fields"] = fields;
-    session::Response response(std::move(priv_->sendRequest("torrent-get", requestValues)));
+    session::Response response(priv_->sendRequest("torrent-get", requestValues));
 
     if (!response.error)
     {
@@ -478,80 +305,102 @@ Error Session::updateTorrentStats(std::vector<std::reference_wrapper<Torrent>> &
 
 std::string Session::url() const
 {
-    return priv_->url_;
+    return priv_->http_.host();
 }
 
 void Session::setUrl(const std::string &url)
 {
-    priv_->url_ = url;
+    priv_->http_.setHost(url);
 }
 
 void Session::setUrl(std::string &&url)
 {
-    priv_->url_ = url;
+    priv_->http_.setHost(std::forward<std::string>(url));
 }
 
 std::string Session::path() const
 {
-    return priv_->path_;
+    return priv_->http_.path();
 }
 
 void Session::setPath(const std::string &path)
 {
-    priv_->path_ = path;
+    priv_->http_.setPath(path);
 }
 
 void Session::setPath(std::string &&path)
 {
-    priv_->path_ = path;
+    priv_->http_.setPath(std::forward<std::string>(path));
 }
 
 std::int32_t Session::port() const
 {
-    return priv_->port_;
+    return priv_->http_.port();
 }
 
 void Session::setPort(std::int32_t port)
 {
-    priv_->port_ = port;
+    priv_->http_.setPort(port);
 }
 
 bool Session::authenticationRequired() const
 {
-    return priv_->authenticationRequired_;
+    return priv_->http_.authenticationRequired();
 }
 
 void Session::setAuthentication(Session::Authentication authentication)
 {
-    priv_->authenticationRequired_ = (authentication == Session::Authentication::Required);
+    if (authentication == Session::Authentication::Required)
+    {
+        priv_->http_.enableAuthentication();
+    }
+    else
+    {
+        priv_->http_.disableAuthentication();
+    }
 }
 
 std::string Session::username() const
 {
-    return priv_->username_;
+    return priv_->http_.username();
 }
 
 void Session::setUsername(const std::string &username)
 {
-    priv_->username_ = username;
+    priv_->http_.setUsername(username);
 }
 
 void Session::setUsername(std::string &&username)
 {
-    priv_->username_ = username;
+    priv_->http_.setUsername(std::forward<std::string>(username));
 }
 
 std::string Session::password() const
 {
-    return priv_->password_;
+    return priv_->http_.password();
 }
 
 void Session::setPassword(const std::string &password)
 {
-    priv_->password_ = password;
+    priv_->http_.setPassword(password);
 }
 
 void Session::setPassword(std::string &&password)
 {
-    priv_->password_ = password;
+    priv_->http_.setPassword(std::forward<std::string>(password));
+}
+
+std::int32_t Session::timeout() const
+{
+    return static_cast<std::int32_t>(priv_->http_.timeout().count());
+}
+
+void Session::setTimeout(std::int32_t value)
+{
+    priv_->http_.setTimeout(std::chrono::milliseconds(value));
+}
+
+void Session::setSSLErrorHandling(Session::SSLErrorHandling value)
+{
+    priv_->http_.setSSLErrorHandling(static_cast<librt::http::SSLErrorHandling>(value));
 }

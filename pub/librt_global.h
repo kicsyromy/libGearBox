@@ -25,4 +25,8 @@
     klass(const klass &other) = delete; \
     klass &operator =(const klass &other) = delete;
 
+#define DISABLE_MOVE(klass) \
+    klass(klass &&other) = delete; \
+    klass &operator =(klass &&other) = delete;
+
 #endif // LIBRT_GLOBAL_H

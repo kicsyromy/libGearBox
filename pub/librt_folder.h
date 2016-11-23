@@ -18,8 +18,8 @@ namespace librt
     {
     public:
         Folder(); // make librt::ReturnType happy
-        Folder(Folder &&);
-        ~Folder();
+        Folder(Folder &&) noexcept(true);
+        ~Folder() noexcept(true);
         Folder &operator =(Folder &&) noexcept(true);
 
     public:

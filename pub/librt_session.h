@@ -16,7 +16,8 @@ namespace librt
     class LIBRT_API Session
     {
     public:
-        static constexpr const char * DEFAULT_PATH = "/transmission/rpc";
+        static constexpr const char * DEFAULT_PATH { "/transmission/rpc" };
+        static constexpr const std::int32_t PORT_AUTODETECT { -1 };
 
     public:
         enum class Authentication
@@ -47,7 +48,7 @@ namespace librt
 
         Session(const std::string &url,
                 const std::string &path = DEFAULT_PATH,
-                std::int32_t port = -1,
+                std::int32_t port = PORT_AUTODETECT,
                 Authentication authentication = Authentication::None,
                 const std::string &username = "",
                 const std::string &password = "");
@@ -60,9 +61,6 @@ namespace librt
                 std::string &&password = "");
 
     public:
-        std::int32_t timeout() const;
-        void setTimeout(int32_t value);
-        void setSSLErrorHandling(SSLErrorHandling value);
         ReturnType<Statistics> statistics() const;
         ReturnType<std::vector<librt::Torrent>> torrents() const;
         ReturnType<std::vector<std::int32_t>> recentlyRemoved() const;
@@ -72,22 +70,28 @@ namespace librt
         std::string url() const;
         void setUrl(const std::string &url);
         void setUrl(std::string &&url);
+
         std::string path() const;
         void setPath(const std::string &path);
         void setPath(std::string &&path);
+
         std::int32_t port() const;
         void setPort(std::int32_t port);
+
         bool authenticationRequired() const;
         void setAuthentication(Authentication authentication);
         std::string username() const;
         void setUsername(const std::string &username);
         void setUsername(std::string &&username);
+
         std::string password() const;
         void setPassword(const std::string &password);
         void setPassword(std::string &&password);
 
-    public:
-        Error lastError() const;
+        std::int32_t timeout() const;
+        void setTimeout(int32_t value);
+
+        void setSSLErrorHandling(SSLErrorHandling value);
 
     private:
         std::shared_ptr<SessionPrivate> priv_;
