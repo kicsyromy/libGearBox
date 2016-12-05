@@ -46,10 +46,6 @@ namespace librt
 
     public:
         explicit Torrent(TorrentPrivate *priv);
-
-        Torrent(const Torrent &) = delete;
-        Torrent &operator=(const Torrent &) noexcept(true) = delete;
-
         Torrent(Torrent &&);
         Torrent &operator=(Torrent &&) noexcept(true);
         ~Torrent() noexcept(true);
@@ -102,6 +98,9 @@ namespace librt
 
     private:
         friend class Session;
+
+    private:
+        DISABLE_COPY(Torrent)
     };
 }
 

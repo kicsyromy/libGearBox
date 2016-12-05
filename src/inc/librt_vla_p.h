@@ -2,7 +2,12 @@
 #define LIBRT_VLA_P_H
 
 #include <cstddef>
+
+#ifndef PLATFORM_WINDOWS
+#include <alloca.h>
+#else
 #include <malloc.h>
+#endif
 
 #define make_vla_impl(type, size) new(static_cast<type*>(alloca(sizeof(type) * size))) type[size], size
 #define make_vla(type, size) ::librt::Array<type>(make_vla_impl(type, size)) 

@@ -59,7 +59,7 @@ namespace librt
                 Request()
                 {
                     sequential::attribute::set_value<Request::fields>(
-                        *this, std::move(::librt::TorrentPrivate::Files::attribute_names())
+                        *this, ::librt::TorrentPrivate::Files::attribute_names()
                     );
                 }
             };

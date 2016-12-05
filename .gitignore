@@ -40,3 +40,7 @@ build-*
 *.files
 *.includes
 
+# macOS Finder files
+.DS_Store
+._.DS_Store
+

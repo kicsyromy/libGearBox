@@ -22,8 +22,8 @@ namespace
                                       INTERNET_FLAG_IGNORE_REDIRECT_TO_HTTPS;
     constexpr auto CONNECTION_FLAGS_SSL = INTERNET_FLAG_RELOAD | INTERNET_FLAG_KEEP_CONNECTION | INTERNET_FLAG_NO_CACHE_WRITE |
                                           INTERNET_FLAG_SECURE;
-    constexpr Port HTTP_PORT = INTERNET_DEFAULT_HTTP_PORT;
-    constexpr Port HTTP_PORT_SSL = INTERNET_DEFAULT_HTTPS_PORT;
+    constexpr port_t HTTP_PORT = INTERNET_DEFAULT_HTTP_PORT;
+    constexpr port_t HTTP_PORT_SSL = INTERNET_DEFAULT_HTTPS_PORT;
 
     Error fromWinINetError(DWORD error)
     {
@@ -217,11 +217,11 @@ namespace
         return err;
     }
 
-    std::pair<std::int32_t, librt::http::HeaderArray> parseHeaders(char *buffer, std::size_t length)
+    std::pair<std::int32_t, header_array_t> parseHeaders(char *buffer, std::size_t length)
     {
         const char *key = nullptr;
         const char *statusStr = nullptr;
-        librt::http::HeaderArray headers;
+        header_array_t headers;
 
         std::size_t headersStart = 0;
         for (; headersStart < length - 1; ++headersStart)
@@ -405,12 +405,12 @@ void WinHttp::setHost(std::string &&hostname)
     hostname_ = validPrefix ? std::move(hostname.substr(prefixEndIndex)) : std::move(hostname);
 }
 
-Port WinHttp::port() const
+WinHttp::http_port_t WinHttp::port() const
 {
     return port_;
 }
 
-void WinHttp::setPort(HttpPort port)
+void WinHttp::setPort(http_port_t port)
 {
     closeSession();
     port_ = port;
@@ -486,29 +486,29 @@ void WinHttp::setPassword(std::string &&password)
     authentication_.password = std::move(password);
 }
 
-void WinHttp::setSSLErrorHandling(HttpSSLErrorHandling value)
+void WinHttp::setSSLErrorHandling(http_ssl_error_handling_t value)
 {
-    sslErrorHandlingEnabled_ = (value == HttpSSLErrorHandling::Aknowledge);
+    sslErrorHandlingEnabled_ = (value == http_ssl_error_handling_t::Aknowledge);
 }
 
-const Milliseconds &WinHttp::timeout() const
+const milliseconds_t &WinHttp::timeout() const
 {
     return timeout_;
 }
 
-void WinHttp::setTimeout(Milliseconds value)
+void WinHttp::setTimeout(milliseconds_t value)
 {
     closeSession();
     timeout_ = value;
 }
 
-librt::WinHttp::Request::Request(HINTERNET session,
+WinHttp::Request::Request(HINTERNET session,
                                  const std::string &path,
                                  DWORD connectionFlags,
                                  DWORD_PTR &requestId) :
     session_(session),
     path_(path),
-    requestType_(HttpRequestType::GET),
+    requestType_(http_request_t::GET),
     connectionFlags_(connectionFlags),
     requestId_(requestId),
     headers_(),
@@ -517,7 +517,7 @@ librt::WinHttp::Request::Request(HINTERNET session,
 {
 }
 
-librt::WinHttp::Request::~Request()
+WinHttp::Request::~Request()
 {
     if (data_ != nullptr)
     {
@@ -526,9 +526,9 @@ librt::WinHttp::Request::~Request()
     }
 }
 
-void librt::WinHttp::Request::setBody(const std::string &data)
+void WinHttp::Request::setBody(const std::string &data)
 {
-    requestType_ = HttpRequestType::POST;
+    requestType_ = http_request_t::POST;
     if (data_ != nullptr)
     {
         delete [] data_;
@@ -539,7 +539,7 @@ void librt::WinHttp::Request::setBody(const std::string &data)
     dataSize_ = static_cast<DWORD>(data.size());
 }
 
-void librt::WinHttp::Request::setHeaders(const librt::WinHttp::HttpHeaderArray &headers)
+void WinHttp::Request::setHeaders(const librt::WinHttp::http_header_array_t &headers)
 {
     for (const auto &header: headers)
     {
@@ -547,18 +547,18 @@ void librt::WinHttp::Request::setHeaders(const librt::WinHttp::HttpHeaderArray &
     }
 }
 
-void librt::WinHttp::Request::setHeader(const librt::WinHttp::HttpHeader &header)
+void WinHttp::Request::setHeader(const librt::WinHttp::http_header_t &header)
 {
     headers_[header.first] = header.second;
 }
 
-librt::WinHttp::HttpRequestResult librt::WinHttp::Request::send()
+WinHttp::http_request_result_t WinHttp::Request::send()
 {
     using namespace librt::http;
     std::int32_t httpStatus = Unknown;
-    HeaderArray responseHeaders;
+    http_header_array_t responseHeaders;
     std::string text;
-    Error err = { Error::Code::NoError, "" };
+    http_error_t err = { Error::Code::NoError, "" };
     double elapsed = 0;
 
     auto request = HttpOpenRequestA(
@@ -651,7 +651,7 @@ librt::WinHttp::HttpRequestResult librt::WinHttp::Request::send()
         err = fromWinINetError(GetLastError());
     }
     return {
-        HttpStatus(httpStatus),
+        http_status_t(httpStatus),
         {
             responseHeaders,
             text

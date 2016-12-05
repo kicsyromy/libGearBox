@@ -1,16 +1,15 @@
-#ifndef LIBRT_HTTP_WIN_P_H
-#define LIBRT_HTTP_WIN_P_H
-
-#include <windows.h>
-#include <wininet.h>
-
-#include "librt_global.h"
+#ifndef LIBRT_HTTP_MACOS_P_H
+#define LIBRT_HTTP_MACOS_P_H
 
 #include "librt_http_interface_p.h"
 
+@class librtCocoaHttpPrivate;
+@class NSMutableURLRequest;
+@class NSURLSession;
+
 namespace librt
 {
-    class WinHttp
+    class CocoaHttp
     {
     private:
         using milliseconds_t = librt::http::milliseconds_t;
@@ -24,10 +23,10 @@ namespace librt
         using http_request_result_t = librt::http::RequestResult;
 
     public:
-        explicit WinHttp(const std::string &userAgent);
-        WinHttp(WinHttp &&other) noexcept(true);
-        WinHttp &operator =(WinHttp &&) noexcept(true) = default;
-        ~WinHttp();
+        explicit CocoaHttp(const std::string &userAgent);
+        CocoaHttp(CocoaHttp &&) = default;
+        CocoaHttp &operator =(CocoaHttp &&) = default;
+        ~CocoaHttp();
 
     public:
         const std::string &host() const;
@@ -61,15 +60,10 @@ namespace librt
         class Request
         {
         public:
-            Request(HINTERNET session,
-                    const std::string &path,
-                    DWORD connectionFlags,
-                    DWORD_PTR &requestId);
-            Request(const Request &);             /* Visual Studio thinks it needs this */
-            Request &operator =(const Request &); /* Visual Studio thinks it needs this */
-            Request(Request &&) noexcept(true) = default;
-            Request &operator =(Request &&) noexcept(true) = default;
-            ~Request();
+            Request(NSMutableURLRequest *request);
+            Request(Request &&) noexcept(true);
+            Request &operator =(Request &&) noexcept(true);
+            ~Request() noexcept(true);
 
         public:
             void setBody(const std::string &data);
@@ -80,19 +74,13 @@ namespace librt
             http_request_result_t send();
 
         private:
-            HINTERNET session_;
-            const std::string &path_;
-            http_request_t requestType_;
-            DWORD connectionFlags_;
-            DWORD_PTR &requestId_;
-            http_header_array_t headers_;
-            char *data_;
-            DWORD dataSize_;
+            NSMutableURLRequest *request_;
+            NSURLSession *session_;
+            
+        private:
+            DISABLE_COPY(Request);
         };
         Request createRequest();
-
-    private:
-        void closeSession();
 
     private:
         std::string hostname_;
@@ -102,18 +90,10 @@ namespace librt
         struct { std::string username; std::string password; } authentication_;
         bool sslErrorHandlingEnabled_;
         milliseconds_t timeout_;
-
+        
     private:
-        HINTERNET connection_;
-        HINTERNET session_;
-        DWORD_PTR requestId_;
-
-    private:
-        int connectionFlags_;
-
-    private:
-        DISABLE_COPY(WinHttp)
+        librtCocoaHttpPrivate *impl_;
     };
 }
 
-#endif // LIBRT_HTTP_WIN_P_H 
+#endif // LIBRT_HTTP_MACOS_P_H

@@ -1,8 +1,6 @@
 #ifndef LIBRT_HTTP_WIN_P_H
 #define LIBRT_HTTP_WIN_P_H
 
-#include <atomic>
-
 #include <curl/curl.h>
 
 #include "librt_global.h"
@@ -13,19 +11,19 @@ namespace librt
     class CUrlHttp
     {
     private:
-        using Milliseconds = librt::http::Milliseconds;
-        using HttpHeader = librt::http::Header;
-        using HttpHeaderArray = librt::http::HeaderArray;
-        using HttpPort = librt::http::Port;
-        using HttpRequestType = librt::http::RequestType;
-        using HttpSSLErrorHandling = librt::http::SSLErrorHandling;
-        using HttpStatus = librt::http::Status;
-        using HttpRequestError = librt::http::Error;
-        using HttpRequestResult = librt::http::RequestResult;
+        using milliseconds_t = librt::http::milliseconds_t;
+        using http_header_t = librt::http::header_t;
+        using http_header_array_t = librt::http::header_array_t;
+        using http_port_t = librt::http::port_t;
+        using http_request_t = librt::http::RequestType;
+        using http_ssl_error_handling_t = librt::http::SSLErrorHandling;
+        using http_status_t = librt::http::Status;
+        using http_error_t = librt::http::Error;
+        using http_request_result_t = librt::http::RequestResult;
 
     public:
         explicit CUrlHttp(const std::string &userAgent);
-        CUrlHttp(CUrlHttp&&other) noexcept(true) = default;
+        CUrlHttp(CUrlHttp &&) noexcept(true) = default;
         CUrlHttp &operator =(CUrlHttp &&) noexcept(true) = default;
         ~CUrlHttp();
 
@@ -34,8 +32,8 @@ namespace librt
         void setHost(const std::string &hostname);
         void setHost(std::string &&hostname);
 
-        HttpPort port() const;
-        void setPort(HttpPort port);
+        http_port_t port() const;
+        void setPort(http_port_t port);
 
         const std::string &path() const;
         void setPath(const std::string &path);
@@ -52,10 +50,10 @@ namespace librt
         void setPassword(const std::string &password);
         void setPassword(std::string &&password);
 
-        void setSSLErrorHandling(HttpSSLErrorHandling value);
+        void setSSLErrorHandling(http_ssl_error_handling_t value);
 
-        const Milliseconds &timeout() const;
-        void setTimeout(Milliseconds value);
+        const milliseconds_t &timeout() const;
+        void setTimeout(milliseconds_t value);
 
     public:
         class Request
@@ -68,15 +66,15 @@ namespace librt
 
         public:
             void setBody(const std::string &data);
-            void setHeaders(const HttpHeaderArray &headers);
-            void setHeader(const HttpHeader &header);
+            void setHeaders(const http_header_array_t &headers);
+            void setHeader(const http_header_t &header);
 
         public:
-            HttpRequestResult send();
+            http_request_result_t send();
 
         private:
             CURL *handle_;
-            HttpHeaderArray headers_;
+            http_header_array_t headers_;
 
         private:
             DISABLE_COPY(Request)
@@ -85,12 +83,12 @@ namespace librt
 
     private:
         std::string hostname_;
-        HttpPort port_;
+        http_port_t port_;
         std::string path_;
         bool authenticationEnabled_;
         struct { std::string username; std::string password; } authentication_;
         bool sslErrorHandlingEnabled_;
-        Milliseconds timeout_;
+        milliseconds_t timeout_;
 
     private:
         CURL *handle_;

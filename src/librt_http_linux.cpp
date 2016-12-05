@@ -57,7 +57,7 @@ namespace
             err.errorCode = Error::Code::ConnectionFailure;
             break;
         case CURLE_OPERATION_TIMEDOUT:
-            err.errorCode = Error::Code::OperationTimedout;
+            err.errorCode = Error::Code::OperationTimedOut;
             break;
         case CURLE_SSL_CONNECT_ERROR:
             err.errorCode = Error::Code::SSLConnectError;
@@ -119,9 +119,9 @@ namespace
     {
         data->append(static_cast<char *>(ptr), size * nmemb);
         return size * nmemb;
-    };
+    }
 
-    std::size_t headerCallback(void *ptr, size_t size, size_t nmemb, HeaderArray *data)
+    std::size_t headerCallback(void *ptr, size_t size, size_t nmemb, header_array_t *data)
     {
         std::string header(static_cast<char *>(ptr), size * nmemb);
         auto found = header.find("HTTP/");
@@ -139,7 +139,7 @@ namespace
             data->clear();
         }
         return size * nmemb;
-    };
+    }
 }
 
 CUrlHttp::CUrlHttp(const std::string &userAgent) :
@@ -193,12 +193,12 @@ void CUrlHttp::setHost(std::string &&hostname)
     hostname_ = std::move(hostname);
 }
 
-Port CUrlHttp::port() const
+CUrlHttp::http_port_t CUrlHttp::port() const
 {
     return port_;
 }
 
-void CUrlHttp::setPort(HttpPort port)
+void CUrlHttp::setPort(http_port_t port)
 {
     port_ = port;
 }
@@ -267,17 +267,17 @@ void CUrlHttp::setPassword(std::string &&password)
     authentication_.password = std::move(password);
 }
 
-void CUrlHttp::setSSLErrorHandling(HttpSSLErrorHandling value)
+void CUrlHttp::setSSLErrorHandling(http_ssl_error_handling_t value)
 {
-    sslErrorHandlingEnabled_ = (value == HttpSSLErrorHandling::Aknowledge);
+    sslErrorHandlingEnabled_ = (value == http_ssl_error_handling_t::Aknowledge);
 }
 
-const Milliseconds &CUrlHttp::timeout() const
+const milliseconds_t &CUrlHttp::timeout() const
 {
     return timeout_;
 }
 
-void CUrlHttp::setTimeout(Milliseconds value)
+void CUrlHttp::setTimeout(milliseconds_t value)
 {
     timeout_ = value;
 }
@@ -301,7 +301,7 @@ void librt::CUrlHttp::Request::setBody(const std::string &data)
     curl_easy_setopt(handle_, CURLOPT_COPYPOSTFIELDS, data.c_str());
 }
 
-void librt::CUrlHttp::Request::setHeaders(const CUrlHttp::HttpHeaderArray &headers)
+void librt::CUrlHttp::Request::setHeaders(const CUrlHttp::http_header_array_t &headers)
 {
     for (const auto &header: headers)
     {
@@ -309,18 +309,18 @@ void librt::CUrlHttp::Request::setHeaders(const CUrlHttp::HttpHeaderArray &heade
     }
 }
 
-void librt::CUrlHttp::Request::setHeader(const CUrlHttp::HttpHeader &header)
+void librt::CUrlHttp::Request::setHeader(const CUrlHttp::http_header_t &header)
 {
     headers_[header.first] = header.second;
 }
 
-CUrlHttp::HttpRequestResult CUrlHttp::Request::send()
+CUrlHttp::http_request_result_t CUrlHttp::Request::send()
 {
     using namespace librt::http;
     std::int32_t httpStatus = librt::http::Status::Unknown;
-    HeaderArray responseHeaders;
+    http_header_array_t responseHeaders;
     std::string text;
-    Error err = { Error::Code::InternalError, "An internal connection handle is invalid. "
+    http_error_t err = { Error::Code::InternalError, "An internal connection handle is invalid. "
                   "This is most likely due to operating an a moved or otherwise invalidated "
                   "instance of this object" };
     double elapsed = 0;
@@ -354,7 +354,7 @@ CUrlHttp::HttpRequestResult CUrlHttp::Request::send()
     }
 
     return {
-        HttpStatus(httpStatus),
+        http_status_t(httpStatus),
         {
             responseHeaders,
             text

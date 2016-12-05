@@ -19,8 +19,8 @@ namespace librt
     public:
         Folder(); // make librt::ReturnType happy
         Folder(Folder &&) noexcept(true);
-        ~Folder() noexcept(true);
         Folder &operator =(Folder &&) noexcept(true);
+        ~Folder() noexcept(true);
 
     public:
         const std::string &name() const;

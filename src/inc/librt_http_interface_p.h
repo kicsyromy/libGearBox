@@ -18,10 +18,10 @@ namespace librt
 {
     namespace http
     {
-        using Header = std::pair<std::string, std::string>;
-        using HeaderArray = std::map<std::string, std::string, common::CaseInsensitiveCompare>;
-        using Milliseconds = decltype(std::chrono::milliseconds(0));
-        using Port = std::int32_t;
+        using header_t = std::pair<std::string, std::string>;
+        using header_array_t = std::map<std::string, std::string, common::CaseInsensitiveCompare>;
+        using milliseconds_t = decltype(std::chrono::milliseconds(0));
+        using port_t = std::int32_t;
 
         enum class RequestType
         {
@@ -132,7 +132,7 @@ namespace librt
                 RequestInvalid,
                 NetworkReceiveError,
                 NetworkSendFailure,
-                OperationTimedout,
+                OperationTimedOut,
                 ProxyResolutionFailure,
                 CookieDeclined,
                 SSLConnectError,
@@ -154,7 +154,7 @@ namespace librt
         {
             Status status;
             struct {
-                HeaderArray headers;
+                header_array_t headers;
                 std::string text;
             } response;
             double elapsed;
@@ -174,8 +174,8 @@ namespace librt
             inline void setHost(const std::string &hostname) { implementation_.setHost(hostname); }
             inline void setHost(std::string &&hostname) { implementation_.setHost(hostname); }
 
-            inline Port port() const { return implementation_.port(); }
-            inline void setPort(Port port) { implementation_.setPort(port); }
+            inline port_t port() const { return implementation_.port(); }
+            inline void setPort(port_t port) { implementation_.setPort(port); }
 
             inline const std::string &path() const { return implementation_.path(); }
             inline void setPath(const std::string &path) { implementation_.setPath(path); }
@@ -197,8 +197,8 @@ namespace librt
                 implementation_.setSSLErrorHandling(value);
             }
 
-            inline const Milliseconds &timeout() const { return implementation_.timeout(); }
-            inline void setTimeout(Milliseconds value) { implementation_.setTimeout(value); }
+            inline const milliseconds_t &timeout() const { return implementation_.timeout(); }
+            inline void setTimeout(milliseconds_t value) { implementation_.setTimeout(value); }
 
         public:
             inline typename Implementation::Request createRequest() {

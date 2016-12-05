@@ -26,13 +26,14 @@ namespace librt
             value = std::move(other.value);
         }
 
-        ReturnType(const ReturnType &other) = delete;
-        ReturnType &operator =(const ReturnType &other) = delete;
         ~ReturnType() noexcept(true) = default;
 
         Error error;
         T value;
         constexpr operator T() { return std::move(value); }
+
+    private:
+        DISABLE_COPY(ReturnType)
     };
 }
 

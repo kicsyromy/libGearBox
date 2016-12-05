@@ -88,7 +88,7 @@ Error Torrent::start()
 
         if (auto session = priv_->session_.lock())
         {
-            auto response = std::move(session->sendRequest("torrent-start", request));
+            auto response = session->sendRequest("torrent-start", request);
             error = std::move(response.error);
         }
         else
@@ -117,7 +117,7 @@ Error Torrent::startNow()
 
         if (auto session = priv_->session_.lock())
         {
-            auto response = std::move(session->sendRequest("torrent-start-now", request));
+            auto response = session->sendRequest("torrent-start-now", request);
             error = std::move(response.error);
         }
         else
@@ -146,7 +146,7 @@ Error Torrent::stop()
 
         if (auto session = priv_->session_.lock())
         {
-            auto response = std::move(session->sendRequest("torrent-stop", request));
+            auto response = session->sendRequest("torrent-stop", request);
             error = std::move(response.error);
         }
         else
@@ -175,7 +175,7 @@ Error Torrent::verify()
 
         if (auto session = priv_->session_.lock())
         {
-            auto response = std::move(session->sendRequest("torrent-verify", request));
+            auto response = session->sendRequest("torrent-verify", request);
             error = std::move(response.error);
         }
         else
@@ -204,7 +204,7 @@ Error Torrent::askForMorePeers()
 
         if (auto session = priv_->session_.lock())
         {
-            auto response = std::move(session->sendRequest("torrent-reannounce", request));
+            auto response = session->sendRequest("torrent-reannounce", request);
             error = std::move(response.error);
         }
         else
@@ -234,7 +234,7 @@ Error Torrent::remove(LocalDataAction action)
 
         if (auto session = priv_->session_.lock())
         {
-            auto response = std::move(session->sendRequest("torrent-remove", request));
+            auto response = session->sendRequest("torrent-remove", request);
             error = std::move(response.error);
         }
         else
@@ -263,7 +263,7 @@ Error Torrent::queueMoveUp()
 
         if (auto session = priv_->session_.lock())
         {
-            auto response =std::move(session->sendRequest("queue-move-up", request));
+            auto response = session->sendRequest("queue-move-up", request);
             error = std::move(response.error);
         }
         else
@@ -292,7 +292,7 @@ Error Torrent::queueMoveDown()
 
         if (auto session = priv_->session_.lock())
         {
-            auto response = std::move(session->sendRequest("queue-move-down", request));
+            auto response = session->sendRequest("queue-move-down", request);
             error = std::move(response.error);
         }
         else
@@ -321,7 +321,7 @@ Error Torrent::queueMoveTop()
 
         if (auto session = priv_->session_.lock())
         {
-            auto response = std::move(session->sendRequest("queue-move-top", request));
+            auto response = session->sendRequest("queue-move-top", request);
             error = std::move(response.error);
         }
         else
@@ -350,7 +350,7 @@ Error Torrent::queueMoveBottom()
 
         if (auto session = priv_->session_.lock())
         {
-            auto response = std::move(session->sendRequest("queue-move-bottom", request));
+            auto response = session->sendRequest("queue-move-bottom", request);
             error = std::move(response.error);
         }
         else
@@ -380,7 +380,7 @@ Error Torrent::update()
 
         if (auto session = priv_->session_.lock())
         {
-            auto response = std::move(session->sendRequest("torrent-get", request));
+            auto response = session->sendRequest("torrent-get", request);
             error = std::move(response.error);
             if (!error)
             {
@@ -432,7 +432,7 @@ Error Torrent::setWantedFiles(const std::vector<std::reference_wrapper<const Fil
 
         if (auto session = priv_->session_.lock())
         {
-            error = std::move(session->sendRequest("torrent-set", request).error);
+            error = session->sendRequest("torrent-set", request).error;
         }
         else
         {
@@ -446,7 +446,7 @@ Error Torrent::setWantedFiles(const std::vector<std::reference_wrapper<const Fil
         error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
     }
 
-    return std::move(error);
+    return error;
 }
 
 Error Torrent::setSkippedFiles(const std::vector<std::reference_wrapper<const File>> &files)
@@ -467,7 +467,7 @@ Error Torrent::setSkippedFiles(const std::vector<std::reference_wrapper<const Fi
 
         if (auto session = priv_->session_.lock())
         {
-            error = std::move(session->sendRequest("torrent-set", request).error);
+            error = session->sendRequest("torrent-set", request).error;
         }
         else
         {
@@ -481,7 +481,7 @@ Error Torrent::setSkippedFiles(const std::vector<std::reference_wrapper<const Fi
         error = std::make_pair(Error::Code::libRTInvalidTorrent, INVALID_TORRENT);
     }
 
-    return std::move(error);
+    return error;
 }
 
 int32_t Torrent::id() const
@@ -557,7 +557,7 @@ ReturnType<Folder> Torrent::content() const
 
         if (auto session = priv_->session_.lock())
         {
-            session::Response response(std::move(session->sendRequest("torrent-get", jsonFileRequest.output())));
+            session::Response response(session->sendRequest("torrent-get", jsonFileRequest.output()));
 
             if (!response.error)
             {
@@ -625,7 +625,7 @@ ReturnType<std::vector<File>> Torrent::files() const
 
         if (auto session = priv_->session_.lock())
         {
-            session::Response response(std::move(session->sendRequest("torrent-get", jsonFileRequest.output())));
+            session::Response response(session->sendRequest("torrent-get", jsonFileRequest.output()));
 
             if (!response.error)
             {
@@ -693,7 +693,7 @@ Error Torrent::setQueuePosition(int32_t position)
 
         if (auto session = priv_->session_.lock())
         {
-            auto response = std::move(session->sendRequest("torrent-set", request));
+            auto response = session->sendRequest("torrent-set", request);
             error = std::move(response.error);
         }
         else
@@ -731,7 +731,7 @@ Error Torrent::setDownloadDir(const std::string &path, MoveType move)
 
         if (auto session = priv_->session_.lock())
         {
-            auto response = std::move(session->sendRequest("torrent-set-location", jsonFormat.output()));
+            auto response = session->sendRequest("torrent-set-location", jsonFormat.output());
             error = std::move(response.error);
         }
         else

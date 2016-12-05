@@ -59,7 +59,7 @@
     std::terminate(); \
     } while (0)
 
-#ifdef DEBUG_BUILD
+#ifdef RT_LOG_DEBUG
 #define LOG_DEBUG(...) \
     do { \
     std::string log = fmt::format(__VA_ARGS__); \
@@ -72,6 +72,6 @@
     } while (0)
 #else
 #define LOG_DEBUG(...)
-#endif
+#endif // RT_LOG_DEBUG
 
 #endif // LIBRT_LOGGER_P_H

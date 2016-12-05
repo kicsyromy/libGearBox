@@ -12,6 +12,7 @@
 #elif defined(PLATFORM_LINUX)
 #include "librt_http_linux_p.h"
 #elif defined(PLATFORM_MACOS)
+#include "librt_http_macos_p.h"
 #else
 #error "Unsupported platform"
 #endif
@@ -72,6 +73,7 @@ namespace librt
 #elif defined(PLATFORM_LINUX)
     using HttpRequestHandler = librt::http::Interface<librt::CUrlHttp>;
 #elif defined(PLATFORM_MACOS)
+    using HttpRequestHandler = librt::http::Interface<librt::CocoaHttp>;
 #else
 #error "Unsupported platform"
 #endif

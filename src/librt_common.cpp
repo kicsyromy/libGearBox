@@ -2,6 +2,11 @@
 
 #include <algorithm>
 #include <cstring>
+#include <cctype>
+
+#ifndef PLATFORM_WINDOWS
+#include <strings.h>
+#endif
 
 using namespace librt::common;
 
@@ -14,33 +19,9 @@ bool CaseInsensitiveCompare::operator()(const std::string &s1, const std::string
 
 bool CaseInsensitiveCompare::operator()(const char *s1, const char *s2) const
 {
-    const char *ap = s1;
-    const char *bp = s2;
-    bool result = false;
-
-    while ((*ap != '\0') && (*bp != '\0'))
-    {
-        if (std::tolower(*ap) < std::tolower(*bp))
-        {
-            result = true;
-            break;
-        }
-        if (std::tolower(*ap++) > std::tolower(*bp++))
-        {
-            result = false;
-            break;
-        }
-    }
-
-    if (*ap == *bp)
-    {
-        result = false;
-    }
-
-    if ((*ap == '\0') && (*bp != '\0'))
-    {
-        result = true;
-    }
-
-    return result;
+#ifdef PLATFORM_WINDOWS
+    return (_stricmp(s1, s2) < 0);
+#else
+    return (strcasecmp(s1, s2) < 0);
+#endif
 }
