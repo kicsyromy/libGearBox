@@ -19,7 +19,7 @@ include(macOSConfig)
 include(WindowsConfig)
 include(TestCompilerSupport)
 
-if (NOT PLATFORM_OK)
+if (NOT RT_PLATFORM_OK)
     message (WARNING "Building on unsupported platform")
     if (NOT RT_ALLOW_UNSUPPORTED_PLATFORM)
         message (FATAL_ERROR "Stopping since RT_ALLOW_UNSUPPORTED_PLATFORM is not set")
@@ -52,8 +52,8 @@ add_custom_target (seq_headers SOURCES ${SEQ_HEADERS})
 include_directories ("${PROJECT_SOURCE_DIR}/3rdparty/fmt")
 set (FMT_SOURCE "${PROJECT_SOURCE_DIR}/3rdparty/fmt/fmt/format.cc")
 
-include_directories (SYSTEM ${INCLUDE_DIRS})
-link_directories (${LIB_DIRS})
+include_directories (SYSTEM ${RT_INCLUDE_DIRS})
+link_directories (${RT_LIB_DIRS})
 
 aux_source_directory (${PROJECT_SOURCE_DIR}/src LIBRT_SOURCES)
 
@@ -70,7 +70,7 @@ else ()
     message (STATUS "Building shared library")
 endif ()
 
-target_link_libraries (rt ${LIBS})
+target_link_libraries (rt ${RT_LIBS})
 set_target_properties (
     rt         PROPERTIES
     VERSION    ${librt_VERSION_MAJOR}.${librt_VERSION_MINOR}.${librt_VERSION_PATCH}
@@ -78,7 +78,7 @@ set_target_properties (
 )
 set_target_properties (
     rt            PROPERTIES
-    COMPILE_FLAGS "${COMPILER_FLAGS}"
+    COMPILE_FLAGS "${RT_COMPILER_FLAGS}"
 )
 
 install (

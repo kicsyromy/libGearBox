@@ -67,11 +67,11 @@ namespace librt
         Error updateTorrentStats(std::vector<std::reference_wrapper<Torrent>> &torrents);
 
     public:
-        std::string url() const;
+        const std::string &url() const;
         void setUrl(const std::string &url);
         void setUrl(std::string &&url);
 
-        std::string path() const;
+        const std::string &path() const;
         void setPath(const std::string &path);
         void setPath(std::string &&path);
 
@@ -80,11 +80,12 @@ namespace librt
 
         bool authenticationRequired() const;
         void setAuthentication(Authentication authentication);
-        std::string username() const;
+
+        const std::string &username() const;
         void setUsername(const std::string &username);
         void setUsername(std::string &&username);
 
-        std::string password() const;
+        const std::string &password() const;
         void setPassword(const std::string &password);
         void setPassword(std::string &&password);
 

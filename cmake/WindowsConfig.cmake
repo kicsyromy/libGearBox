@@ -1,11 +1,11 @@
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     add_definitions (-DPLATFORM_WINDOWS)
-    set (PLATFORM_OK TRUE)
+    set (RT_PLATFORM_OK TRUE)
 
-    set (COMPILER_FLAGS "")
+    set (RT_COMPILER_FLAGS "")
 
-    set (INCLUDE_DIRS "")
-    set (LIB_DIRS "")
-    set (LIBS "wininet.lib")
+    set (RT_INCLUDE_DIRS "")
+    set (RT_LIB_DIRS "")
+    set (RT_LIBS "wininet.lib")
 endif ()
 

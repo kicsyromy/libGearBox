@@ -303,7 +303,7 @@ Error Session::updateTorrentStats(std::vector<std::reference_wrapper<Torrent>> &
     return std::move(response.error);
 }
 
-std::string Session::url() const
+const std::string &Session::url() const
 {
     return priv_->http_.host();
 }
@@ -318,7 +318,7 @@ void Session::setUrl(std::string &&url)
     priv_->http_.setHost(std::forward<std::string>(url));
 }
 
-std::string Session::path() const
+const std::string &Session::path() const
 {
     return priv_->http_.path();
 }
@@ -360,7 +360,7 @@ void Session::setAuthentication(Session::Authentication authentication)
     }
 }
 
-std::string Session::username() const
+const std::string &Session::username() const
 {
     return priv_->http_.username();
 }
@@ -375,7 +375,7 @@ void Session::setUsername(std::string &&username)
     priv_->http_.setUsername(std::forward<std::string>(username));
 }
 
-std::string Session::password() const
+const std::string &Session::password() const
 {
     return priv_->http_.password();
 }
