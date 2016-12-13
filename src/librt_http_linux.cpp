@@ -270,6 +270,17 @@ void CUrlHttp::setPassword(std::string &&password)
 void CUrlHttp::setSSLErrorHandling(http_ssl_error_handling_t value)
 {
     sslErrorHandlingEnabled_ = (value == http_ssl_error_handling_t::Aknowledge);
+    if (!sslErrorHandlingEnabled_)
+    {
+        curl_easy_setopt(handle_, CURLOPT_SSL_VERIFYPEER, 0L);
+        curl_easy_setopt(handle_, CURLOPT_SSL_VERIFYHOST, 0L);
+    }
+    else
+    {
+        curl_easy_setopt(handle_, CURLOPT_SSL_VERIFYPEER, 1L);
+        curl_easy_setopt(handle_, CURLOPT_SSL_VERIFYHOST, 1L);
+    }
+
 }
 
 const milliseconds_t &CUrlHttp::timeout() const
@@ -280,10 +291,12 @@ const milliseconds_t &CUrlHttp::timeout() const
 void CUrlHttp::setTimeout(milliseconds_t value)
 {
     timeout_ = value;
+    curl_easy_setopt(handle_, CURLOPT_TIMEOUT_MS, timeout_.count());
 }
 
 CUrlHttp::Request::Request(CURL *handle) :
-    handle_(curl_easy_duphandle(handle))
+    handle_(handle),
+    headers_()
 {
 }
 
@@ -366,33 +379,19 @@ CUrlHttp::http_request_result_t CUrlHttp::Request::send()
 
 CUrlHttp::Request CUrlHttp::createRequest()
 {
+    auto curl = curl_easy_duphandle(handle_);
+
     std::string url = fmt::format("{}{}{}", hostname_, port_ > 0 ? fmt::format(":{}", port_) : "", path_);
-    curl_easy_setopt(handle_, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(handle_, CURLOPT_TIMEOUT_MS, timeout_.count());
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
     if (authenticationEnabled_)
     {
-        curl_easy_setopt(handle_,
+        curl_easy_setopt(curl,
                          CURLOPT_USERPWD,
                          fmt::format("{}:{}", authentication_.username, authentication_.password).c_str());
     }
-    else
-    {
-        curl_easy_setopt(handle_, CURLOPT_USERPWD, nullptr);
-    }
 
-    if (!sslErrorHandlingEnabled_)
-    {
-        curl_easy_setopt(handle_, CURLOPT_SSL_VERIFYPEER, 0L);
-        curl_easy_setopt(handle_, CURLOPT_SSL_VERIFYHOST, 0L);
-    }
-    else
-    {
-        curl_easy_setopt(handle_, CURLOPT_SSL_VERIFYPEER, 1L);
-        curl_easy_setopt(handle_, CURLOPT_SSL_VERIFYHOST, 1L);
-    }
-
-    return { handle_ };
+    return { curl };
 }
 
 #endif // PLATFORM_LINUX
