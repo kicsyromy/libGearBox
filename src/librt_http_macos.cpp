@@ -516,6 +516,7 @@ void CocoaHttp::Request::setBody(const std::string &data)
 {
     if (data.empty())
     {
+        [request_ setValue:@"0" forHTTPHeaderField:@"Content-Length"];
         [request_ setHTTPMethod:@"GET"];
         [request_ setHTTPBody:nil];
     }
@@ -528,7 +529,6 @@ void CocoaHttp::Request::setBody(const std::string &data)
             setValue:[@"" stringByAppendingFormat:@"%lu", static_cast<unsigned long>([postData length])]
             forHTTPHeaderField:@"Content-Length"
         ];
-        [request_ setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
         [request_ setHTTPBody:postData];
     }
 }

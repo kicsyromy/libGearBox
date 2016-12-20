@@ -68,6 +68,7 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
 
     LOG_DEBUG("Requesting \"{}\": \n{}", method, jsonFormat.output().dump(4));
     auto r = http_.createRequest();
+    r.setHeader({ "Content-Type", "application/json" });
     r.setBody(jsonFormat.output().dump());
 
     /* As per the Transmission documentation:                                   */
@@ -82,7 +83,7 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
     for (std::int32_t it = 0; it < RETRY_COUNT; ++it)
     {
         r.setHeader({ "X-Transmission-Session-Id", sessionId_ });
-        auto result = r.send();
+        auto &&result = r.send();
 
         if (result.error)
         {
