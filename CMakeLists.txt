@@ -12,6 +12,7 @@ option (RT_STATIC_LIB "Build static library if set to ON otherwise build shared 
 option (RT_DEBUG_LOGS "Build with additional debug logs. CAUTION: Do not use in production." OFF)
 option (RT_ALLOW_UNSUPPORTED_COMPILER "Allow compilation using an unsupported compiler." OFF)
 option (RT_ALLOW_UNSUPPORTED_PLATFORM "Allow compilation on an unsupported platform." OFF)
+option (RT_ENABLE_TESTS "Build tests." OFF)
 
 list (APPEND CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(LinuxConfig)
@@ -27,14 +28,14 @@ if (NOT RT_PLATFORM_OK)
 endif ()
 
 ## PRIVATE HEADERS ##
-include_directories ("${PROJECT_SOURCE_DIR}/src/inc")
-set (librt_PRIVATE_HEADERS "${PROJECT_SOURCE_DIR}/src/inc")
+include_directories ("${PROJECT_SOURCE_DIR}/src/include")
+set (librt_PRIVATE_HEADERS "${PROJECT_SOURCE_DIR}/src/include")
 file (GLOB_RECURSE PRIVATE_HEADERS "${librt_PRIVATE_HEADERS}/*.h")
 add_custom_target (private_headers SOURCES ${PRIVATE_HEADERS})
 
 ## PUBLIC HEADERS ##
-include_directories ("${PROJECT_SOURCE_DIR}/pub")
-set (librt_PUBLIC_HEADERS  "${PROJECT_SOURCE_DIR}/pub")
+include_directories ("${PROJECT_SOURCE_DIR}/include")
+set (librt_PUBLIC_HEADERS  "${PROJECT_SOURCE_DIR}/include")
 file (GLOB_RECURSE PUBLIC_HEADERS "${librt_PUBLIC_HEADERS}/*.h")
 add_custom_target (public_headers SOURCES ${PUBLIC_HEADERS})
 
@@ -92,3 +93,7 @@ install (
     DIRECTORY ${librt_PUBLIC_HEADERS}/
     DESTINATION include/librt
 )
+
+if (RT_ENABLE_TESTS)
+    add_subdirectory (tests)
+endif()
