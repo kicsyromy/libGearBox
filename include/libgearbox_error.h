@@ -7,7 +7,7 @@
 
 namespace gearbox
 {
-    class LIBRT_API Error
+    class GEARBOX_API Error
     {
     public:
         enum class Code

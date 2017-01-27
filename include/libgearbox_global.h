@@ -16,9 +16,9 @@
 #endif
 
 #if defined(GEARBOX_LIB)
-#   define LIBRT_API    EXPORT_SYMBOL
+#   define GEARBOX_API    EXPORT_SYMBOL
 #else
-#   define LIBRT_API    IMPORT_SYMBOL
+#   define GEARBOX_API    IMPORT_SYMBOL
 #endif
 
 #define DISABLE_COPY(klass) \

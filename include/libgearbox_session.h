@@ -13,7 +13,7 @@ namespace gearbox
 {
     class SessionPrivate;
 
-    class LIBRT_API Session
+    class GEARBOX_API Session
     {
     public:
         static constexpr const char * DEFAULT_PATH { "/transmission/rpc" };

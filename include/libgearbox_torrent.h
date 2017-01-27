@@ -17,7 +17,7 @@ namespace gearbox
     class TorrentPrivate;
     class FolderPrivate;
 
-    class LIBRT_API Torrent
+    class GEARBOX_API Torrent
     {
     public:
         enum class Status

@@ -10,7 +10,7 @@ namespace gearbox
     class Torrent;
     class FolderPrivate;
 
-    class LIBRT_API File
+    class GEARBOX_API File
     {
     public:
         enum class Priority

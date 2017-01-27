@@ -14,7 +14,7 @@ namespace gearbox
     class Torrent;
     class FolderPrivate;
 
-    class LIBRT_API Folder
+    class GEARBOX_API Folder
     {
     public:
         Folder(); // make gearbox::ReturnType happy
