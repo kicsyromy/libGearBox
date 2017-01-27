@@ -1,18 +1,18 @@
 cmake_minimum_required (VERSION 2.8.12)
-project (librt)
-add_definitions (-DRT_LIB)
+project (libgearbox)
+add_definitions (-DGEARBOX_LIB)
 
-set (librt_VERSION_MAJOR 0)
-set (librt_VERSION_MINOR 0)
-set (librt_VERSION_PATCH 3)
-add_definitions (-DLIBRT_VERISION=${librt_VERSION_MAJOR}${LIBRT_VERSION_MINOR}${LIBRT_VERSION_PATCH})
-add_definitions (-DLIBRT_VERISION_STR="${librt_VERSION_MAJOR}.${librt_VERSION_MINOR}.${librt_VERSION_PATCH}")
+set (libgearbox_VERSION_MAJOR 0)
+set (libgearbox_VERSION_MINOR 0)
+set (libgearbox_VERSION_PATCH 3)
+add_definitions (-DLIBGEARBOX_VERISION=${libgearbox_VERSION_MAJOR}${libgearbox_VERSION_MINOR}${libgearbox_VERSION_PATCH})
+add_definitions (-DLIBGEARBOX_VERISION_STR="${libgearbox_VERSION_MAJOR}.${libgearbox_VERSION_MINOR}.${libgearbox_VERSION_PATCH}")
 
-option (RT_STATIC_LIB "Build static library if set to ON otherwise build shared library." ON)
-option (RT_DEBUG_LOGS "Build with additional debug logs. CAUTION: Do not use in production." OFF)
-option (RT_ALLOW_UNSUPPORTED_COMPILER "Allow compilation using an unsupported compiler." OFF)
-option (RT_ALLOW_UNSUPPORTED_PLATFORM "Allow compilation on an unsupported platform." OFF)
-option (RT_ENABLE_TESTS "Build tests." OFF)
+option (GEARBOX_STATIC_LIB "Build static library if set to ON otherwise build shared library." ON)
+option (GEARBOX_DEBUG_LOGS "Build with additional debug logs. CAUTION: Do not use in production." OFF)
+option (GEARBOX_ALLOW_UNSUPPORTED_COMPILER "Allow compilation using an unsupported compiler." OFF)
+option (GEARBOX_ALLOW_UNSUPPORTED_PLATFORM "Allow compilation on an unsupported platform." OFF)
+option (GEARBOX_ENABLE_TESTS "Build tests." OFF)
 
 list (APPEND CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(LinuxConfig)
@@ -20,23 +20,23 @@ include(macOSConfig)
 include(WindowsConfig)
 include(TestCompilerSupport)
 
-if (NOT RT_PLATFORM_OK)
+if (NOT GEARBOX_PLATFORM_OK)
     message (WARNING "Building on unsupported platform")
-    if (NOT RT_ALLOW_UNSUPPORTED_PLATFORM)
+    if (NOT GEARBOX_ALLOW_UNSUPPORTED_PLATFORM)
         message (FATAL_ERROR "Stopping since RT_ALLOW_UNSUPPORTED_PLATFORM is not set")
     endif ()
 endif ()
 
 ## PRIVATE HEADERS ##
 include_directories ("${PROJECT_SOURCE_DIR}/src/include")
-set (librt_PRIVATE_HEADERS "${PROJECT_SOURCE_DIR}/src/include")
-file (GLOB_RECURSE PRIVATE_HEADERS "${librt_PRIVATE_HEADERS}/*.h")
+set (libgearbox_PRIVATE_HEADERS "${PROJECT_SOURCE_DIR}/src/include")
+file (GLOB_RECURSE PRIVATE_HEADERS "${libgearbox_PRIVATE_HEADERS}/*.h")
 add_custom_target (private_headers SOURCES ${PRIVATE_HEADERS})
 
 ## PUBLIC HEADERS ##
 include_directories ("${PROJECT_SOURCE_DIR}/include")
-set (librt_PUBLIC_HEADERS  "${PROJECT_SOURCE_DIR}/include")
-file (GLOB_RECURSE PUBLIC_HEADERS "${librt_PUBLIC_HEADERS}/*.h")
+set (libgearbox_PUBLIC_HEADERS  "${PROJECT_SOURCE_DIR}/include")
+file (GLOB_RECURSE PUBLIC_HEADERS "${libgearbox_PUBLIC_HEADERS}/*.h")
 add_custom_target (public_headers SOURCES ${PUBLIC_HEADERS})
 
 ## NLOHMANN JSON ##
@@ -53,47 +53,47 @@ add_custom_target (seq_headers SOURCES ${SEQ_HEADERS})
 include_directories ("${PROJECT_SOURCE_DIR}/3rdparty/fmt")
 set (FMT_SOURCE "${PROJECT_SOURCE_DIR}/3rdparty/fmt/fmt/format.cc")
 
-include_directories (SYSTEM ${RT_INCLUDE_DIRS})
-link_directories (${RT_LIB_DIRS})
+include_directories (SYSTEM ${GEARBOX_INCLUDE_DIRS})
+link_directories (${GEARBOX_LIB_DIRS})
 
-aux_source_directory (${PROJECT_SOURCE_DIR}/src LIBRT_SOURCES)
+aux_source_directory (${PROJECT_SOURCE_DIR}/src LIBGEARBOX_SOURCES)
 
-if (RT_DEBUG_LOGS)
-    add_definitions (-DRT_LOG_DEBUG)
+if (GEARBOX_DEBUG_LOGS)
+    add_definitions (-DGEARBOX_LOG_DEBUG)
     message (STATUS "Building with debug informaton and logging")
 endif ()
 
-if (RT_STATIC_LIB)
-    add_library (rt STATIC ${LIBRT_SOURCES} ${FMT_SOURCE})
+if (GEARBOX_STATIC_LIB)
+    add_library (gearbox STATIC ${LIBGEARBOX_SOURCES} ${FMT_SOURCE})
     message (STATUS "Building static library")
 else ()
-    add_library (rt SHARED ${LIBRT_SOURCES} ${FMT_SOURCE})
+    add_library (gearbox SHARED ${LIBGEARBOX_SOURCES} ${FMT_SOURCE})
     message (STATUS "Building shared library")
 endif ()
 
-target_link_libraries (rt ${RT_LIBS})
+target_link_libraries (gearbox ${GEARBOX_LIBS})
 set_target_properties (
-    rt         PROPERTIES
-    VERSION    ${librt_VERSION_MAJOR}.${librt_VERSION_MINOR}.${librt_VERSION_PATCH}
-    SOVERSION  ${librt_VERSION_MAJOR}
+    gearbox    PROPERTIES
+    VERSION    ${libgearbox_VERSION_MAJOR}.${libgearbox_VERSION_MINOR}.${libgearbox_VERSION_PATCH}
+    SOVERSION  ${libgearbox_VERSION_MAJOR}
 )
 set_target_properties (
-    rt            PROPERTIES
-    COMPILE_FLAGS "${RT_COMPILER_FLAGS}"
+    gearbox       PROPERTIES
+    COMPILE_FLAGS "${GEARBOX_COMPILER_FLAGS}"
 )
 
 install (
-    TARGETS rt
+    TARGETS gearbox
     RUNTIME DESTINATION lib
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
 )
 
 install (
-    DIRECTORY ${librt_PUBLIC_HEADERS}/
-    DESTINATION include/librt
+    DIRECTORY ${libgearbox_PUBLIC_HEADERS}/
+    DESTINATION include/gearbox
 )
 
-if (RT_ENABLE_TESTS)
+if (GEARBOX_ENABLE_TESTS)
     add_subdirectory (tests)
 endif()
