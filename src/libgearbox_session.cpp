@@ -11,14 +11,14 @@
 #include "libgearbox_logger_p.h"
 
 using nlohmann::json;
-using namespace librt;
+using namespace gearbox;
 
 namespace
 {
     constexpr std::uint16_t SESSION_TAG     { 33872 };
     constexpr std::int32_t  DEFAULT_TIMEOUT {  5000 };
     constexpr std::int32_t  RETRY_COUNT     {     5 };
-    constexpr const char    USER_AGENT[29]  { "libRemoteTransmission v" LIBRT_VERISION_STR };
+    constexpr const char    USER_AGENT[29]  { "libRemoteTransmission v" LIBGEARBOX_VERISION_STR };
 }
 
 SessionPrivate::SessionPrivate(const std::string &url,
@@ -88,17 +88,17 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
         if (result.error)
         {
             LOG_DEBUG("Error: {}", static_cast<std::string>(result.error));
-            response.error = librt::Error(librt::Error::Code::TransmissionUnknownError, "Some dummy error until I can figure out how to convert between types");
+            response.error = gearbox::Error(gearbox::Error::Code::TransmissionUnknownError, "Some dummy error until I can figure out how to convert between types");
             break;
         }
 
-        if (result.status == librt::http::Status::Conflict)
+        if (result.status == gearbox::http::Status::Conflict)
         {
             sessionId_ = result.response.headers["X-Transmission-Session-Id"];
             continue;
         }
 
-        if (result.status == librt::http::Status::MethodNotAllowed)
+        if (result.status == gearbox::http::Status::MethodNotAllowed)
         {
             response.error = std::make_pair(
                 Error::Code::TransmissionMethodNotAllowed,
@@ -107,7 +107,7 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
             break;
         }
 
-        if (result.status == librt::http::Status::OK)
+        if (result.status == gearbox::http::Status::OK)
         {
             LOG_DEBUG("{}", result.response.text);
             jsonFormat.parse(result.response.text);
@@ -403,5 +403,5 @@ void Session::setTimeout(std::int32_t value)
 
 void Session::setSSLErrorHandling(Session::SSLErrorHandling value)
 {
-    priv_->http_.setSSLErrorHandling(static_cast<librt::http::SSLErrorHandling>(value));
+    priv_->http_.setSSLErrorHandling(static_cast<gearbox::http::SSLErrorHandling>(value));
 }

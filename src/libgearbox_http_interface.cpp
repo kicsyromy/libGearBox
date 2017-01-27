@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <cctype>
 
-using namespace librt::http;
+using namespace gearbox::http;
 
-librt::http::Status::Status(std::int32_t code) :
+gearbox::http::Status::Status(std::int32_t code) :
     statusCode_(Unknown),
     name_(nullptr)
 {

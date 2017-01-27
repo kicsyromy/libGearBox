@@ -9,7 +9,7 @@
 #include "libgearbox_session_p.h"
 #include "libgearbox_logger_p.h"
 
-using namespace librt;
+using namespace gearbox;
 
 namespace
 {

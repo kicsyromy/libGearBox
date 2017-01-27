@@ -1,10 +1,10 @@
-#ifndef LIBRT_RETURN_TYPE_H
-#define LIBRT_RETURN_TYPE_H
+#ifndef LIBGEARBOX_RETURN_TYPE_H
+#define LIBGEARBOX_RETURN_TYPE_H
 
 #include <libgearbox_global.h>
 #include <libgearbox_error.h>
 
-namespace librt
+namespace gearbox
 {
     template <typename T>
     struct ReturnType
@@ -37,4 +37,4 @@ namespace librt
     };
 }
 
-#endif // LIBRT_RETURN_TYPE_H
+#endif // LIBGEARBOX_RETURN_TYPE_H

@@ -1,5 +1,5 @@
-#ifndef LIBRT_HTTP_INTERFACE_H
-#define LIBRT_HTTP_INTERFACE_H
+#ifndef LIBGEARBOX_HTTP_INTERFACE_H
+#define LIBGEARBOX_HTTP_INTERFACE_H
 
 #include <string>
 #include <map>
@@ -14,7 +14,7 @@
 using namespace std::chrono_literals;
 #endif
 
-namespace librt
+namespace gearbox
 {
     namespace http
     {
@@ -213,4 +213,4 @@ namespace librt
         };
     }
 }
-#endif // LIBRT_HTTP_INTERFACE_H
+#endif // LIBGEARBOX_HTTP_INTERFACE_H

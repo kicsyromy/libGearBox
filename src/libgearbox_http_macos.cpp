@@ -14,7 +14,7 @@
 
 namespace
 {
-    using namespace librt::http;
+    using namespace gearbox::http;
 
     Error fromNSURLError(NSError *error)
     {
@@ -239,7 +239,7 @@ namespace
 - (void) setPassword: (const std::string &)password;
 - (void) setSSLErrorHandling: (bool)value;
 - (void) setTimeout: (milliseconds_t)value;
-- (librt::CocoaHttp::Request) createRequest;
+- (gearbox::CocoaHttp::Request) createRequest;
 
 @end
 
@@ -308,7 +308,7 @@ namespace
     timeout_ = (UInt32)value.count();
 }
 
-- (librt::CocoaHttp::Request) createRequest
+- (gearbox::CocoaHttp::Request) createRequest
 {
     NSString *urlString = nil;
     if (port_ > -1)
@@ -360,7 +360,7 @@ namespace
 
 @end
 
-using namespace librt;
+using namespace gearbox;
 
 CocoaHttp::CocoaHttp(const std::string &userAgent) :
     hostname_(),
@@ -376,7 +376,7 @@ CocoaHttp::CocoaHttp(const std::string &userAgent) :
     [impl_ setPort:-1];
 }
 
-librt::CocoaHttp::~CocoaHttp()
+gearbox::CocoaHttp::~CocoaHttp()
 {
 }
 
@@ -552,8 +552,8 @@ void CocoaHttp::Request::setHeader(const http_header_t &header)
 
 CocoaHttp::http_request_result_t CocoaHttp::Request::send()
 {
-    using namespace librt::http;
-    std::int32_t httpStatus = librt::http::Status::Unknown;
+    using namespace gearbox::http;
+    std::int32_t httpStatus = gearbox::http::Status::Unknown;
     http_header_array_t responseHeaders;
     std::string text;
     http_error_t err = { Error::Code::InternalError, "An internal connection handle is invalid. "

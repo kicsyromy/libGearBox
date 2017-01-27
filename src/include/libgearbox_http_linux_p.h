@@ -1,25 +1,25 @@
-#ifndef LIBRT_HTTP_WIN_P_H
-#define LIBRT_HTTP_WIN_P_H
+#ifndef LIBGEARBOX_HTTP_WIN_P_H
+#define LIBGEARBOX_HTTP_WIN_P_H
 
 #include <curl/curl.h>
 
 #include "libgearbox_global.h"
 #include "libgearbox_http_interface_p.h"
 
-namespace librt
+namespace gearbox
 {
     class CUrlHttp
     {
     private:
-        using milliseconds_t = librt::http::milliseconds_t;
-        using http_header_t = librt::http::header_t;
-        using http_header_array_t = librt::http::header_array_t;
-        using http_port_t = librt::http::port_t;
-        using http_request_t = librt::http::RequestType;
-        using http_ssl_error_handling_t = librt::http::SSLErrorHandling;
-        using http_status_t = librt::http::Status;
-        using http_error_t = librt::http::Error;
-        using http_request_result_t = librt::http::RequestResult;
+        using milliseconds_t = gearbox::http::milliseconds_t;
+        using http_header_t = gearbox::http::header_t;
+        using http_header_array_t = gearbox::http::header_array_t;
+        using http_port_t = gearbox::http::port_t;
+        using http_request_t = gearbox::http::RequestType;
+        using http_ssl_error_handling_t = gearbox::http::SSLErrorHandling;
+        using http_status_t = gearbox::http::Status;
+        using http_error_t = gearbox::http::Error;
+        using http_request_result_t = gearbox::http::RequestResult;
 
     public:
         explicit CUrlHttp(const std::string &userAgent);
@@ -98,4 +98,4 @@ namespace librt
     };
 }
 
-#endif // LIBRT_HTTP_WIN_P_H 
+#endif // LIBGEARBOX_HTTP_WIN_P_H 

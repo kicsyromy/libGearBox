@@ -1,5 +1,7 @@
 #include <catch.hpp>
 
+#include <cstring>
+
 #define private public
 #include <libgearbox_file_p.h>
 #include <libgearbox_file.h>
@@ -7,16 +9,16 @@
 
 TEST_CASE("Test librt_file_p and librt_file", "[file]")
 {
-	librt::File f {
+	gearbox::File f {
 		"/libremotetransmission/test_file.txt",
 		123456789,
 		987654321,
 		true,
-		librt::File::Priority::Normal
+		gearbox::File::Priority::Normal
 	};
 
 	SECTION("Test MIME Type")
 	{
-		REQUIRE((f.type().name == "text/plain"));
+		REQUIRE((strcmp(f.type().name,"text/plain") == 0));
 	}
 }

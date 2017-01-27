@@ -1,5 +1,5 @@
-#ifndef LIBRT_FOLDER_H
-#define LIBRT_FOLDER_H
+#ifndef LIBGEARBOX_FOLDER_H
+#define LIBGEARBOX_FOLDER_H
 
 #include <string>
 #include <vector>
@@ -9,7 +9,7 @@
 #include <libgearbox_global.h>
 #include <libgearbox_file.h>
 
-namespace librt
+namespace gearbox
 {
     class Torrent;
     class FolderPrivate;
@@ -17,7 +17,7 @@ namespace librt
     class LIBRT_API Folder
     {
     public:
-        Folder(); // make librt::ReturnType happy
+        Folder(); // make gearbox::ReturnType happy
         Folder(Folder &&) noexcept(true);
         Folder &operator =(Folder &&) noexcept(true);
         ~Folder() noexcept(true);
@@ -47,4 +47,4 @@ namespace librt
     };
 }
 
-#endif // LIBRT_FOLDER_H
+#endif // LIBGEARBOX_FOLDER_H

@@ -1,5 +1,5 @@
-#ifndef LIBRT_SESSION_H
-#define LIBRT_SESSION_H
+#ifndef LIBGEARBOX_SESSION_H
+#define LIBGEARBOX_SESSION_H
 
 #include <vector>
 #include <memory>
@@ -9,7 +9,7 @@
 #include <libgearbox_torrent.h>
 #include <libgearbox_return_type.h>
 
-namespace librt
+namespace gearbox
 {
     class SessionPrivate;
 
@@ -62,7 +62,7 @@ namespace librt
 
     public:
         ReturnType<Statistics> statistics() const;
-        ReturnType<std::vector<librt::Torrent>> torrents() const;
+        ReturnType<std::vector<gearbox::Torrent>> torrents() const;
         ReturnType<std::vector<std::int32_t>> recentlyRemoved() const;
         Error updateTorrentStats(std::vector<std::reference_wrapper<Torrent>> &torrents);
 
@@ -102,4 +102,4 @@ namespace librt
     };
 }
 
-#endif // LIBRT_SESSION_H
+#endif // LIBGEARBOX_SESSION_H

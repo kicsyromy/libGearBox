@@ -1,11 +1,11 @@
-#ifndef LIBRT_ERROR_H
-#define LIBRT_ERROR_H
+#ifndef LIBGEARBOX_ERROR_H
+#define LIBGEARBOX_ERROR_H
 
 #include <string>
 
 #include <libgearbox_global.h>
 
-namespace librt
+namespace gearbox
 {
     class LIBRT_API Error
     {
@@ -58,4 +58,4 @@ namespace librt
     };
 }
 
-#endif // LIBRT_ERROR_H
+#endif // LIBGEARBOX_ERROR_H

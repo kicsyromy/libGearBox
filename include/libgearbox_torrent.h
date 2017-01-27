@@ -1,5 +1,5 @@
-#ifndef LIBRT_TORRENT_H
-#define LIBRT_TORRENT_H
+#ifndef LIBGEARBOX_TORRENT_H
+#define LIBGEARBOX_TORRENT_H
 
 #include <cstdint>
 #include <vector>
@@ -12,7 +12,7 @@
 #include <libgearbox_global.h>
 #include <libgearbox_return_type.h>
 
-namespace librt
+namespace gearbox
 {
     class TorrentPrivate;
     class FolderPrivate;
@@ -104,4 +104,4 @@ namespace librt
     };
 }
 
-#endif // LIBRT_TORRENT_H
+#endif // LIBGEARBOX_TORRENT_H

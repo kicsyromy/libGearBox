@@ -1,9 +1,9 @@
-#ifndef LIBRT_FILE_P_H
-#define LIBRT_FILE_P_H
+#ifndef LIBGEARBOX_FILE_P_H
+#define LIBGEARBOX_FILE_P_H
 
 #include <sequential.h>
 
-namespace librt
+namespace gearbox
 {
     struct FileAttr
     {
@@ -22,4 +22,4 @@ namespace librt
     };
 }
 
-#endif // LIBRT_FILE_P_H
+#endif // LIBGEARBOX_FILE_P_H

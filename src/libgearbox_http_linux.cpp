@@ -7,12 +7,12 @@
 #include "libgearbox_vla_p.h"
 #include "libgearbox_logger_p.h"
 
-using namespace librt;
+using namespace gearbox;
 using namespace std::chrono_literals;
 
 namespace
 {
-    using namespace librt::http;
+    using namespace gearbox::http;
 
     struct CUrlInitializer
     {
@@ -170,7 +170,7 @@ CUrlHttp::CUrlHttp(const std::string &userAgent) :
     }
 }
 
-librt::CUrlHttp::~CUrlHttp()
+gearbox::CUrlHttp::~CUrlHttp()
 {
     if (handle_ != nullptr)
     {
@@ -308,13 +308,13 @@ CUrlHttp::Request::~Request()
     }
 }
 
-void librt::CUrlHttp::Request::setBody(const std::string &data)
+void gearbox::CUrlHttp::Request::setBody(const std::string &data)
 {
     curl_easy_setopt(handle_, CURLOPT_POSTFIELDSIZE, data.size());
     curl_easy_setopt(handle_, CURLOPT_COPYPOSTFIELDS, data.c_str());
 }
 
-void librt::CUrlHttp::Request::setHeaders(const CUrlHttp::http_header_array_t &headers)
+void gearbox::CUrlHttp::Request::setHeaders(const CUrlHttp::http_header_array_t &headers)
 {
     for (const auto &header: headers)
     {
@@ -322,15 +322,15 @@ void librt::CUrlHttp::Request::setHeaders(const CUrlHttp::http_header_array_t &h
     }
 }
 
-void librt::CUrlHttp::Request::setHeader(const CUrlHttp::http_header_t &header)
+void gearbox::CUrlHttp::Request::setHeader(const CUrlHttp::http_header_t &header)
 {
     headers_[header.first] = header.second;
 }
 
 CUrlHttp::http_request_result_t CUrlHttp::Request::send()
 {
-    using namespace librt::http;
-    std::int32_t httpStatus = librt::http::Status::Unknown;
+    using namespace gearbox::http;
+    std::int32_t httpStatus = gearbox::http::Status::Unknown;
     http_header_array_t responseHeaders;
     std::string text;
     http_error_t err = { Error::Code::InternalError, "An internal connection handle is invalid. "

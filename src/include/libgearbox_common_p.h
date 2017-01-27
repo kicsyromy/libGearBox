@@ -1,9 +1,9 @@
-#ifndef LIBRT_COMMON_P_H
-#define LIBRT_COMMON_P_H
+#ifndef LIBGEARBOX_COMMON_P_H
+#define LIBGEARBOX_COMMON_P_H
 
 #include <string>
 
-namespace librt
+namespace gearbox
 {
     namespace common
     {
@@ -15,4 +15,4 @@ namespace librt
     }
 }
 
-#endif // LIBRT_COMMON_P_H
+#endif // LIBGEARBOX_COMMON_P_H

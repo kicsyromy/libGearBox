@@ -1,5 +1,5 @@
-#ifndef FOLDER_P_H
-#define FOLDER_P_H
+#ifndef LIBGEARBOX_FOLDER_P_H
+#define LIBGEARBOX_FOLDER_P_H
 
 #include <unordered_map>
 #include <memory>
@@ -7,7 +7,7 @@
 
 #include <libgearbox_file.h>
 
-namespace librt
+namespace gearbox
 {
     class Folder;
 
@@ -44,4 +44,4 @@ namespace librt
     };
 }
 
-#endif // FOLDER_P_H
+#endif // LIBGEARBOX_FOLDER_P_H

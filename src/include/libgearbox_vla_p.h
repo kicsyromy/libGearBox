@@ -1,5 +1,5 @@
-#ifndef LIBRT_VLA_P_H
-#define LIBRT_VLA_P_H
+#ifndef LIBGEARBOX_VLA_P_H
+#define LIBGEARBOX_VLA_P_H
 
 #include <cstddef>
 
@@ -10,9 +10,9 @@
 #endif
 
 #define make_vla_impl(type, size) new(static_cast<type*>(alloca(sizeof(type) * size))) type[size], size
-#define make_vla(type, size) ::librt::Array<type>(make_vla_impl(type, size)) 
+#define make_vla(type, size) ::gearbox::Array<type>(make_vla_impl(type, size)) 
 
-namespace librt
+namespace gearbox
 {
     template <typename T>
     class Array
@@ -44,4 +44,4 @@ namespace librt
     };
 }
 
-#endif // LIBRT_VLA_P_H
+#endif // LIBGEARBOX_VLA_P_H

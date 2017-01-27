@@ -1,5 +1,5 @@
-#ifndef LIBRT_TORRENT_P_H
-#define LIBRT_TORRENT_P_H
+#ifndef LIBGEARBOX_TORRENT_P_H
+#define LIBGEARBOX_TORRENT_P_H
 
 #include <cstdint>
 #include <vector>
@@ -11,7 +11,7 @@
 #include "libgearbox_file_p.h"
 #include "libgearbox_session_p.h"
 
-namespace librt
+namespace gearbox
 {
     class TorrentPrivate
     {
@@ -59,7 +59,7 @@ namespace librt
                 Request()
                 {
                     sequential::attribute::set_value<Request::fields>(
-                        *this, ::librt::TorrentPrivate::Files::attribute_names()
+                        *this, ::gearbox::TorrentPrivate::Files::attribute_names()
                     );
                 }
             };
@@ -99,4 +99,4 @@ namespace librt
     };
 }
 
-#endif // LIBRT_TORRENT_P_H
+#endif // LIBGEARBOX_TORRENT_P_H

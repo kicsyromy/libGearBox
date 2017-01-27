@@ -1,5 +1,5 @@
-#ifndef LIBRT_LOGGER_P_H
-#define LIBRT_LOGGER_P_H
+#ifndef LIBGEARBOX_LOGGER_P_H
+#define LIBGEARBOX_LOGGER_P_H
 
 #include <fmt/format.h>
 
@@ -72,6 +72,6 @@
     } while (0)
 #else
 #define LOG_DEBUG(...)
-#endif // RT_LOG_DEBUG
+#endif // GEARBOX_LOG_DEBUG
 
-#endif // LIBRT_LOGGER_P_H
+#endif // LIBGEARBOX_LOGGER_P_H

@@ -10,12 +10,12 @@
 #include "libgearbox_vla_p.h"
 #include "libgearbox_logger_p.h"
 
-using namespace librt;
+using namespace gearbox;
 using namespace std::chrono_literals;
 
 namespace
 {
-    using namespace librt::http;
+    using namespace gearbox::http;
 
     constexpr std::array<const char *, 2> HTTP_METHOD {{ "GET", "POST" }};
     constexpr auto CONNECTION_FLAGS = INTERNET_FLAG_RELOAD | INTERNET_FLAG_KEEP_CONNECTION | INTERNET_FLAG_NO_CACHE_WRITE |
@@ -300,7 +300,7 @@ WinHttp::WinHttp(const std::string &userAgent) :
     }
 }
 
-librt::WinHttp::WinHttp(WinHttp &&other) noexcept(true) :
+gearbox::WinHttp::WinHttp(WinHttp &&other) noexcept(true) :
     hostname_(std::move(other.hostname_)),
     port_(other.port_),
     path_(std::move(other.path_)),
@@ -317,7 +317,7 @@ librt::WinHttp::WinHttp(WinHttp &&other) noexcept(true) :
     other.session_ = nullptr;
 }
 
-librt::WinHttp::~WinHttp()
+gearbox::WinHttp::~WinHttp()
 {
     if (session_ != nullptr)
     {
@@ -539,7 +539,7 @@ void WinHttp::Request::setBody(const std::string &data)
     dataSize_ = static_cast<DWORD>(data.size());
 }
 
-void WinHttp::Request::setHeaders(const librt::WinHttp::http_header_array_t &headers)
+void WinHttp::Request::setHeaders(const gearbox::WinHttp::http_header_array_t &headers)
 {
     for (const auto &header: headers)
     {
@@ -547,14 +547,14 @@ void WinHttp::Request::setHeaders(const librt::WinHttp::http_header_array_t &hea
     }
 }
 
-void WinHttp::Request::setHeader(const librt::WinHttp::http_header_t &header)
+void WinHttp::Request::setHeader(const gearbox::WinHttp::http_header_t &header)
 {
     headers_[header.first] = header.second;
 }
 
 WinHttp::http_request_result_t WinHttp::Request::send()
 {
-    using namespace librt::http;
+    using namespace gearbox::http;
     std::int32_t httpStatus = Unknown;
     http_header_array_t responseHeaders;
     std::string text;
@@ -720,7 +720,7 @@ WinHttp::Request WinHttp::createRequest()
     };
 }
 
-void librt::WinHttp::closeSession()
+void gearbox::WinHttp::closeSession()
 {
     if (session_ != nullptr)
     {

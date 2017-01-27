@@ -1,5 +1,5 @@
-#ifndef LIBRT_SESSION_P_H
-#define LIBRT_SESSION_P_H
+#ifndef LIBGEARBOX_SESSION_P_H
+#define LIBGEARBOX_SESSION_P_H
 
 #include <vector>
 
@@ -19,7 +19,7 @@
 
 #include "libgearbox_error.h"
 
-namespace librt
+namespace gearbox
 {
     namespace session
     {
@@ -69,11 +69,11 @@ namespace librt
     }
 
 #if defined(PLATFORM_WINDOWS)
-    using HttpRequestHandler = librt::http::Interface<librt::WinHttp>;
+    using HttpRequestHandler = gearbox::http::Interface<gearbox::WinHttp>;
 #elif defined(PLATFORM_LINUX)
-    using HttpRequestHandler = librt::http::Interface<librt::CUrlHttp>;
+    using HttpRequestHandler = gearbox::http::Interface<gearbox::CUrlHttp>;
 #elif defined(PLATFORM_MACOS)
-    using HttpRequestHandler = librt::http::Interface<librt::CocoaHttp>;
+    using HttpRequestHandler = gearbox::http::Interface<gearbox::CocoaHttp>;
 #else
 #error "Unsupported platform"
 #endif
@@ -105,4 +105,4 @@ namespace librt
     };
 }
 
-#endif // LIBRT_SESSION_P_H
+#endif // LIBGEARBOX_SESSION_P_H

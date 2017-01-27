@@ -3,8 +3,8 @@ project (libgearbox)
 add_definitions (-DGEARBOX_LIB)
 
 set (libgearbox_VERSION_MAJOR 0)
-set (libgearbox_VERSION_MINOR 0)
-set (libgearbox_VERSION_PATCH 3)
+set (libgearbox_VERSION_MINOR 1)
+set (libgearbox_VERSION_PATCH 0)
 add_definitions (-DLIBGEARBOX_VERISION=${libgearbox_VERSION_MAJOR}${libgearbox_VERSION_MINOR}${libgearbox_VERSION_PATCH})
 add_definitions (-DLIBGEARBOX_VERISION_STR="${libgearbox_VERSION_MAJOR}.${libgearbox_VERSION_MINOR}.${libgearbox_VERSION_PATCH}")
 

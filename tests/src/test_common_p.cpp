@@ -5,7 +5,7 @@
 
 TEST_CASE("Test librt_common_p", "[common]")
 {
-	librt::common::CaseInsensitiveCompare c;
+	gearbox::common::CaseInsensitiveCompare c;
 
 	SECTION("bool CaseInsensitiveCompare::operator()(std::string, std::string)")
 	{

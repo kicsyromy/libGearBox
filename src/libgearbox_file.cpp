@@ -4,8 +4,8 @@
 
 #include "libgearbox_common_p.h"
 
-using namespace librt;
-using namespace librt::common;
+using namespace gearbox;
+using namespace gearbox::common;
 
 namespace
 {

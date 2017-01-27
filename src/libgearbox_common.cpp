@@ -8,7 +8,7 @@
 #include <strings.h>
 #endif
 
-using namespace librt::common;
+using namespace gearbox::common;
 
 bool CaseInsensitiveCompare::operator()(const std::string &s1, const std::string &s2) const
 {

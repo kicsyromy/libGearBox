@@ -1,11 +1,11 @@
-#ifndef LIBRT_FILE_H
-#define LIBRT_FILE_H
+#ifndef LIBGEARBOX_FILE_H
+#define LIBGEARBOX_FILE_H
 
 #include <string>
 
 #include <libgearbox_global.h>
 
-namespace librt
+namespace gearbox
 {
     class Torrent;
     class FolderPrivate;
@@ -67,4 +67,4 @@ namespace librt
     };
 }
 
-#endif // LIBRT_FILE_H
+#endif // LIBGEARBOX_FILE_H

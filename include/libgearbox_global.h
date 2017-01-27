@@ -1,5 +1,5 @@
-#ifndef LIBRT_GLOBAL_H
-#define LIBRT_GLOBAL_H
+#ifndef LIBGEARBOX_GLOBAL_H
+#define LIBGEARBOX_GLOBAL_H
 
 #if defined(_MSC_VER)
     /* Microsoft */
@@ -29,4 +29,4 @@
     klass(klass &&other) = delete; \
     klass &operator =(klass &&other) = delete;
 
-#endif // LIBRT_GLOBAL_H
+#endif // LIBGEARBOX_GLOBAL_H

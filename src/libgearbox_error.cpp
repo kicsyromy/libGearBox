@@ -1,6 +1,6 @@
 #include "libgearbox_error.h"
 
-using namespace librt;
+using namespace gearbox;
 
 Error::Error() :
     errorCode_(Error::Code::Ok),
