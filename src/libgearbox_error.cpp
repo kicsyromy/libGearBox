@@ -1,4 +1,4 @@
-#include "librt_error.h"
+#include "libgearbox_error.h"
 
 using namespace librt;
 

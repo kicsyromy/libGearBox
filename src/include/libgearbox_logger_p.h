@@ -59,7 +59,7 @@
     std::terminate(); \
     } while (0)
 
-#ifdef RT_LOG_DEBUG
+#ifdef GEARBOX_LOG_DEBUG
 #define LOG_DEBUG(...) \
     do { \
     std::string log = fmt::format(__VA_ARGS__); \

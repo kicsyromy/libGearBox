@@ -1,5 +1,5 @@
 #ifdef PLATFORM_WINDOWS
-#include "librt_http_win_p.h"
+#include "libgearbox_http_win_p.h"
 
 #include <array>
 #include <iostream>
@@ -7,8 +7,8 @@
 
 #include <fmt/format.h>
 
-#include "librt_vla_p.h"
-#include "librt_logger_p.h"
+#include "libgearbox_vla_p.h"
+#include "libgearbox_logger_p.h"
 
 using namespace librt;
 using namespace std::chrono_literals;

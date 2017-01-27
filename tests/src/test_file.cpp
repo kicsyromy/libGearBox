@@ -1,9 +1,9 @@
 #include <catch.hpp>
 
 #define private public
-#include <librt_file_p.h>
-#include <librt_file.h>
-#include <librt_file.cpp>
+#include <libgearbox_file_p.h>
+#include <libgearbox_file.h>
+#include <libgearbox_file.cpp>
 
 TEST_CASE("Test librt_file_p and librt_file", "[file]")
 {

@@ -2,7 +2,7 @@
 #if ! __has_feature(objc_arc)
 #error "ARC is disabled"
 #endif
-#include "librt_http_macos_p.h"
+#include "libgearbox_http_macos_p.h"
 
 #import <Cocoa/Cocoa.h>
 
@@ -10,7 +10,7 @@
 #include <chrono>
 #include <cctype>
 
-#include "librt_vla_p.h"
+#include "libgearbox_vla_p.h"
 
 namespace
 {

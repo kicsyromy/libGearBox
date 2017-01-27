@@ -1,7 +1,7 @@
 #ifndef LIBRT_HTTP_MACOS_P_H
 #define LIBRT_HTTP_MACOS_P_H
 
-#include "librt_http_interface_p.h"
+#include "libgearbox_http_interface_p.h"
 
 @class librtCocoaHttpPrivate;
 @class NSMutableURLRequest;

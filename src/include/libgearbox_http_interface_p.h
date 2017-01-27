@@ -7,8 +7,8 @@
 
 #include <fmt/format.h>
 
-#include "librt_global.h"
-#include "librt_common_p.h"
+#include "libgearbox_global.h"
+#include "libgearbox_common_p.h"
 
 #ifdef CHRONO_LITERALS
 using namespace std::chrono_literals;

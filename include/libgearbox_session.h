@@ -4,10 +4,10 @@
 #include <vector>
 #include <memory>
 
-#include <librt_global.h>
+#include <libgearbox_global.h>
 
-#include <librt_torrent.h>
-#include <librt_return_type.h>
+#include <libgearbox_torrent.h>
+#include <libgearbox_return_type.h>
 
 namespace librt
 {

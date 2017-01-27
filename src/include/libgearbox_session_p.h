@@ -6,18 +6,18 @@
 #include <sequential.h>
 #include <json.hpp>
 
-#include "librt_http_interface_p.h"
+#include "libgearbox_http_interface_p.h"
 #if defined(PLATFORM_WINDOWS)
-#include "librt_http_win_p.h"
+#include "libgearbox_http_win_p.h"
 #elif defined(PLATFORM_LINUX)
-#include "librt_http_linux_p.h"
+#include "libgearbox_http_linux_p.h"
 #elif defined(PLATFORM_MACOS)
-#include "librt_http_macos_p.h"
+#include "libgearbox_http_macos_p.h"
 #else
 #error "Unsupported platform"
 #endif
 
-#include "librt_error.h"
+#include "libgearbox_error.h"
 
 namespace librt
 {

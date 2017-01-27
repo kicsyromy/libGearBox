@@ -8,8 +8,8 @@
 
 #include <sequential.h>
 
-#include "librt_file_p.h"
-#include "librt_session_p.h"
+#include "libgearbox_file_p.h"
+#include "libgearbox_session_p.h"
 
 namespace librt
 {

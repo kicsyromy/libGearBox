@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include <librt_global.h>
+#include <libgearbox_global.h>
 
 namespace librt
 {

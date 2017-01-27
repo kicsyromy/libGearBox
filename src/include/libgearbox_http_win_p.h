@@ -4,9 +4,9 @@
 #include <windows.h>
 #include <wininet.h>
 
-#include "librt_global.h"
+#include "libgearbox_global.h"
 
-#include "librt_http_interface_p.h"
+#include "libgearbox_http_interface_p.h"
 
 namespace librt
 {

@@ -1,8 +1,8 @@
 #ifndef LIBRT_RETURN_TYPE_H
 #define LIBRT_RETURN_TYPE_H
 
-#include <librt_global.h>
-#include <librt_error.h>
+#include <libgearbox_global.h>
+#include <libgearbox_error.h>
 
 namespace librt
 {

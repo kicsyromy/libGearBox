@@ -1,4 +1,4 @@
-#include "librt_session.h"
+#include "libgearbox_session.h"
 
 #include <string>
 #include <utility>
@@ -6,9 +6,9 @@
 #include <formats/json_format.h>
 #include <fmt/format.h>
 
-#include "librt_session_p.h"
-#include "librt_torrent_p.h"
-#include "librt_logger_p.h"
+#include "libgearbox_session_p.h"
+#include "libgearbox_torrent_p.h"
+#include "libgearbox_logger_p.h"
 
 using nlohmann::json;
 using namespace librt;

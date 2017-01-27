@@ -15,7 +15,7 @@
 #   pragma warning Unknown dynamic link import/export semantics.
 #endif
 
-#if defined(RT_LIB)
+#if defined(GEARBOX_LIB)
 #   define LIBRT_API    EXPORT_SYMBOL
 #else
 #   define LIBRT_API    IMPORT_SYMBOL
