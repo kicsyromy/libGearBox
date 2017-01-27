@@ -1,12 +1,13 @@
 #include <catch.hpp>
 
 #include <librt_common_p.h>
+#include <librt_common.cpp>
 
-TEST_CASE("Test common functionaly used in other modules", "[common]")
+TEST_CASE("Test librt_common_p", "[common]")
 {
 	librt::common::CaseInsensitiveCompare c;
 
-	SECTION("Comparison operator for std::string")
+	SECTION("bool CaseInsensitiveCompare::operator()(std::string, std::string)")
 	{
 		std::string strUpper = "STR";
 		std::string strLower = "str";
@@ -17,7 +18,7 @@ TEST_CASE("Test common functionaly used in other modules", "[common]")
 		REQUIRE(!(!c(strLower, strOther) && !c(strOther, strLower)));
 	}
 
-	SECTION("Comparison operator for const char *")
+	SECTION("bool CaseInsensitiveCompare::operator()(const char *, const char *)")
 	{
 		const char * strUpper = "STR";
 		const char * strLower = "str";
