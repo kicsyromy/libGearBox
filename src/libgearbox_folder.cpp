@@ -9,16 +9,23 @@ using namespace gearbox;
 
 namespace
 {
-    inline char *find_char(char *string, const std::size_t size, char wanted)
+    /* Perform a search in 'string', from the end, and return the address of the last character */
+    /* that matches 'wanted'                                                                    */      
+    inline char *rfind_char(char *string, const std::size_t size, char wanted)
     {
         char *c = nullptr;
         if (size > 0)
         {
-            for (int it = static_cast<int>(size) - 1; it >= 0; --it)
+            for (std::size_t it = size - 1;; --it)
             {
                 if (string[it] == wanted)
                 {
                     c = &string[it];
+                    break;
+                }
+
+                if (it == 0)
+                {
                     break;
                 }
             }
@@ -26,12 +33,15 @@ namespace
         return c;
     }
 
-    std::vector<std::string> split(const std::string &path, char separator)
+    /* Splits a string into a vector based on 'separator'. The elements are stored in reverse */
+    /* order, with the first element of the string, last element of the vector, ignored       */
+    std::vector<std::string> rsplit(const std::string &path, char separator)
     {
         const auto len = path.size();
         auto fullyQualifiedName = make_vla(char, len + 1);
         std::strncpy(fullyQualifiedName, path.c_str(), len);
-        auto separatorPtr = find_char(fullyQualifiedName, len, separator);
+        fullyQualifiedName[len] = '\0';
+        auto separatorPtr = rfind_char(fullyQualifiedName, len, separator);
 
         std::vector<std::string> folders;
         while (separatorPtr > fullyQualifiedName)
@@ -39,7 +49,7 @@ namespace
             std::size_t indexOfSeparator = static_cast<std::size_t>(separatorPtr - fullyQualifiedName);
             separatorPtr[0] = '\0';
             folders.push_back(&fullyQualifiedName[indexOfSeparator + 1]);
-            separatorPtr = find_char(fullyQualifiedName, indexOfSeparator, '/');
+            separatorPtr = rfind_char(fullyQualifiedName, indexOfSeparator, separator);
         }
 
         return folders;
@@ -104,7 +114,7 @@ void FolderPrivate::addPath(Folder &root, const std::string &path, std::size_t i
                             std::uint64_t bytesCompleted, std::uint64_t length,
                             bool wanted, File::Priority priority)
 {
-    auto names = split(path, '/');
+    auto names = rsplit(path, '/');
     Folder *node = &root;
     auto lastFolderIndex = names.empty() ? 0 : static_cast<int>(names.size()) - 1;
     for (int it = lastFolderIndex; it >= 1; --it)

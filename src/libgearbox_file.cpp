@@ -616,7 +616,7 @@ namespace
         const char *c = nullptr;
         if (size > 0)
         {
-            for (int it = static_cast<int>(size) - 1; it >= 0; --it)
+            for (std::size_t it = size - 1; it >= 0; --it)
             {
                 if (string[it] == wanted)
                 {
