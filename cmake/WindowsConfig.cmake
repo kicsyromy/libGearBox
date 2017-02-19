@@ -7,5 +7,6 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set (GEARBOX_INCLUDE_DIRS "")
     set (GEARBOX_LIB_DIRS "")
     set (GEARBOX_LIBS "wininet.lib")
+	set (GEARBOX_GENERATE_MANPAGE "NO")
 endif ()
 

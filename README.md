@@ -57,6 +57,8 @@ libGearBox supports some [CMake options](https://cmake.org/cmake/help/v3.7/comma
 
 `GEARBOX_ENABLE_TESTS` Build tests. Defaults to OFF.
 
+`GEARBOX_BUILD_DOCUMENTATION` Build HTML documentation, also builds manpages when building under Linux. Defaults to OFF.
+
 ## Roadmap
 TBD
 

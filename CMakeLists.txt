@@ -13,6 +13,7 @@ option (GEARBOX_DEBUG_LOGS "Build with additional debug logs. CAUTION: Do not us
 option (GEARBOX_ALLOW_UNSUPPORTED_COMPILER "Allow compilation using an unsupported compiler." OFF)
 option (GEARBOX_ALLOW_UNSUPPORTED_PLATFORM "Allow compilation on an unsupported platform." OFF)
 option (GEARBOX_ENABLE_TESTS "Build tests." OFF)
+option (GEARBOX_BUILD_DOCUMENTATION "Build documentation." OFF)
 
 list (APPEND CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(LinuxConfig)
@@ -56,7 +57,12 @@ set (FMT_SOURCE "${PROJECT_SOURCE_DIR}/3rdparty/fmt/fmt/format.cc")
 include_directories (SYSTEM ${GEARBOX_INCLUDE_DIRS})
 link_directories (${GEARBOX_LIB_DIRS})
 
-aux_source_directory (${PROJECT_SOURCE_DIR}/src LIBGEARBOX_SOURCES)
+set (GEARBOX_SOURCES "${PROJECT_SOURCE_DIR}/src")
+aux_source_directory (${GEARBOX_SOURCES} LIBGEARBOX_SOURCES)
+
+if (GEARBOX_BUILD_DOCUMENTATION)
+	include (Documentation)
+endif ()
 
 if (GEARBOX_DEBUG_LOGS)
     add_definitions (-DGEARBOX_LOG_DEBUG)
