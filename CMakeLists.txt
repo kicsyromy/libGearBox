@@ -61,7 +61,7 @@ set (GEARBOX_SOURCES "${PROJECT_SOURCE_DIR}/src")
 aux_source_directory (${GEARBOX_SOURCES} LIBGEARBOX_SOURCES)
 
 if (GEARBOX_BUILD_DOCUMENTATION)
-	include (Documentation)
+    include (Documentation)
 endif ()
 
 if (GEARBOX_DEBUG_LOGS)
