@@ -40,11 +40,16 @@ namespace
         const char *c = nullptr;
         if (size > 0)
         {
-            for (std::size_t it = size - 1; it >= 0; --it)
+            for (std::size_t it = size - 1;; --it)
             {
                 if (string[it] == wanted)
                 {
                     c = &string[it];
+                    break;
+                }
+
+                if (it == 0)
+                {
                     break;
                 }
             }

@@ -70,5 +70,4 @@ TEST_CASE("Test librt_folder_p and librt_folder", "[folder]")
             REQUIRE((result.empty()));
         }
     }
-
 }

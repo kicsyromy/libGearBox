@@ -22,6 +22,15 @@
  * Author: Romeo Calota
  */
 
+/*!
+    \class gearbox::Folder
+    \brief A folder from a torrent's file hierarchy.
+
+    Is represented by a name and consists of a set of folders and files.
+    Folders are created solely by the gearbox::Torrent class by calling
+    gearbox::Torrent::content() const on a valid instance.
+*/
+
 #include "libgearbox_folder_p.h"
 #include "libgearbox_folder.h"
 #include "libgearbox_vla_p.h"
@@ -79,6 +88,7 @@ namespace
         return folders;
     }
 }
+
 
 FolderPrivate::FolderPrivate(std::string &&name) :
     name_(std::move(name))
@@ -166,11 +176,19 @@ Folder::Folder() :
 {
 }
 
+/*!
+    Returns the \c name of the folder.
+*/
 const std::string &Folder::name() const
 {
     return priv_->name();
 }
 
+/*!
+    Returns a list of subfolders from the current folder.
+
+    Subfolders are valid as long as the folder on which this function was called is valid.
+*/
 const std::vector<std::reference_wrapper<const Folder>> Folder::subfolders() const
 {
     std::vector<std::reference_wrapper<const Folder>> subfolders;
@@ -183,6 +201,11 @@ const std::vector<std::reference_wrapper<const Folder>> Folder::subfolders() con
     return subfolders;
 }
 
+/*!
+    Returns a list of files from the current folder.
+
+    Files are valid as long as the folder on which this function was called is valid.
+*/
 const std::vector<std::reference_wrapper<const File>> Folder::files() const
 {
     std::vector<std::reference_wrapper<const File>> files;

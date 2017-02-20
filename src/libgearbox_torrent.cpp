@@ -22,6 +22,19 @@
  * Author: Romeo Calota
  */
 
+/*!
+    \class gearbox::Torrent
+    \brief Represents a torrent file on the remote server.
+
+    It caches some basic information about the torrent such as name, completion data,
+    ratio, speeds, status, size, etc. More complex information is requested on-demand
+    by calling the appropriate functions, see gearbox::Torrent::content() const,
+    gearbox::Torrent::files() const.
+
+    It also provides methods to alter the state of the torrent with regards to status,
+    content, peers etc.
+*/
+
 #include "libgearbox_torrent.h"
 
 #include <string>
@@ -40,6 +53,36 @@ namespace
     constexpr const char *INVALID_SESSION { "Invalid session" };
     constexpr const char *INVALID_TORRENT { "Invalid torrent" };
 }
+
+/*!
+    \enum gearbox::Torrent::Status
+
+    \brief Enumerates the possible states of a torrent.
+
+    \var gearbox::Torrent::Stopped
+    \brief The torrent is stopped.
+
+    \var gearbox::Torrent::CheckWait
+    \brief The torrent is queued for file checking.
+
+    \var gearbox::Torrent::Check
+    \brief The torrent is checking files.
+
+    \var gearbox::Torrent::DownloadWait
+    \brief The torrent is queued for download.
+
+    \var gearbox::Torrent::Download
+    \brief The torrent is downloading.
+
+    \var gearbox::Torrent::SeedWait
+    \brief The torrent is queued for seeding.
+
+    \var gearbox::Torrent::Seed
+    \brief The torrent is seeding.
+
+    \var gearbox::Torrent::Invalid
+    \brief The torrent is in an unknown state.
+*/
 
 TorrentPrivate::TorrentPrivate() :
     attributes(),
@@ -564,6 +607,13 @@ int32_t Torrent::eta() const
     return valid() ? priv_->get_eta() : 0;
 }
 
+/*!
+    Returns the root folder of the torrent.
+
+    The lifetime and validity of the returned folder
+    is not tied in any way to the lifetime of the torrent, but the former should be considered
+    invalid/stale if the torrent is removed from the server.
+*/
 ReturnType<Folder> Torrent::content() const
 {
     Folder result((std::string(name())));
