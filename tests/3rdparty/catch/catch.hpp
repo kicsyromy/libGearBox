@@ -10390,7 +10390,6 @@ namespace Catch {
 // Standard C/C++ main entry point
 int main (int argc, char * argv[]) {
     auto r = Catch::Session().run( argc, argv );
-    std::cin.get();
     return r;
 }
 
