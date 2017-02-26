@@ -7,17 +7,16 @@
 
 TEST_CASE("Test librt_folder_p and librt_folder", "[folder]")
 {
-	gearbox::Folder root("root");
+    SECTION("Folder::Folder(std::string &&)")
+    {
+        gearbox::Folder root("root");
+        REQUIRE((root.name() == "root"));
+        REQUIRE((root.files().empty()));
+        REQUIRE((root.subfolders().empty()));
+    }
 
-	SECTION("Folder::Folder(std::string &&)")
-	{
-		REQUIRE((root.name() == "root"));
-		REQUIRE((root.files().empty()));
-		REQUIRE((root.subfolders().empty()));
-	}
-
-	SECTION("<anonymous>::rfind_char(char *, const std::size_t, char wanted)")
-	{
+    SECTION("<anonymous>::rfind_char(char *, const std::size_t, char wanted)")
+    {
         /* Test normal use-case */
         {
             char str[] = { "/some/long/path/" };
@@ -47,7 +46,7 @@ TEST_CASE("Test librt_folder_p and librt_folder", "[folder]")
             auto result = rfind_char(str, length, ' ');
             REQUIRE((result == nullptr));
         }
-	}
+    }
 
     SECTION("<anonymous>::rsplit(const std::string &, char)")
     {
@@ -69,5 +68,31 @@ TEST_CASE("Test librt_folder_p and librt_folder", "[folder]")
             const auto result = rsplit(str, '|');
             REQUIRE((result.empty()));
         }
+    }
+
+    SECTION("gearbox::FolderPrivate::addPath(const std::string &, std::size_t, std::uint64_t, std::uint64_t, bool, gearbox::File::Priority")
+    {
+        using namespace gearbox;
+
+        Folder root("root");
+        root.priv_->addPath("root/subl1/subl2/file.txt", 0, 0, 0, true, File::Priority::Normal);
+
+        auto &subfoldersl1 = root.priv_->subfolders_;
+        REQUIRE((subfoldersl1.size() == 1));
+        auto subl1 = subfoldersl1.find("subl1");
+        REQUIRE((subl1 != subfoldersl1.end()));
+        auto &subfoldersl2 = subl1->second->priv_->subfolders_;
+        auto subl2 = subfoldersl2.find("subl2");
+        REQUIRE((subl2 != subfoldersl2.end()));
+
+        auto &files = subl2->second->priv_->files_;
+        REQUIRE((files.size() == 1));
+        auto file = files.find("file.txt");
+        REQUIRE((file != files.end()));
+        REQUIRE((file->second->id_ == 0));
+        REQUIRE((file->second->bytesCompleted_ == 0));
+        REQUIRE((file->second->bytesTotal_ == 0));
+        REQUIRE((file->second->wanted_ == true));
+        REQUIRE((file->second->priority_ == File::Priority::Normal));
     }
 }
