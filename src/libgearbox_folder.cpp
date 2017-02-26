@@ -90,7 +90,8 @@ namespace
 }
 
 
-FolderPrivate::FolderPrivate(std::string &&name) :
+FolderPrivate::FolderPrivate(std::string &&name, Folder &folder) :
+    folder_(folder),
     name_(std::move(name))
 {}
 
@@ -144,12 +145,12 @@ File *FolderPrivate::insert(File &&file)
     return f;
 }
 
-void FolderPrivate::addPath(Folder &root, const std::string &path, std::size_t id,
+void FolderPrivate::addPath(const std::string &path, std::size_t id,
                             std::uint64_t bytesCompleted, std::uint64_t length,
                             bool wanted, File::Priority priority)
 {
     auto names = rsplit(path, '/');
-    Folder *node = &root;
+    Folder *node = &folder_;
     auto lastFolderIndex = names.empty() ? 0 : static_cast<int>(names.size()) - 1;
     for (int it = lastFolderIndex; it >= 1; --it)
     {
@@ -163,7 +164,7 @@ void FolderPrivate::addPath(Folder &root, const std::string &path, std::size_t i
 }
 
 Folder::Folder(std::string &&name) :
-    priv_(new FolderPrivate(std::forward<std::string>(name)))
+    priv_(new FolderPrivate(std::forward<std::string>(name), *this))
 {
 }
 
@@ -216,11 +217,4 @@ const std::vector<std::reference_wrapper<const File>> Folder::files() const
         files.push_back(std::cref(*(it->second.get())));
     }
     return files;
-}
-
-void Folder::addPath(Folder &root, const std::string &path, std::size_t id,
-                     std::uint64_t bytesCompleted, std::uint64_t length,
-                     bool wanted, File::Priority priority)
-{
-    root.priv_->addPath(root, path, id, bytesCompleted, length, wanted, priority);
 }

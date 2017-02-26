@@ -42,7 +42,7 @@ namespace gearbox
         using file_array_t   = std::unordered_map<std::string, std::unique_ptr<File>>;
 
     public:
-        FolderPrivate(std::string &&name);
+        FolderPrivate(std::string &&name, Folder &folder);
 
     public:
         const std::string &name() const;
@@ -57,11 +57,12 @@ namespace gearbox
         File *insert(File &&file);
 
     public:
-        static void addPath(Folder &root, const std::string &path, std::size_t id,
-                            std::uint64_t bytesCompleted, std::uint64_t length,
-                            bool wanted, File::Priority priority);
+        void addPath(const std::string &path, std::size_t id,
+                     std::uint64_t bytesCompleted, std::uint64_t length,
+                     bool wanted, File::Priority priority);
 
     private:
+        Folder &folder_;
         std::string name_;
         folder_array_t subfolders_;
         file_array_t files_;

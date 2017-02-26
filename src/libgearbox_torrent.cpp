@@ -44,6 +44,8 @@
 
 #include "libgearbox_torrent_p.h"
 #include "libgearbox_session_p.h"
+#include "libgearbox_folder.h"
+#include "libgearbox_folder_p.h"
 #include "libgearbox_logger_p.h"
 
 using namespace gearbox;
@@ -647,8 +649,7 @@ ReturnType<Folder> Torrent::content() const
 
                     for (std::size_t it = 0; it < length; ++it)
                     {
-                        Folder::addPath(
-                            result,
+                        result.priv_->addPath(
                             files.at(it).get_name(),
                             it,
                             files.at(it).get_bytesCompleted(),

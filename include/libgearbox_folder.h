@@ -55,11 +55,6 @@ namespace gearbox
         Folder(std::string &&name);
 
     private:
-        static void addPath(Folder &root, const std::string &path, std::size_t id,
-                            std::uint64_t bytesCompleted, std::uint64_t length,
-                            bool wanted, File::Priority priority);
-
-    private:
         std::unique_ptr<FolderPrivate> priv_;
 
     private:
