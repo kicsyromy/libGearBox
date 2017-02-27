@@ -91,6 +91,62 @@ TEST_CASE("Test librt_folder_p and librt_folder", "[folder]")
         REQUIRE((subf == it->second.get()));
     }
 
+    SECTION("gearbox::FolderPrivate::insert(std::string)")
+    {
+        using namespace gearbox;
+
+        Folder f("folder");
+        f.priv_->insert("sub1");
+        f.priv_->insert("sub2");
+        f.priv_->insert("sub3");
+
+        auto &subfolders = f.priv_->subfolders_;
+        REQUIRE((subfolders.size() == 3));
+        auto it = subfolders.find("sub1");
+        REQUIRE((it != subfolders.end()));
+        it = subfolders.find("sub2");
+        REQUIRE((it != subfolders.end()));
+        it = subfolders.find("sub3");
+        REQUIRE((it != subfolders.end()));
+    }
+
+    SECTION("gearbox::FolderPrivate::insert(gearbox::File &&)")
+    {
+        using namespace gearbox;
+
+        Folder f("folder");
+        f.priv_->insert(File {
+            "file1",
+            0,
+            0,
+            true,
+            File::Priority::Normal
+        });
+        f.priv_->insert(File {
+            "file2",
+            0,
+            0,
+            true,
+            File::Priority::Normal
+        });
+        f.priv_->insert(File {
+            "file3",
+            0,
+            0,
+            true,
+            File::Priority::Normal
+        });
+
+        auto &files = f.priv_->files_;
+        REQUIRE((files.size() == 3));
+        auto it = files.find("file1");
+        REQUIRE((it != files.end()));
+        it = files.find("file2");
+        REQUIRE((it != files.end()));
+        it = files.find("file3");
+        REQUIRE((it != files.end()));
+    }
+
     SECTION("gearbox::FolderPrivate::addPath(const std::string &, std::size_t, std::uint64_t, std::uint64_t, bool, gearbox::File::Priority")
     {
         using namespace gearbox;
@@ -115,5 +171,59 @@ TEST_CASE("Test librt_folder_p and librt_folder", "[folder]")
         REQUIRE((file->second->bytesTotal_ == 0));
         REQUIRE((file->second->wanted_ == true));
         REQUIRE((file->second->priority_ == File::Priority::Normal));
+    }
+
+    SECTION("gearbox::Folder::subfolders()")
+    {
+        using namespace gearbox;
+
+        Folder f("folder");
+        auto &subfolders = f.priv_->subfolders_;
+        subfolders.insert(std::make_pair("sub1", std::make_unique<Folder>("sub1")));
+        subfolders.insert(std::make_pair("sub2", std::make_unique<Folder>("sub2")));
+        subfolders.insert(std::make_pair("sub3", std::make_unique<Folder>("sub3")));
+
+        auto result = f.subfolders();
+        REQUIRE((result.size() == 3));
+        for (const Folder &folder: result)
+        {
+            REQUIRE((subfolders.find(folder.name()) != subfolders.end()));
+        }
+    }
+
+    SECTION("gearbox::Folder::files()")
+    {
+        using namespace gearbox;
+
+        Folder f("folder");
+        auto &files = f.priv_->files_;
+        files.insert(std::make_pair("file1", std::make_unique<File> (
+            "file1",
+            0,
+            0,
+            true,
+            File::Priority::Normal
+        )));
+        files.insert(std::make_pair("file2", std::make_unique<File> (
+            "file2",
+            0,
+            0,
+            true,
+            File::Priority::Normal
+        )));
+        files.insert(std::make_pair("file3", std::make_unique<File> (
+            "file3",
+            0,
+            0,
+            true,
+            File::Priority::Normal
+        )));
+
+        auto result = f.files();
+        REQUIRE((result.size() == 3));
+        for (const File &file: result)
+        {
+            REQUIRE((files.find(file.name()) != files.end()));
+        }
     }
 }
