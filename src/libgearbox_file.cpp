@@ -35,7 +35,7 @@ namespace
 {
     #include "libgearbox_mimetypes.h"
 
-    inline const char *find_char(const char *string, const std::size_t size, char wanted)
+    inline const char *rfind_char(const char *string, const std::size_t size, char wanted)
     {
         const char *c = nullptr;
         if (size > 0)
@@ -60,7 +60,7 @@ namespace
     File::MIMEType mimeType(const std::string &name)
     {
         const char *fileName = name.c_str();
-        auto extension = find_char(fileName, name.size(), '.');
+        auto extension = rfind_char(fileName, name.size(), '.');
         if (extension != nullptr)
         {
             auto it = mimeTypes.find(extension);
