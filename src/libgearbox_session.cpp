@@ -112,7 +112,7 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
         if (result.error)
         {
             LOG_DEBUG("Error: {}", static_cast<std::string>(result.error));
-            response.error = gearbox::Error(gearbox::Error::Code::TransmissionUnknownError, "Some dummy error until I can figure out how to convert between types");
+            response.error = Error(static_cast<Error::Code>(result.error.errorCode), result.error.message);
             break;
         }
 
@@ -120,15 +120,6 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
         {
             sessionId_ = result.response.headers["X-Transmission-Session-Id"];
             continue;
-        }
-
-        if (result.status == gearbox::http::Status::MethodNotAllowed)
-        {
-            response.error = std::make_pair(
-                Error::Code::TransmissionMethodNotAllowed,
-                std::string{ "Method not allowed" }
-            );
-            break;
         }
 
         if (result.status == gearbox::http::Status::OK)
@@ -140,14 +131,14 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
             auto &result = response.get_result();
             if (result != "success" && !result.empty())
             {
-                response.error = std::make_pair(Error::Code::TransmissionUnknownError, std::move(result));
+                response.error = std::make_pair(Error::Code::UnknownError, std::move(result));
             }
 
             break;
         }
         else
         {
-            response.error = std::make_pair(Error::Code::TransmissionUnknownError, std::string{ "Unknown error" });
+            response.error = std::make_pair(static_cast<Error::Code>(result.status.code()), result.status.name());
             break;
         }
     }
