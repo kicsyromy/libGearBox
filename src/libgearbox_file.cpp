@@ -35,6 +35,8 @@ namespace
 {
     #include "libgearbox_mimetypes.h"
 
+    /* Perform a search in 'string', from the end, and return the address of the last character */
+    /* that matches 'wanted'                                                                    */
     inline const char *rfind_char(const char *string, const std::size_t size, char wanted)
     {
         const char *c = nullptr;
@@ -57,6 +59,7 @@ namespace
         return c;
     }
 
+    /* Find the assumed MIMEType of a file based on its extension */
     File::MIMEType mimeType(const std::string &name)
     {
         const char *fileName = name.c_str();

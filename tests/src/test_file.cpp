@@ -55,6 +55,12 @@ TEST_CASE("Test librt_file_p and librt_file", "[file]")
             REQUIRE((strcmp(mimeType(file).name, "") == 0));
             REQUIRE((mimeType(file).id == -1));
         }
+
+        {
+            std::string file { "file_without_ext" };
+            REQUIRE((strcmp(mimeType(file).name, "") == 0));
+            REQUIRE((mimeType(file).id == -1));
+        }
     }
 
     gearbox::File f {
