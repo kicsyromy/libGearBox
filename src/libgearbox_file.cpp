@@ -33,7 +33,9 @@ using namespace gearbox::common;
 
 namespace
 {
-    #include "libgearbox_mimetypes.h"
+    const std::map<const char *, File::MIMEType, CaseInsensitiveCompare> mimeTypes {{
+        #include "libgearbox_mimetypes_p.h"
+    }};
 
     /* Perform a search in 'string', from the end, and return the address of the last character */
     /* that matches 'wanted'                                                                    */
