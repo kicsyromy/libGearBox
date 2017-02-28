@@ -151,12 +151,12 @@ void FolderPrivate::addPath(const std::string &path, std::size_t id,
 {
     auto names = rsplit(path, '/');
     Folder *node = &folder_;
-    auto lastFolderIndex = names.empty() ? 0 : static_cast<int>(names.size()) - 1;
-    for (int it = lastFolderIndex; it >= 1; --it)
+    std::size_t lastFolderIndex = names.empty() ? 0 : names.size() - 1;
+    for (std::size_t it = lastFolderIndex; it >= 1; --it)
     {
-        auto newNode = node->priv_->find(names.at(static_cast<std::size_t>(it)));
+        auto newNode = node->priv_->find(names.at(it));
         if (newNode == nullptr)
-            newNode = node->priv_->insert(std::move(names.at(static_cast<std::size_t>(it))));
+            newNode = node->priv_->insert(std::move(names.at(it)));
         node = newNode;
     }
     File *f = node->priv_->insert(File(std::move(names.at(0)), bytesCompleted, length, wanted, priority));
