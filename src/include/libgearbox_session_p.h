@@ -33,10 +33,13 @@
 #include "libgearbox_http_interface_p.h"
 #if defined(PLATFORM_WINDOWS)
 #include "libgearbox_http_win_p.h"
+using HttpRequestHandler = gearbox::http::Interface<gearbox::WinHttp>;
 #elif defined(PLATFORM_LINUX)
 #include "libgearbox_http_linux_p.h"
+using HttpRequestHandler = gearbox::http::Interface<gearbox::CUrlHttp>;
 #elif defined(PLATFORM_MACOS)
 #include "libgearbox_http_macos_p.h"
+using HttpRequestHandler = gearbox::http::Interface<gearbox::CocoaHttp>;
 #else
 #error "Unsupported platform"
 #endif
@@ -92,15 +95,6 @@ namespace gearbox
         };
     }
 
-#if defined(PLATFORM_WINDOWS)
-    using HttpRequestHandler = gearbox::http::Interface<gearbox::WinHttp>;
-#elif defined(PLATFORM_LINUX)
-    using HttpRequestHandler = gearbox::http::Interface<gearbox::CUrlHttp>;
-#elif defined(PLATFORM_MACOS)
-    using HttpRequestHandler = gearbox::http::Interface<gearbox::CocoaHttp>;
-#else
-#error "Unsupported platform"
-#endif
     class SessionPrivate
     {
         friend class Session;
