@@ -30,7 +30,15 @@ private:
 
 public:
     explicit TestHttpImplementation(const std::string &userAgent) :
-        userAgent_(userAgent)
+        userAgent_(userAgent),
+        host_("http://domain.com"),
+        port_(443),
+        path_("/rpc/transmission"),
+        authenticationRequired_(true),
+        username_("user"),
+        password_("pass"),
+        sslErrorHandling_(http_ssl_error_handling_t::Aknowledge),
+        timeout_(milliseconds_t { 1000 })
     {
     }
 
@@ -158,7 +166,49 @@ TEST_CASE("Test libgearbox_http_interface", "[http]")
 {
     using HttpInterface = gearbox::http::Interface<TestHttpImplementation>;
 
+    HttpInterface itf("UserAgent");
+
     SECTION("gearbox::http::Interface::Interface(const std::string &)")
     {
+        REQUIRE((itf.implementation_.userAgent_ == "UserAgent"));
+        REQUIRE((itf.implementation_.host_ == "http://domain.com"));
+        REQUIRE((itf.implementation_.port_ == 443));
+        REQUIRE((itf.implementation_.path_ == "/rpc/transmission"));
+        REQUIRE((itf.implementation_.authenticationRequired_ == true));
+        REQUIRE((itf.implementation_.username_ == "user"));
+        REQUIRE((itf.implementation_.password_ == "pass"));
+        REQUIRE((itf.implementation_.sslErrorHandling_ == gearbox::http::SSLErrorHandling::Aknowledge));
+        REQUIRE((itf.implementation_.timeout_ == milliseconds_t { 1000 }));
+    }
+
+    SECTION(("gearbox::http::Interface::host() const"))
+    {
+        REQUIRE((itf.host() == "http://domain.com"));
+    }
+
+    SECTION(("gearbox::http::Interface::setHost(const std::string &)"))
+    {
+        const std::string copiable { "http://other-domain.com" };
+        itf.setHost(copiable);
+        REQUIRE((itf.implementation_.host_ == "http://other-domain.com"));
+    }
+
+    SECTION(("gearbox::http::Interface::setHost(const std::string &&)"))
+    {
+        std::string movable { "http://moved-domain.com" };
+        itf.setHost(std::move(movable));
+        REQUIRE((itf.implementation_.host_ == "http://moved-domain.com"));
+        REQUIRE((movable.empty()));
+    }
+
+    SECTION(("gearbox::http::Interface::port() const"))
+    {
+        REQUIRE((itf.port() == 443));
+    }
+
+    SECTION(("gearbox::http::Interface::setPort(gearbox::http::port_t port)"))
+    {
+        itf.setPort(80);
+        REQUIRE((itf.implementation_.port_ == 80));
     }
 }
