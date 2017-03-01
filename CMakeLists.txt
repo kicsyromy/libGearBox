@@ -79,13 +79,10 @@ endif ()
 
 target_link_libraries (gearbox ${GEARBOX_LIBS})
 set_target_properties (
-    gearbox    PROPERTIES
-    VERSION    ${libgearbox_VERSION_MAJOR}.${libgearbox_VERSION_MINOR}.${libgearbox_VERSION_PATCH}
-    SOVERSION  ${libgearbox_VERSION_MAJOR}
-)
-set_target_properties (
     gearbox       PROPERTIES
     COMPILE_FLAGS "${GEARBOX_COMPILER_FLAGS}"
+    VERSION       ${libgearbox_VERSION_MAJOR}.${libgearbox_VERSION_MINOR}.${libgearbox_VERSION_PATCH}
+    SOVERSION     ${libgearbox_VERSION_MAJOR}
 )
 
 install (

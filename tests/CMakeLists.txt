@@ -22,7 +22,8 @@ aux_source_directory (${PROJECT_SOURCE_DIR}/src LIBGEARBOX_TEST_SOURCES)
 
 add_executable (${PROJECT_NAME} ${LIBGEARBOX_TEST_SOURCES} ${FMT_SOURCE})
 target_link_libraries (${PROJECT_NAME} ${GEARBOX_LIBS})
+
 set_target_properties (
     ${PROJECT_NAME} PROPERTIES
-    COMPILE_FLAGS   "-std=c++14"
+    COMPILE_FLAGS   "${GEARBOX_COMPILER_FLAGS}"
 )
