@@ -27,23 +27,22 @@
 
 #include <fmt/format.h>
 
-#ifdef PLATFORM_WINDOWS
-    #ifdef _MSC_VER
-        #define __PRETTY_FUNCTION__ __FUNCSIG__
-    #endif // _MSC_VER
+#ifdef _MSC_VER
+    #define __PRETTY_FUNCTION__ __FUNCSIG__
     #define PATH_SEPARATOR '\\'
 #else
     #define PATH_SEPARATOR '/'
-#endif // PLATFORM_WINDOWS
+#endif // _MSC_VER
+
 
 #define LOG(...) \
     do { \
     std::string log = fmt::format(__VA_ARGS__); \
     fmt::print(stderr, \
             "libgearbox: INFO: {}: {}: {}:\n{}\n", \
-            &__FILE__[strrchr(__FILE__, PATH_SEPARATOR) - __FILE__ + 1], \
-            __PRETTY_FUNCTION__, \
+            strrchr(__FILE__, PATH_SEPARATOR) + 1, \
             __LINE__, \
+            __PRETTY_FUNCTION__, \
             log); \
     } while (0)
 
@@ -54,9 +53,9 @@
     std::string log = fmt::format(__VA_ARGS__)); \
     fmt::print(stderr, \
             "libgearbox: WARNING: {}: {}: {}:\n{}\n", \
-            &__FILE__[strrchr(__FILE__, PATH_SEPARATOR) - __FILE__ + 1], \
-            __PRETTY_FUNCTION__, \
+            strrchr(__FILE__, PATH_SEPARATOR) + 1, \
             __LINE__, \
+            __PRETTY_FUNCTION__, \
             log); \
     } while (0)
 
@@ -65,9 +64,9 @@
     std::string log = fmt::format(__VA_ARGS__); \
     fmt::print(stderr, \
             "libgearbox: ERROR: {}: {}: {}:\n{}\n", \
-            &__FILE__[strrchr(__FILE__, PATH_SEPARATOR) - __FILE__ + 1], \
-            __PRETTY_FUNCTION__, \
+            strrchr(__FILE__, PATH_SEPARATOR) + 1, \
             __LINE__, \
+            __PRETTY_FUNCTION__, \
             log); \
     } while (0)
 
@@ -76,9 +75,9 @@
     std::string log = fmt::format(__VA_ARGS__); \
     fmt::print(stderr, \
             "libgearbox: FATAL: {}: {}: {}:\n{}\n", \
-            &__FILE__[strrchr(__FILE__, PATH_SEPARATOR) - __FILE__ + 1], \
-            __PRETTY_FUNCTION__, \
+            strrchr(__FILE__, PATH_SEPARATOR) + 1, \
             __LINE__, \
+            __PRETTY_FUNCTION__, \
             log); \
     std::terminate(); \
     } while (0)
@@ -89,9 +88,9 @@
     std::string log = fmt::format(__VA_ARGS__); \
     fmt::print(stderr, \
             "libgearbox: DEBUG: {}: {}: {}:\n{}\n", \
-            __PRETTY_FUNCTION__, \
-            &__FILE__[strrchr(__FILE__, PATH_SEPARATOR) - __FILE__ + 1], \
+            strrchr(__FILE__, PATH_SEPARATOR) + 1, \
             __LINE__, \
+            __PRETTY_FUNCTION__, \
             log); \
     } while (0)
 #else
