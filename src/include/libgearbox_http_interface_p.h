@@ -196,14 +196,14 @@ namespace gearbox
         public:
             inline const std::string &host() const { return implementation_.host(); }
             inline void setHost(const std::string &hostname) { implementation_.setHost(hostname); }
-            inline void setHost(std::string &&hostname) { implementation_.setHost(hostname); }
+            inline void setHost(std::string &&hostname) { implementation_.setHost(std::move(hostname)); }
 
             inline port_t port() const { return implementation_.port(); }
             inline void setPort(port_t port) { implementation_.setPort(port); }
 
             inline const std::string &path() const { return implementation_.path(); }
             inline void setPath(const std::string &path) { implementation_.setPath(path); }
-            inline void setPath(std::string &&path) { implementation_.setPath(path); }
+            inline void setPath(std::string &&path) { implementation_.setPath(std::move(path)); }
 
             inline bool authenticationRequired() const { return implementation_.authenticationRequired(); }
             inline void enableAuthentication() { implementation_.enableAuthentication(); }
@@ -211,11 +211,11 @@ namespace gearbox
 
             inline const std::string &username() const { return implementation_.username(); }
             inline void setUsername(const std::string &username) { implementation_.setUsername(username); }
-            inline void setUsername(std::string &&username) { implementation_.setUsername(username); }
+            inline void setUsername(std::string &&username) { implementation_.setUsername(std::move(username)); }
 
             inline const std::string &password() const { return implementation_.password(); }
             inline void setPassword(const std::string &password) { implementation_.setPassword(password); }
-            inline void setPassword(std::string &&password) { implementation_.setPassword(password); }
+            inline void setPassword(std::string &&password) { implementation_.setPassword(std::move(password)); }
 
             inline void setSSLErrorHandling(SSLErrorHandling value) {
                 implementation_.setSSLErrorHandling(value);
