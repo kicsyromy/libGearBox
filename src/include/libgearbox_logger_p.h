@@ -29,7 +29,7 @@
 
 #ifdef PLATFORM_WINDOWS
     #ifdef _MSC_VER
-        #define __PRETTY_FUNCTION__ __FUNCTION__
+        #define __PRETTY_FUNCTION__ __FUNCSIG__
     #endif // _MSC_VER
     #define PATH_SEPARATOR '\\'
 #else
@@ -40,7 +40,7 @@
     do { \
     std::string log = fmt::format(__VA_ARGS__); \
     fmt::print(stderr, \
-            "librt: INFO: {}: {}: {}:\n{}\n", \
+            "libgearbox: INFO: {}: {}: {}:\n{}\n", \
             &__FILE__[strrchr(__FILE__, PATH_SEPARATOR) - __FILE__ + 1], \
             __PRETTY_FUNCTION__, \
             __LINE__, \
@@ -53,7 +53,7 @@
     do { \
     std::string log = fmt::format(__VA_ARGS__)); \
     fmt::print(stderr, \
-            "librt: WARNING: {}: {}: {}:\n{}\n", \
+            "libgearbox: WARNING: {}: {}: {}:\n{}\n", \
             &__FILE__[strrchr(__FILE__, PATH_SEPARATOR) - __FILE__ + 1], \
             __PRETTY_FUNCTION__, \
             __LINE__, \
@@ -64,7 +64,7 @@
     do { \
     std::string log = fmt::format(__VA_ARGS__); \
     fmt::print(stderr, \
-            "librt: ERROR: {}: {}: {}:\n{}\n", \
+            "libgearbox: ERROR: {}: {}: {}:\n{}\n", \
             &__FILE__[strrchr(__FILE__, PATH_SEPARATOR) - __FILE__ + 1], \
             __PRETTY_FUNCTION__, \
             __LINE__, \
@@ -75,7 +75,7 @@
     do { \
     std::string log = fmt::format(__VA_ARGS__); \
     fmt::print(stderr, \
-            "librt: FATAL: {}: {}: {}:\n{}\n", \
+            "libgearbox: FATAL: {}: {}: {}:\n{}\n", \
             &__FILE__[strrchr(__FILE__, PATH_SEPARATOR) - __FILE__ + 1], \
             __PRETTY_FUNCTION__, \
             __LINE__, \
@@ -88,7 +88,7 @@
     do { \
     std::string log = fmt::format(__VA_ARGS__); \
     fmt::print(stderr, \
-            "librt: DEBUG: {}: {}: {}:\n{}\n", \
+            "libgearbox: DEBUG: {}: {}: {}:\n{}\n", \
             __PRETTY_FUNCTION__, \
             &__FILE__[strrchr(__FILE__, PATH_SEPARATOR) - __FILE__ + 1], \
             __LINE__, \
