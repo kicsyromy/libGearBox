@@ -224,8 +224,18 @@ namespace gearbox
             inline const milliseconds_t &timeout() const { return implementation_.timeout(); }
             inline void setTimeout(milliseconds_t value) { implementation_.setTimeout(value); }
 
+        private:
+            TYPE_HAS_METHOD(Implementation::Request, send, RequestResult());
+            TYPE_HAS_METHOD(Implementation::Request, setBody, void(const std::string &));
+            TYPE_HAS_METHOD(Implementation::Request, setHeaders, void(const header_array_t &));
+            TYPE_HAS_METHOD(Implementation::Request, setHeader, void(const header_t &));
+
         public:
             inline typename Implementation::Request createRequest() {
+                static_assert(has_send_v, "Missing 'gearbox::http::RequestResult send()' method in Request type");
+                static_assert(has_setBody_v, "Missing 'void setBody(const std::string &)' in Request type");
+                static_assert(has_setHeaders_v, "Missing 'void setHeaders(const gearbox::http::header_array_t &)' in Request type");
+                static_assert(has_setHeader_v, "Missing 'void setHeader(const gearbox::http::header_t &)' in Request type");
                 return implementation_.createRequest();
             }
 
