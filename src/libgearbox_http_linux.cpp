@@ -145,7 +145,7 @@ namespace
         return size * nmemb;
     }
 
-    std::size_t headerCallback(void *ptr, size_t size, size_t nmemb, header_array_t *data)
+    std::size_t headerCallback(void *ptr, std::size_t size, std::size_t nmemb, header_array_t *data)
     {
         std::string header(static_cast<char *>(ptr), size * nmemb);
         auto found = header.find("HTTP/");

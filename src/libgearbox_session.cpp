@@ -42,7 +42,7 @@ namespace
     constexpr std::uint16_t SESSION_TAG     { 33872 };
     constexpr std::int32_t  DEFAULT_TIMEOUT {  5000 };
     constexpr std::int32_t  RETRY_COUNT     {     5 };
-    constexpr const char    USER_AGENT[29]  { "libRemoteTransmission v" LIBGEARBOX_VERISION_STR };
+    constexpr const char    USER_AGENT[17]  { "libGearbox/" LIBGEARBOX_VERISION_STR };
 }
 
 SessionPrivate::SessionPrivate(const std::string &url,
