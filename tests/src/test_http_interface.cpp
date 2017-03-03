@@ -59,6 +59,7 @@ public:
     void setHost(std::string &&hostname)
     {
         host_ = std::move(hostname);
+        hostname.clear();
     }
 
     http_port_t port() const
@@ -84,6 +85,7 @@ public:
     inline void setPath(std::string &&path)
     {
         path_ = std::move(path);
+        path.clear();
     }
 
     bool authenticationRequired() const
@@ -114,6 +116,7 @@ public:
     void setUsername(std::string &&username)
     {
         username_ = std::move(username);
+        username.clear();
     }
 
     const std::string &password() const
@@ -129,6 +132,7 @@ public:
     void setPassword(std::string &&password)
     {
         password_ = std::move(password);
+        password.clear();
     }
 
     void setSSLErrorHandling(http_ssl_error_handling_t value)
@@ -150,6 +154,10 @@ public:
     struct Request
     {
         bool created = true;
+        void setBody(const std::string &data);
+        void setHeaders(const http_header_array_t &headers);
+        void setHeader(const http_header_t &header);
+        http_request_result_t send();
     };
 
 public:
@@ -188,9 +196,10 @@ TEST_CASE("Test libgearbox_http_interface", "[http]")
 
     SECTION(("gearbox::http::Interface::setHost(const std::string &)"))
     {
-        const std::string copiable { "http://other-domain.com" };
+        std::string copiable { "http://other-domain.com" };
         itf.setHost(copiable);
         REQUIRE((itf.implementation_.host_ == "http://other-domain.com"));
+        REQUIRE((!copiable.empty()));
     }
 
     SECTION(("gearbox::http::Interface::setHost(const std::string &&)"))
@@ -210,5 +219,120 @@ TEST_CASE("Test libgearbox_http_interface", "[http]")
     {
         itf.setPort(80);
         REQUIRE((itf.implementation_.port_ == 80));
+    }
+
+    SECTION(("gearbox::http::Interface::path() const"))
+    {
+        REQUIRE((itf.path() == "/rpc/transmission"));
+    }
+
+    SECTION(("gearbox::http::Interface::setPath(const std::string &)"))
+    {
+        std::string copiable { "/copy/path" };
+        itf.setPath(copiable);
+        REQUIRE((itf.implementation_.path_ == "/copy/path"));
+        REQUIRE((!copiable.empty()));
+    }
+
+    SECTION(("gearbox::http::Interface::setPath(const std::string &&)"))
+    {
+        std::string movable { "/move/path" };
+        itf.setPath(std::move(movable));
+        REQUIRE((itf.implementation_.path_ == "/move/path"));
+        REQUIRE((movable.empty()));
+    }
+
+    SECTION(("gearbox::http::Interface::authenticationRequired() const"))
+    {
+        REQUIRE((itf.authenticationRequired()));
+    }
+
+    SECTION(("gearbox::http::Interface::enableAuthentication()"))
+    {
+        itf.implementation_.authenticationRequired_ = true;
+        itf.enableAuthentication();
+        REQUIRE((itf.implementation_.authenticationRequired_));
+
+        itf.implementation_.authenticationRequired_ = false;
+        itf.enableAuthentication();
+        REQUIRE((itf.implementation_.authenticationRequired_));
+    }
+
+    SECTION(("gearbox::http::Interface::disableAuthentication()"))
+    {
+        itf.implementation_.authenticationRequired_ = false;
+        itf.disableAuthentication();
+        REQUIRE((!itf.implementation_.authenticationRequired_));
+
+        itf.implementation_.authenticationRequired_ = true;
+        itf.disableAuthentication();
+        REQUIRE((!itf.implementation_.authenticationRequired_));
+    }
+
+    SECTION(("gearbox::http::Interface::username() const"))
+    {
+        REQUIRE((itf.username() == "user"));
+    }
+
+    SECTION(("gearbox::http::Interface::setUsername(std::string &)"))
+    {
+        std::string copiable { "copy_user" };
+        itf.setUsername(copiable);
+        REQUIRE((itf.implementation_.username_ == "copy_user"));
+        REQUIRE((!copiable.empty()));
+    }
+
+    SECTION(("gearbox::http::Interface::setUsername(std::string &&)"))
+    {
+        std::string movable { "move_user" };
+        itf.setUsername(std::move(movable));
+        REQUIRE((itf.implementation_.username_ == "move_user"));
+        REQUIRE((movable.empty()));
+    }
+
+    SECTION(("gearbox::http::Interface::password() const"))
+    {
+        REQUIRE((itf.password() == "pass"));
+    }
+
+    SECTION(("gearbox::http::Interface::setPassword(std::string &)"))
+    {
+        std::string copiable { "copy_pass" };
+        itf.setPassword(copiable);
+        REQUIRE((itf.implementation_.password_ == "copy_pass"));
+        REQUIRE((!copiable.empty()));
+    }
+
+    SECTION(("gearbox::http::Interface::setPassword(std::string &&)"))
+    {
+        std::string movable { "move_pass" };
+        itf.setPassword(std::move(movable));
+        REQUIRE((itf.implementation_.password_ == "move_pass"));
+        REQUIRE((movable.empty()));
+    }
+
+    SECTION(("gearbox::http::Interface::setSSLErrorHandling(gearbox::http::SSLErrorHandling)"))
+    {
+        itf.setSSLErrorHandling(SSLErrorHandling::Aknowledge);
+        REQUIRE((itf.implementation_.sslErrorHandling_ == SSLErrorHandling::Aknowledge));
+        itf.setSSLErrorHandling(SSLErrorHandling::Ignore);
+        REQUIRE((itf.implementation_.sslErrorHandling_ == SSLErrorHandling::Ignore));
+    }
+
+    SECTION(("gearbox::http::Interface::timeout() const"))
+    {
+        REQUIRE((itf.timeout() == milliseconds_t { 1000 }));
+    }
+
+    SECTION(("gearbox::http::Interface::setTimeout(gearbox::http::milliseconds_t)"))
+    {
+        itf.setTimeout(milliseconds_t { 100 });
+        REQUIRE(itf.implementation_.timeout_ == milliseconds_t { 100 });
+    }
+
+    SECTION(("gearbox::http::Interface::createRequest()"))
+    {
+        auto request = itf.createRequest();
+        REQUIRE((request.created));
     }
 }
