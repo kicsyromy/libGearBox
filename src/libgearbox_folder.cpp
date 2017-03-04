@@ -38,6 +38,11 @@
 #include <vector>
 #include <cstring>
 
+#ifdef _MSC_VER
+/* Disable warning about strncpy not being safe */
+#pragma warning(disable: 4996)
+#endif // _MSC_VER
+
 using namespace gearbox;
 
 namespace

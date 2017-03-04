@@ -139,12 +139,16 @@ namespace
         return err;
     }
 
+    /* Appends a buffer of length size * nmemb to data. This function is called by CUrl for */
+    /* subsequent chunks of data that constitute the response for a request.                */
     std::size_t writeCallback(void *ptr, std::size_t size, std::size_t nmemb, std::string *data)
     {
         data->append(static_cast<char *>(ptr), size * nmemb);
         return size * nmemb;
     }
 
+    /* Appends a key-value pair, represented by ptr, of length size * nmemb, to the data map. */
+    /* This function is called by CUrl for each line in the header of a response.             */
     std::size_t headerCallback(void *ptr, std::size_t size, std::size_t nmemb, header_array_t *data)
     {
         std::string header(static_cast<char *>(ptr), size * nmemb);
@@ -156,6 +160,7 @@ namespace
             {
                 auto value = header.substr(separatorPos + 2);
                 (*data)[header.substr(0, separatorPos)] = value.substr(0, value.size() - 2);
+                /* Ignore CL/RF at the end of the header line             ^^^^^^^^^^^^^^^^ */
             }
         }
         else

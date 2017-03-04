@@ -26,6 +26,7 @@
 #define LIBGEARBOX_COMMON_P_H
 
 #include <string>
+#include <type_traits>
 
 #define TYPE_HAS_METHOD(type_name, method_name, signature)                        \
     template<typename T>                                                          \
