@@ -1,12 +1,14 @@
-#ifdef PLATFORM_LINUX
-
 #include <catch.hpp>
 
 #define private public
+
+#ifdef PLATFORM_LINUX
 #include <libgearbox_http_linux_p.h>
 #include <libgearbox_http_linux.cpp>
 
-TEST_CASE("Test libgearbox_http_linux", "[http]")
+using HttpImplementation = gearbox::CUrlHttp;
+
+TEST_CASE("Test libgearbox_http_linux_p", "[http]")
 {
     SECTION(("<anonymous>::writeCallback(void *, std::size_t, std::size_t, std::string *data"))
     {
@@ -62,10 +64,30 @@ TEST_CASE("Test libgearbox_http_linux", "[http]")
         REQUIRE((result.at("key3") == "value3"));
         REQUIRE((result.at("key4") == "value4"));
     }
+}
+#endif // PLATFORM_LINUX
 
-    SECTION(("gearbox::CUrlHttp::CUrlHttp(std::string &)"))
+#ifdef PLATFORM_WINDOWS
+#include <libgearbox_http_win_p.h>
+#include <libgearbox_http_win.cpp>
+
+TEST_CASE("Test libgearbox_http_win_p", "[http]")
+{
+    SECTION(("<anonymous>::parseHeaders(char *, std::size_t)"))
     {
+        char headers[] = {
+            "HTTP/1.1 200 OK\0"
+            "Server: Microsoft-IIS/5.0\0"
+            "Date: Thu, 13 Jul 2000 05:46:53 GMT\0"
+            "Content-Length: 2291\0"
+            "Content-Type: text / html\0"
+            "Set-Cookie: ASPSESSIONIDQQGGGNCG = LKLDFFKCINFLDMFHCBCBMFLJ; path=/\0"
+            "Cache-control: private\0"
+        };
+
+        auto result = parseHeaders(headers, sizeof(headers));
     }
 }
 
-#endif
+#endif // PLATFORM_WINDOWS
+
