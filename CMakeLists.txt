@@ -42,17 +42,13 @@ add_custom_target (public_headers SOURCES ${PUBLIC_HEADERS})
 
 ## NLOHMANN JSON ##
 include_directories ("${PROJECT_SOURCE_DIR}/3rdparty/json/src")
-file (GLOB_RECURSE JSON_HEADERS "${PROJECT_SOURCE_DIR}/3rdparty/json/src/*.hpp")
-add_custom_target (json_headers SOURCES ${JSON_HEADERS})
 
 ## SEQUENTIAL SERIALIZER ##
 include_directories ("${PROJECT_SOURCE_DIR}/3rdparty/sequential")
-file (GLOB_RECURSE SEQ_HEADERS "${PROJECT_SOURCE_DIR}/3rdparty/sequential/*.h")
-add_custom_target (seq_headers SOURCES ${SEQ_HEADERS})
 
 ## C++ FORMAT ##
+add_definitions (-DFMT_HEADER_ONLY)
 include_directories ("${PROJECT_SOURCE_DIR}/3rdparty/fmt")
-set (FMT_SOURCE "${PROJECT_SOURCE_DIR}/3rdparty/fmt/fmt/format.cc")
 
 include_directories (SYSTEM ${GEARBOX_INCLUDE_DIRS})
 link_directories (${GEARBOX_LIB_DIRS})
@@ -70,10 +66,10 @@ if (GEARBOX_DEBUG_LOGS)
 endif ()
 
 if (GEARBOX_STATIC_LIB)
-    add_library (gearbox STATIC ${LIBGEARBOX_SOURCES} ${FMT_SOURCE})
+    add_library (gearbox STATIC ${LIBGEARBOX_SOURCES})
     message (STATUS "Building static library")
 else ()
-    add_library (gearbox SHARED ${LIBGEARBOX_SOURCES} ${FMT_SOURCE})
+    add_library (gearbox SHARED ${LIBGEARBOX_SOURCES})
     message (STATUS "Building shared library")
 endif ()
 

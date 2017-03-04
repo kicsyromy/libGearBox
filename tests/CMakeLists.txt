@@ -20,7 +20,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/../include")
 ## SOURCES ##
 aux_source_directory (${PROJECT_SOURCE_DIR}/src LIBGEARBOX_TEST_SOURCES)
 
-add_executable (${PROJECT_NAME} ${LIBGEARBOX_TEST_SOURCES} ${FMT_SOURCE})
+add_executable (${PROJECT_NAME} ${LIBGEARBOX_TEST_SOURCES})
 target_link_libraries (${PROJECT_NAME} ${GEARBOX_LIBS})
 
 set_target_properties (
