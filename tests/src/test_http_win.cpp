@@ -77,8 +77,60 @@ TEST_CASE("Test libgearbox_http_win", "[http]")
         REQUIRE((result.second.size() == 0));
     }
 
-    SECTION(("WinHttp::WinHttp(const std::string &)"))
+
+    SECTION(("gearbox::WinHttp::WinHttp(const std::string &)"))
     {
+        gearbox::WinHttp test("user-agent");
+
+        DWORD bufferLen;
+        InternetQueryOption(
+            test.connection_,
+            INTERNET_OPTION_USER_AGENT,
+            nullptr,
+            &bufferLen
+        );
+        char *buffer = new char[bufferLen];
+        InternetQueryOption(
+            test.connection_,
+            INTERNET_OPTION_USER_AGENT,
+            buffer,
+            &bufferLen
+        );
+
+        REQUIRE((strncmp(buffer, "user-agent", bufferLen) == 0));
+
+        delete [] buffer;
+    }
+
+    SECTION(("gearbox::WinHttp::setHost(std::string &&)"))
+    {
+        using gearbox::WinHttp;
+        /* Test with no protocol in hostname */
+        {
+            WinHttp test("user-agent");
+            test.setHost("some-domain.com");
+            REQUIRE((test.hostname_ == "some-domain.com"));
+            REQUIRE((test.port_ == HTTP_PORT));
+            REQUIRE((test.connectionFlags_ == CONNECTION_FLAGS));
+        }
+
+        /* Test with http:// in hostname */
+        {
+            WinHttp test("user-agent");
+            test.setHost("http://some-domain.com");
+            REQUIRE((test.hostname_ == "some-domain.com"));
+            REQUIRE((test.port_ == HTTP_PORT));
+            REQUIRE((test.connectionFlags_ == CONNECTION_FLAGS));
+        }
+
+        /* Test with https:// in hostname */
+        {
+            WinHttp test("user-agent");
+            test.setHost("https://some-domain.com");
+            REQUIRE((test.hostname_ == "some-domain.com"));
+            REQUIRE((test.port_ == HTTP_PORT_SSL));
+            REQUIRE((test.connectionFlags_ == CONNECTION_FLAGS_SSL));
+        }
     }
 }
 

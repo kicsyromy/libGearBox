@@ -389,7 +389,7 @@ void WinHttp::setHost(std::string &&hostname)
 {
     closeSession();
 
-    static constexpr std::size_t PREFIX_LEN { 9 };
+    static constexpr const std::size_t PREFIX_LEN { 9 };
     char prefix[PREFIX_LEN] = { '\0' };
     std::size_t flagCount = 0;
     std::size_t prefixEndIndex = 0;
