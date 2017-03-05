@@ -247,6 +247,12 @@ namespace
         const char *statusStr = nullptr;
         header_array_t headers;
 
+        if (length <= 1)
+        {
+            LOG_WARN("Empty HTTP header");
+            return { 0, headers };
+        }
+
         std::size_t headersStart = 0;
         for (; headersStart < length - 1; ++headersStart)
         {
@@ -269,31 +275,44 @@ namespace
                 break;
             }
         }
-        key = &buffer[headersStart];
-        for (std::size_t i = headersStart; i < length - 1; ++i)
+        if (headersStart < length)
         {
-            if ((buffer[i] == ':') || (buffer[i] == '\0'))
+            key = &buffer[headersStart];
+            for (std::size_t i = headersStart; i < length - 1; ++i)
             {
-                buffer[i] = '\0';
-                if (buffer[i + 1] != '\0')
+                if ((buffer[i] == ':') || (buffer[i] == '\0'))
                 {
-                    i += 2;
-                    if (i < length)
+                    buffer[i] = '\0';
+                    if (buffer[i + 1] != '\0')
                     {
-                        auto it = headers.insert({ key, &buffer[i] });
-                        i += it.first->second.size();
-                        if (i < length - 1)
-                            key = &buffer[i + 1];
+                        i += 2;
+                        if (i < length)
+                        {
+                            auto it = headers.insert({ key, &buffer[i] });
+                            i += it.first->second.size();
+                            if (i < length - 1)
+                                key = &buffer[i + 1];
+                        }
                     }
-                }
-                else
-                {
-                    key = &buffer[i + 1];
+                    else
+                    {
+                        key = &buffer[i + 1];
+                    }
                 }
             }
         }
 
-        return { std::strtol(statusStr, nullptr, 10), headers };
+        if (headers.empty())
+        {
+            LOG_WARN("No valid headers found");
+        }
+
+        return {
+            statusStr != nullptr ?
+                ::strtol(statusStr, nullptr, 10) :
+                0,
+            headers
+        };
     }
 }
 
