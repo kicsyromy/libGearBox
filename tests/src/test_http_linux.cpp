@@ -5,8 +5,6 @@
 #include <libgearbox_http_linux_p.h>
 #include <libgearbox_http_linux.cpp>
 
-using HttpImplementation = gearbox::CUrlHttp;
-
 TEST_CASE("Test libgearbox_http_linux", "[http]")
 {
     SECTION(("<anonymous>::writeCallback(void *, std::size_t, std::size_t, std::string *data"))
@@ -62,6 +60,72 @@ TEST_CASE("Test libgearbox_http_linux", "[http]")
         REQUIRE((result.at("key2") == "value2"));
         REQUIRE((result.at("key3") == "value3"));
         REQUIRE((result.at("key4") == "value4"));
+    }
+
+    SECTION(("gearbox::CUrlHttp::CUrlHttp(const std::string &)"))
+    {
+        gearbox::CUrlHttp test("user-agent");
+        REQUIRE((test.handle_ != nullptr));
+    }
+
+    SECTION(("gearbox::CUrlHttp::createRequest()"))
+    {
+        using gearbox::CUrlHttp;
+
+        CUrlHttp test("user-agent");
+
+        /* Test with no port, no path*/
+        {
+            test.setHost("http://domain.com");
+            auto request = test.createRequest();
+            REQUIRE((request.handle_ != nullptr));
+            REQUIRE((request.handle_ != test.handle_));
+            char *urlp = nullptr;
+            curl_easy_getinfo(request.handle_, CURLINFO_EFFECTIVE_URL, &urlp);
+            std::string url { urlp };
+            REQUIRE((url == "http://domain.com/"));
+        }
+
+        /* Test with port, no path*/
+        {
+            test.setHost("http://domain.com");
+            test.setPort(8080);
+            auto request = test.createRequest();
+            REQUIRE((request.handle_ != nullptr));
+            REQUIRE((request.handle_ != test.handle_));
+            char *urlp = nullptr;
+            curl_easy_getinfo(request.handle_, CURLINFO_EFFECTIVE_URL, &urlp);
+            std::string url { urlp };
+            REQUIRE((url == "http://domain.com:8080/"));
+        }
+
+        /* Test with port and path*/
+        {
+            test.setHost("http://domain.com");
+            test.setPort(8080);
+            test.setPath("/some/path");
+            auto request = test.createRequest();
+            REQUIRE((request.handle_ != nullptr));
+            REQUIRE((request.handle_ != test.handle_));
+            char *urlp = nullptr;
+            curl_easy_getinfo(request.handle_, CURLINFO_EFFECTIVE_URL, &urlp);
+            std::string url { urlp };
+            REQUIRE((url == "http://domain.com:8080/some/path"));
+        }
+
+        /* Test with no port and path*/
+        {
+            test.setHost("http://domain.com");
+            test.setPort(-1);
+            test.setPath("/some/path");
+            auto request = test.createRequest();
+            REQUIRE((request.handle_ != nullptr));
+            REQUIRE((request.handle_ != test.handle_));
+            char *urlp = nullptr;
+            curl_easy_getinfo(request.handle_, CURLINFO_EFFECTIVE_URL, &urlp);
+            std::string url { urlp };
+            REQUIRE((url == "http://domain.com/some/path"));
+        }
     }
 }
 
