@@ -1,5 +1,7 @@
 project (libgearbox_test)
 
+option (GEARBOX_TESTS_ENABLE_CODE_COVERAGE "Generate test coverage report." OFF)
+
 list (APPEND CMAKE_MODULE_PATH 1 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(PythonConfig)
 
@@ -29,13 +31,17 @@ link_directories (${PYTHON_LIBRARY_DIRS})
 ## SOURCES ##
 aux_source_directory ("${PROJECT_SOURCE_DIR}/src" LIBGEARBOX_TEST_SOURCES)
 
+if (GEARBOX_TESTS_ENABLE_CODE_COVERAGE)
+    include (Coverage)
+endif ()
+
 add_executable (${PROJECT_NAME} ${LIBGEARBOX_TEST_SOURCES})
-target_link_libraries (${PROJECT_NAME} ${GEARBOX_LIBS} ${GEARBOX_PY_LIBS})
+target_link_libraries (${PROJECT_NAME} ${GEARBOX_LIBS} ${GEARBOX_PY_LIBS} ${GEARBOX_TESTS_COVERAGE_LIBRARIES})
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     target_link_libraries (${PROJECT_NAME} -lpthread)
 endif()
 
 set_target_properties (
     ${PROJECT_NAME} PROPERTIES
-    COMPILE_FLAGS   "${GEARBOX_COMPILER_FLAGS}"
+    COMPILE_FLAGS   "${GEARBOX_COMPILER_FLAGS} ${GEARBOX_TESTS_COVERAGE_COMPILER_FLAGS}"
 )
