@@ -31,6 +31,7 @@
 # Debug files
 *.dSYM/
 
+# Qt Creator
 *.pro.user
 CMakeLists.txt.user
 
@@ -40,7 +41,18 @@ build-*
 *.files
 *.includes
 
+# Visual Studio
+.vs/
+CMakeSettings.json
+
 # macOS Finder files
 .DS_Store
 ._.DS_Store
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Vim
+*.swp
