@@ -28,6 +28,8 @@
 #include <string>
 #include <type_traits>
 
+/* For whatever reason clang refuses to compile this code */
+#ifndef __clang__
 #define TYPE_HAS_METHOD(type_name, method_name, signature)                        \
     template<typename T>                                                          \
     struct has_##method_name {                                                    \
@@ -47,6 +49,10 @@
         typedef decltype(check<typename type_name>(0)) type;                      \
     public: static constexpr bool value = type::value; };                         \
     static constexpr const bool has_##method_name##_v = has_##method_name<signature>::value
+#else
+#define TYPE_HAS_METHOD(type_name, method_name, signature) \
+    static constexpr const bool has_##method_name##_v = true
+#endif
 
 namespace gearbox
 {

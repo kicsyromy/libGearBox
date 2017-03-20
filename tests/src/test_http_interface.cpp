@@ -42,8 +42,8 @@ public:
     {
     }
 
-    TestHttpImplementation(TestHttpImplementation &&) noexcept(true) = default;
-    TestHttpImplementation &operator =(TestHttpImplementation &&) noexcept(true) = default;
+    TestHttpImplementation(TestHttpImplementation &&) = default;
+    TestHttpImplementation &operator =(TestHttpImplementation &&) = default;
 
 public:
     const std::string &host() const
