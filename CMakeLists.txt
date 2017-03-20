@@ -53,8 +53,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/3rdparty/fmt")
 include_directories (SYSTEM ${GEARBOX_INCLUDE_DIRS})
 link_directories (${GEARBOX_LIB_DIRS})
 
-set (GEARBOX_SOURCES "${PROJECT_SOURCE_DIR}/src")
-aux_source_directory (${GEARBOX_SOURCES} LIBGEARBOX_SOURCES)
+aux_source_directory ("${PROJECT_SOURCE_DIR}/src" LIBGEARBOX_SOURCES)
 
 if (GEARBOX_BUILD_DOCUMENTATION)
     include (Documentation)

@@ -4,7 +4,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
     if (COMPILER_SUPPORTS_CXX14)
 	    set (GEARBOX_COMPILER_FLAGS "${GEARBOX_COMPILER_FLAGS} -std=c++14")
     else ()
-        message (WARNING "The compiler ${CMAKE_CXX_COMPILER} has no C++14 support. Please use a different C++ compiler.")
+        message (WARNING "The compiler ${CMAKE_CXX_COMPILER} has no C++14 support.")
 		set (GEARBOX_BAD_COMPILER 1)
     endif ()
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
