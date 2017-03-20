@@ -25,6 +25,8 @@
 #ifndef LIBGEARBOX_HTTP_WIN_P_H
 #define LIBGEARBOX_HTTP_WIN_P_H
 
+#include <memory>
+
 #include <windows.h>
 #include <wininet.h>
 
@@ -85,7 +87,7 @@ namespace gearbox
         class Request
         {
         public:
-            Request(HINTERNET session,
+            Request(std::shared_ptr<void> session,
                     const std::string &path,
                     DWORD connectionFlags,
                     DWORD_PTR &requestId);
@@ -104,7 +106,7 @@ namespace gearbox
             http_request_result_t send();
 
         private:
-            HINTERNET session_;
+            std::shared_ptr<void> session_;
             const std::string &path_;
             http_request_t requestType_;
             DWORD connectionFlags_;
@@ -129,7 +131,7 @@ namespace gearbox
 
     private:
         HINTERNET connection_;
-        HINTERNET session_;
+        std::shared_ptr<void> session_;
         DWORD_PTR requestId_;
 
     private:

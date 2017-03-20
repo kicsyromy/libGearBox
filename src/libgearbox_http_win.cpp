@@ -352,22 +352,15 @@ gearbox::WinHttp::WinHttp(WinHttp &&other) noexcept(true) :
     sslErrorHandlingEnabled_(other.sslErrorHandlingEnabled_),
     timeout_(std::move_if_noexcept(other.timeout_)),
     connection_(other.connection_),
-    session_(other.session_),
+    session_(std::move(other.session_)),
     requestId_(other.requestId_),
     connectionFlags_(other.connectionFlags_)
 {
     other.connection_ = nullptr;
-    other.session_ = nullptr;
 }
 
 gearbox::WinHttp::~WinHttp()
 {
-    if (session_ != nullptr)
-    {
-        InternetCloseHandle(session_);
-        session_ = nullptr;
-    }
-
     if (connection_ != nullptr)
     {
         InternetCloseHandle(connection_);
@@ -395,7 +388,7 @@ void WinHttp::setHost(std::string &&hostname)
     std::size_t prefixEndIndex = 0;
     bool validPrefix = false;
 
-    for (std::size_t i = 0; (i < PREFIX_LEN) && (flagCount < 3); ++i)
+    for (std::size_t i = 0; (i < hostname.size()) && (i < PREFIX_LEN) && (flagCount < 3); ++i)
     {
         const auto character = hostname.at(i);
         switch (character)
@@ -545,10 +538,10 @@ void WinHttp::setTimeout(milliseconds_t value)
     timeout_ = value;
 }
 
-WinHttp::Request::Request(HINTERNET session,
-                                 const std::string &path,
-                                 DWORD connectionFlags,
-                                 DWORD_PTR &requestId) :
+WinHttp::Request::Request(std::shared_ptr<void> session,
+                          const std::string &path,
+                          DWORD connectionFlags,
+                          DWORD_PTR &requestId) :
     session_(session),
     path_(path),
     requestType_(http_request_t::GET),
@@ -605,7 +598,7 @@ WinHttp::http_request_result_t WinHttp::Request::send()
     double elapsed = 0;
 
     auto request = HttpOpenRequestA(
-        session_,
+        session_.get(),
         HTTP_METHOD[static_cast<std::size_t>(requestType_)],
         path_.c_str(),
         "",
@@ -714,7 +707,7 @@ WinHttp::Request WinHttp::createRequest()
 
     if (session_ == nullptr)
     {
-        session_ = InternetConnectA(
+        session_.reset(InternetConnectA(
             connection_,
             hostname_.c_str(),
             static_cast<INTERNET_PORT>(port_),
@@ -723,24 +716,24 @@ WinHttp::Request WinHttp::createRequest()
             INTERNET_SERVICE_HTTP,
             0,
             0
-        );
+        ), [](void *handle) { InternetCloseHandle(handle); });
         if (session_ != nullptr)
         {
             /* const */unsigned long timeout = static_cast<unsigned long>(timeout_.count());
             InternetSetOptionA(
-                session_,
+                session_.get(),
                 INTERNET_OPTION_CONNECT_TIMEOUT,
                 &timeout,
                 sizeof(timeout)
             );
             InternetSetOptionA(
-                session_,
+                session_.get(),
                 INTERNET_OPTION_SEND_TIMEOUT,
                 &timeout,
                 sizeof(timeout)
             );
             InternetSetOptionA(
-                session_,
+                session_.get(),
                 INTERNET_OPTION_RECEIVE_TIMEOUT,
                 &timeout,
                 sizeof(timeout)
@@ -757,8 +750,9 @@ WinHttp::Request WinHttp::createRequest()
         session_,
         path_,
         !sslErrorHandlingEnabled_ ? static_cast<DWORD>(connectionFlags_) :
-        static_cast<DWORD>(connectionFlags_ | INTERNET_FLAG_IGNORE_CERT_CN_INVALID
-        | INTERNET_FLAG_IGNORE_CERT_DATE_INVALID),
+            static_cast<DWORD>(connectionFlags_ | INTERNET_FLAG_IGNORE_CERT_CN_INVALID
+                                                | INTERNET_FLAG_IGNORE_CERT_DATE_INVALID
+            ),
         requestId_
     };
 }
@@ -767,8 +761,7 @@ void gearbox::WinHttp::closeSession()
 {
     if (session_ != nullptr)
     {
-        InternetCloseHandle(session_);
-        session_ = nullptr;
+        session_.reset();
     }
 }
 
