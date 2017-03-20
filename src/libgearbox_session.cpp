@@ -54,9 +54,9 @@ SessionPrivate::SessionPrivate(const std::string &url,
     sessionId_("dummy"),
     http_(USER_AGENT)
 {
-    http_.setPort(port);
     http_.setHost(url);
     http_.setPath(path);
+    http_.setPort(port);
     http_.setUsername(username);
     http_.setPassword(password);
     http_.setTimeout(std::chrono::milliseconds(DEFAULT_TIMEOUT));
@@ -73,11 +73,11 @@ SessionPrivate::SessionPrivate(std::string &&url,
     sessionId_("dummy"),
     http_(USER_AGENT)
 {
+    http_.setHost(std::move(url));
+    http_.setPath(std::move(path));
     http_.setPort(port);
-    http_.setHost(std::forward<std::string>(url));
-    http_.setPath(std::forward<std::string>(path));
-    http_.setUsername(std::forward<std::string>(username));
-    http_.setPassword(std::forward<std::string>(password));
+    http_.setUsername(std::move(username));
+    http_.setPassword(std::move(password));
     http_.setTimeout(std::chrono::milliseconds(DEFAULT_TIMEOUT));
     if (!authenticationRequired)
         http_.disableAuthentication();
