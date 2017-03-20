@@ -127,6 +127,66 @@ TEST_CASE("Test libgearbox_http_linux", "[http]")
             REQUIRE((url == "http://domain.com/some/path"));
         }
     }
+
+    SECTION(("gearbox::CUrlHttp::Request::setBody(const std::string &)"))
+    {
+        /* Nothing to test with current implementation */
+    }
+
+    SECTION(("gearbox::CUrlHttp::Request::setHeader(s)(const std::string &)"))
+    {
+        using gearbox::CUrlHttp;
+
+        auto handle = curl_easy_init();
+        CUrlHttp::Request test(handle);
+
+        CUrlHttp::http_header_array_t headers {
+            { "key1", "value1" },
+            { "key2", "value2" },
+            { "key3", "value3" }
+        };
+        test.setHeaders(headers);
+        REQUIRE((test.headers_ == headers));
+
+        headers = {
+            { "key1", "value4" },
+            { "key2", "value5" },
+            { "key3", "value6" }
+        };
+        test.setHeaders(headers);
+        REQUIRE((test.headers_ == headers));
+
+        headers["key4"] = "value7";
+        test.setHeader({ "key4", "value7" });
+        REQUIRE((test.headers_ == headers));
+
+        headers["key4"] = "value8";
+        test.setHeader({ "key4", "value8" });
+        REQUIRE((test.headers_ == headers));
+    }
+
+    SECTION(("gearbox::CUrlHttp::Request::send()"))
+    {
+        using gearbox::CUrlHttp;
+
+        CUrlHttp test("user-agent");
+        test.setHost("http://localhost");
+        test.setPort(CUrlHttp::http_port_t { 9999 });
+        test.setPath("/test_connection");
+
+        auto request = test.createRequest();
+
+        auto result = request.send();
+        REQUIRE((result.error == 0));
+        REQUIRE((result.status == CUrlHttp::http_status_t::OK));
+        REQUIRE((result.response.text == "OK GET"));
+
+        request.setBody("POST");
+        result = request.send();
+        REQUIRE((result.error == 0));
+        REQUIRE((result.status == CUrlHttp::http_status_t::OK));
+        REQUIRE((result.response.text == "OK POST"));
+    }
 }
 
 #endif // PLATFORM_LINUX
