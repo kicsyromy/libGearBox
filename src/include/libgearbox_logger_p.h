@@ -44,7 +44,7 @@
             log); \
     } while (0)
 
-#define LOG_INFO(message) LOG(message)
+#define LOG_INFO(...) LOG(__VA_ARGS__)
 
 #define LOG_WARN(...) \
     do { \
