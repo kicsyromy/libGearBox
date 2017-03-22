@@ -78,4 +78,62 @@ TEST_CASE("Test libgearbox_session", "[session]")
         REQUIRE((response.get_result() == "success"));
         REQUIRE((response.get_arguments().value<int>("args", -1) == 0));
     }
+
+    {
+        using gearbox::Session;
+
+        Session test;
+        SECTION(("gearbox::Session::Session()"))
+        {
+            REQUIRE((test.priv_ != nullptr));
+            if (test.priv_ != nullptr)
+            {
+                auto &impl = test.priv_->http_;
+                REQUIRE((impl.host() == ""));
+                REQUIRE((impl.path() == Session::DEFAULT_PATH));
+                REQUIRE((impl.port() == -1));
+                REQUIRE((impl.authenticationRequired() == false));
+                REQUIRE((impl.username() == ""));
+                REQUIRE((impl.password() == ""));
+                REQUIRE((impl.timeout() == http::milliseconds_t { DEFAULT_TIMEOUT }));
+            }
+        }
+
+        Session testMove(std::move(test));
+        SECTION(("gearbox::Session::Session(gearbox::Session &&)"))
+        {
+            REQUIRE((test.priv_ == nullptr));
+            REQUIRE((testMove.priv_ != nullptr));
+            if (test.priv_ != nullptr)
+            {
+                auto &impl = testMove.priv_->http_;
+                REQUIRE((impl.host() == ""));
+                REQUIRE((impl.path() == Session::DEFAULT_PATH));
+                REQUIRE((impl.port() == -1));
+                REQUIRE((impl.authenticationRequired() == false));
+                REQUIRE((impl.username() == ""));
+                REQUIRE((impl.password() == ""));
+                REQUIRE((impl.timeout() == http::milliseconds_t { DEFAULT_TIMEOUT }));
+            }
+        }
+
+        SECTION(("gearbox::Session::operator =(gearbox::Session &&)"))
+        {
+            test = std::move(testMove);
+
+            REQUIRE((testMove.priv_ == nullptr));
+            REQUIRE((test.priv_ != nullptr));
+            if (test.priv_ != nullptr)
+            {
+                auto &impl = test.priv_->http_;
+                REQUIRE((impl.host() == ""));
+                REQUIRE((impl.path() == Session::DEFAULT_PATH));
+                REQUIRE((impl.port() == -1));
+                REQUIRE((impl.authenticationRequired() == false));
+                REQUIRE((impl.username() == ""));
+                REQUIRE((impl.password() == ""));
+                REQUIRE((impl.timeout() == http::milliseconds_t { DEFAULT_TIMEOUT }));
+            }
+        }
+    }
 }
