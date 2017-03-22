@@ -89,6 +89,7 @@ TEST_CASE("Test libgearbox_session", "[session]")
             if (test.priv_ != nullptr)
             {
                 auto &impl = test.priv_->http_;
+                REQUIRE((test.priv_->sessionId_ == "dummy"));
                 REQUIRE((impl.host() == ""));
                 REQUIRE((impl.path() == Session::DEFAULT_PATH));
                 REQUIRE((impl.port() == -1));
@@ -107,6 +108,7 @@ TEST_CASE("Test libgearbox_session", "[session]")
             if (test.priv_ != nullptr)
             {
                 auto &impl = testMove.priv_->http_;
+                REQUIRE((test.priv_->sessionId_ == "dummy"));
                 REQUIRE((impl.host() == ""));
                 REQUIRE((impl.path() == Session::DEFAULT_PATH));
                 REQUIRE((impl.port() == -1));
@@ -126,6 +128,7 @@ TEST_CASE("Test libgearbox_session", "[session]")
             if (test.priv_ != nullptr)
             {
                 auto &impl = test.priv_->http_;
+                REQUIRE((test.priv_->sessionId_ == "dummy"));
                 REQUIRE((impl.host() == ""));
                 REQUIRE((impl.path() == Session::DEFAULT_PATH));
                 REQUIRE((impl.port() == -1));
@@ -134,6 +137,182 @@ TEST_CASE("Test libgearbox_session", "[session]")
                 REQUIRE((impl.password() == ""));
                 REQUIRE((impl.timeout() == http::milliseconds_t { DEFAULT_TIMEOUT }));
             }
+        }
+    }
+
+    SECTION(("gearbox::Session::Session(const std::string &, const std::string &, std::int32_t, bool, const std::string &, const std::string &)"))
+    {
+        using gearbox::Session;
+
+        const std::string url = "test";
+        const std::string path = "test";
+        const std::int32_t port = -1;
+        const std::string username = "username";
+        const std::string password = "password";
+
+        {
+            Session test(
+                url,
+                path,
+                port,
+                Session::Authentication::Required,
+                username,
+                password
+            );
+
+            REQUIRE((test.priv_ != nullptr));
+            if (test.priv_ != nullptr)
+            {
+                auto &impl = test.priv_->http_;
+                REQUIRE((test.priv_->sessionId_ == "dummy"));
+                REQUIRE((impl.host() == url));
+                REQUIRE((impl.path() == path));
+                REQUIRE((impl.port() == port));
+                REQUIRE((impl.authenticationRequired() == true));
+                REQUIRE((impl.username() == username));
+                REQUIRE((impl.password() == password));
+                REQUIRE((impl.timeout() == http::milliseconds_t{ DEFAULT_TIMEOUT }));
+            }
+        }
+
+        {
+            Session test(
+                url,
+                path,
+                port,
+                Session::Authentication::None,
+                username,
+                password
+            );
+
+            REQUIRE((test.priv_ != nullptr));
+            if (test.priv_ != nullptr)
+            {
+                auto &impl = test.priv_->http_;
+                REQUIRE((test.priv_->sessionId_ == "dummy"));
+                REQUIRE((impl.host() == url));
+                REQUIRE((impl.path() == path));
+                REQUIRE((impl.port() == port));
+                REQUIRE((impl.authenticationRequired() == false));
+                REQUIRE((impl.username() == username));
+                REQUIRE((impl.password() == password));
+                REQUIRE((impl.timeout() == http::milliseconds_t{ DEFAULT_TIMEOUT }));
+            }
+        }
+    }
+
+    SECTION(("gearbox::Session::Session(std::string &&, std::string &&, std::int32_t, bool, std::string &&, std::string &&)"))
+    {
+        using gearbox::Session;
+
+        const std::string url = "test";
+        const std::string path = "test";
+        const std::int32_t port = -1;
+        const std::string username = "username";
+        const std::string password = "password";
+
+        {
+            Session test(
+                std::string(url),
+                std::string(path),
+                port,
+                Session::Authentication::Required,
+                std::string(username),
+                std::string(password)
+            );
+
+            REQUIRE((test.priv_ != nullptr));
+            if (test.priv_ != nullptr)
+            {
+                auto &impl = test.priv_->http_;
+                REQUIRE((test.priv_->sessionId_ == "dummy"));
+                REQUIRE((impl.host() == url));
+                REQUIRE((impl.path() == path));
+                REQUIRE((impl.port() == port));
+                REQUIRE((impl.authenticationRequired() == true));
+                REQUIRE((impl.username() == username));
+                REQUIRE((impl.password() == password));
+                REQUIRE((impl.timeout() == http::milliseconds_t{ DEFAULT_TIMEOUT }));
+            }
+        }
+
+        {
+            Session test(
+                std::string(url),
+                std::string(path),
+                port,
+                Session::Authentication::None,
+                std::string(username),
+                std::string(password)
+            );
+
+            REQUIRE((test.priv_ != nullptr));
+            if (test.priv_ != nullptr)
+            {
+                auto &impl = test.priv_->http_;
+                REQUIRE((test.priv_->sessionId_ == "dummy"));
+                REQUIRE((impl.host() == url));
+                REQUIRE((impl.path() == path));
+                REQUIRE((impl.port() == port));
+                REQUIRE((impl.authenticationRequired() == false));
+                REQUIRE((impl.username() == username));
+                REQUIRE((impl.password() == password));
+                REQUIRE((impl.timeout() == http::milliseconds_t{ DEFAULT_TIMEOUT }));
+            }
+        }
+    }
+
+    {
+        using gearbox::Session;
+
+        const std::string url = "test";
+        const std::string path = "test";
+        const std::int32_t port = -1;
+        const std::string username = "username";
+        const std::string password = "password";
+
+        Session test(
+            url,
+            path,
+            port,
+            Session::Authentication::Required,
+            username,
+            password
+        );
+
+        SECTION(("gearbox::Session::url() const"))
+        {
+            REQUIRE((test.url() == url));
+        }
+
+        SECTION(("gearbox::Session::path() const"))
+        {
+            REQUIRE((test.path() == path));
+        }
+
+        SECTION(("gearbox::Session::port() const"))
+        {
+            REQUIRE((test.port() == port));
+        }
+
+        SECTION(("gearbox::Session::authenticationRequired() const"))
+        {
+            REQUIRE((test.authenticationRequired()));
+        }
+
+        SECTION(("gearbox::Session::username() const"))
+        {
+            REQUIRE((test.username() == username));
+        }
+
+        SECTION(("gearbox::Session::password() const"))
+        {
+            REQUIRE((test.password() == password));
+        }
+
+        SECTION(("gearbox::Session::timeout() const"))
+        {
+            REQUIRE((test.timeout() == DEFAULT_TIMEOUT));
         }
     }
 }
