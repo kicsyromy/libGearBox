@@ -26,6 +26,7 @@ Documentation:
 Clone the repository:
 ```bash
 git clone https://github.com/kicsyromy/libGearBox.git
+git submodule update --init
 ```
 **Note:** Since CMake supports several Makefile formats, based on the target platform, I am not going to cover all of them here. Feel free to use the Visual Studio generator on Windows, or XCode generator on macOS. If a specific generator doesn't work for you please file a bug report.
 
