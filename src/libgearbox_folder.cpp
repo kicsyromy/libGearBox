@@ -26,7 +26,7 @@
     \class gearbox::Folder
     \brief A folder from a torrent's file hierarchy.
 
-    Is represented by a name and consists of a set of folders and files.
+    It's represented by a name and consists of a set of folders and files.
     Folders are created solely by the gearbox::Torrent class by calling
     gearbox::Torrent::content() const on a valid instance.
 */

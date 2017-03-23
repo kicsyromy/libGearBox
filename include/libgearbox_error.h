@@ -46,7 +46,7 @@ namespace gearbox
             RequestHostResolutionFailure,
             RequestInternalError,
             RequestInvalidURL,
-            RequestRequestInvalid,
+            RequestInvalid,
             RequestNetworkReceiveError,
             RequestNetworkSendFailure,
             RequestOperationTimedOut,

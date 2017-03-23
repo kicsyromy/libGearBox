@@ -53,12 +53,10 @@ include_directories ("${PROJECT_SOURCE_DIR}/3rdparty/fmt")
 include_directories (SYSTEM ${GEARBOX_INCLUDE_DIRS})
 link_directories (${GEARBOX_LIB_DIRS})
 
-# Needed for Doxygen documentation generation
-set (GEARBOX_SOURCES "${PROJECT_SOURCE_DIR}/src")
-
 aux_source_directory ("${PROJECT_SOURCE_DIR}/src" LIBGEARBOX_SOURCES)
 
 if (GEARBOX_BUILD_DOCUMENTATION)
+    set (GEARBOX_SOURCES "${PROJECT_SOURCE_DIR}/src")
     include (Documentation)
 endif ()
 
