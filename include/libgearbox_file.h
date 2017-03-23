@@ -48,8 +48,8 @@ namespace gearbox
         {
             int id;
             const char * const name;
-            inline bool operator ==(const MIMEType &other) { return id == other.id; }
-            inline bool isValid() { return id >= 0; }
+            inline bool operator ==(const MIMEType &other) const { return id == other.id; }
+            inline bool isValid() const { return id >= 0; }
         };
 
     public:
