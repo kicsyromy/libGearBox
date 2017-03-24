@@ -177,6 +177,18 @@ Folder::Folder(Folder &&) noexcept(true) = default;
 Folder &Folder::operator=(Folder &&) noexcept(true) = default;
 Folder::~Folder() noexcept(true) = default;
 
+/*!
+    \fn gearbox::Folder::Folder(gearbox::Folder &&) noexcept(true)
+
+    Move constructor
+*/
+
+/*!
+    \fn gearbox::Folder &gearbox::Folder::operator =(gearbox::Folder &&) noexcept(true);
+
+    Move asignment operator
+*/
+
 Folder::Folder() :
     priv_(nullptr)
 {

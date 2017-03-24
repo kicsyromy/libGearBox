@@ -41,7 +41,7 @@ namespace gearbox
     class GEARBOX_API Folder
     {
     public:
-        Folder(); // make gearbox::ReturnType happy
+        Folder(); /* make gearbox::ReturnType happy */
         Folder(Folder &&) noexcept(true);
         Folder &operator =(Folder &&) noexcept(true);
         ~Folder() noexcept(true);
