@@ -70,16 +70,16 @@ namespace gearbox
         Session(Session &&other);
         Session &operator =(Session &&other);
 
-        Session(const std::string &url,
+        Session(const std::string &host,
                 const std::string &path = DEFAULT_PATH,
                 std::int32_t port = PORT_AUTODETECT,
                 Authentication authentication = Authentication::None,
                 const std::string &username = "",
                 const std::string &password = "");
 
-        Session(std::string &&url,
+        Session(std::string &&host,
                 std::string &&path = DEFAULT_PATH,
-                std::int32_t port = -1,
+                std::int32_t port = PORT_AUTODETECT,
                 Authentication authentication = Authentication::None,
                 std::string &&username = "",
                 std::string &&password = "");
@@ -91,9 +91,9 @@ namespace gearbox
         Error updateTorrentStats(std::vector<std::reference_wrapper<Torrent>> &torrents);
 
     public:
-        const std::string &url() const;
-        void setUrl(const std::string &url);
-        void setUrl(std::string &&url);
+        const std::string &host() const;
+        void setHost(const std::string &url);
+        void setHost(std::string &&url);
 
         const std::string &path() const;
         void setPath(const std::string &path);

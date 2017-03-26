@@ -282,7 +282,7 @@ TEST_CASE("Test libgearbox_session", "[session]")
 
         SECTION(("gearbox::Session::url() const"))
         {
-            REQUIRE((test.url() == url));
+            REQUIRE((test.host() == url));
         }
 
         SECTION(("gearbox::Session::path() const"))

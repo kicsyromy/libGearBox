@@ -100,14 +100,14 @@ namespace gearbox
         friend class Session;
 
     public:
-        SessionPrivate(const std::string &url,
+        SessionPrivate(const std::string &host,
                        const std::string &path,
                        std::int32_t port,
                        bool authenticationRequired,
                        const std::string &username,
                        const std::string &password);
 
-        SessionPrivate(std::string &&url,
+        SessionPrivate(std::string &&host,
                        std::string &&path,
                        std::int32_t port,
                        bool authenticationRequired,
