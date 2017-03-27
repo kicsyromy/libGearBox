@@ -26,13 +26,28 @@
     \class gearbox::Torrent
     \brief Represents a torrent file on the remote server.
 
-    It caches some basic information about the torrent such as name, completion data,
-    ratio, speeds, status, size, etc. More complex information is requested on-demand
-    by calling the appropriate functions, see gearbox::Torrent::content() const,
-    gearbox::Torrent::files() const.
+    An valid instance of gearbox::Torrent can only be obtained by calling
+    gearbox::Session::torrents.
 
-    It also provides methods to alter the state of the torrent with regards to status,
-    content, peers etc.
+    It caches some basic information about the torrent such as name, completion,
+    ratio, speeds, status, size, etc. More complex information is requested
+    on-demand by calling the appropriate functions, see
+    gearbox::Torrent::content and gearbox::Torrent::files as examples of this.
+
+    As is with gearbox::Session, all data returned by methods that make an HTTP
+    request (i.e. return gearbox::ReturnType or gearbox::Error) are considered
+    to be thread safe. Unless otherwise noted, no other methods have this
+    guarantee.
+
+    Any and all data returned by these methods should only be considered valid
+    as long as the instance of gearbox::Torrent is available.
+
+    In case that the creating gearbox::Session instance is no longer available
+    an error code or gearbox::Error::Code::GearboxSessionInvalid will be
+    returned.
+
+    Methods are also provided to alter the state of the torrent with regards to
+    status, content, peers etc.
 */
 
 #include "libgearbox_torrent.h"
@@ -55,36 +70,6 @@ namespace
     constexpr const char *INVALID_SESSION { "Invalid session" };
     constexpr const char *INVALID_TORRENT { "Invalid torrent" };
 }
-
-/*!
-    \enum gearbox::Torrent::Status
-
-    \brief Enumerates the possible states of a torrent.
-
-    \var gearbox::Torrent::Stopped
-    \brief The torrent is stopped.
-
-    \var gearbox::Torrent::CheckWait
-    \brief The torrent is queued for file checking.
-
-    \var gearbox::Torrent::Check
-    \brief The torrent is checking files.
-
-    \var gearbox::Torrent::DownloadWait
-    \brief The torrent is queued for download.
-
-    \var gearbox::Torrent::Download
-    \brief The torrent is downloading.
-
-    \var gearbox::Torrent::SeedWait
-    \brief The torrent is queued for seeding.
-
-    \var gearbox::Torrent::Seed
-    \brief The torrent is seeding.
-
-    \var gearbox::Torrent::Invalid
-    \brief The torrent is in an unknown state.
-*/
 
 TorrentPrivate::TorrentPrivate() :
     attributes(),
@@ -122,30 +107,123 @@ TorrentPrivate &TorrentPrivate::operator =(const TorrentPrivate &other)
     return *this;
 }
 
+/*!
+    \enum gearbox::Torrent::Status
+    \brief Enumerates the possible states of a torrent.
+
+    \var gearbox::Torrent::Stopped
+    \brief The torrent is stopped.
+
+    \var gearbox::Torrent::CheckWait
+    \brief The torrent is queued for file checking.
+
+    \var gearbox::Torrent::Check
+    \brief The torrent is checking files.
+
+    \var gearbox::Torrent::DownloadWait
+    \brief The torrent is queued for download.
+
+    \var gearbox::Torrent::Download
+    \brief The torrent is downloading.
+
+    \var gearbox::Torrent::SeedWait
+    \brief The torrent is queued for seeding.
+
+    \var gearbox::Torrent::Seed
+    \brief The torrent is seeding.
+
+    \var gearbox::Torrent::Invalid
+    \brief The torrent is in an unknown state.
+*/
+
+/*!
+    \enum gearbox::Torrent::MoveType
+    \brief Verbose boolean type used when calling gearbox::Torrent::setDownloadDir()
+
+    \var gearbox::Torrent::MoveToNewLocation
+    \brief When passed to gearbox::Torrent::setDownloadDir() moves the currently
+    downloaded files to the new location
+
+    \var gearbox::Torrent::SearchForExistingFiles
+    \brief When passed to gearbox::Torrent::setDownloadDir() keeps already
+    downloaded data as is and searches for existing data in the new location
+*/
+
+/*!
+    \enum gearbox::Torrent::LocalDataAction
+    \brief Verbose boolean type used when calling gearbox::Torrent::remove()
+
+    \var gearbox::Torrent::KeepFiles
+    \brief When passed to gearbox::Torrent::remove() the downloaded
+    files are keep in the download location
+
+    \var gearbox::Torrent::DeleteFiles
+    \brief When passed to gearbox::Torrent::remove() the downloaded
+    files are also removed from the download location
+*/
+
+/*!
+    Constructs an instance based on \c priv parameter. Only used internally
+    by gearbox::Session.
+*/
 Torrent::Torrent(TorrentPrivate *priv) :
     priv_(priv)
 {
 }
 
+/*!
+    Move contructor
+*/
 Torrent::Torrent(Torrent &&) = default;
+
+/*!
+    Move asignment operator
+*/
 Torrent &Torrent::operator=(Torrent &&) noexcept(true) = default;
+
 Torrent::~Torrent() noexcept(true) = default;
 
+/*!
+    Comparison operator
+ */
 bool Torrent::operator ==(const Torrent &other) const
 {
     return valid() ? (priv_->get_id() == other.priv_->get_id()) : false;
 }
 
+/*!
+    Less than operator
+ */
 bool Torrent::operator <(const Torrent &other) const
 {
     return valid() ? (priv_->get_queuePosition() < other.priv_->get_queuePosition()) : false;
 }
 
+/*!
+    Returns \c true if the torrent is considered to be valid.
+
+    Validity of a torrent is mostly an implementation detail and could be
+    removed from the public interface in the future.
+*/
 bool Torrent::valid() const
 {
     return static_cast<bool>(priv_);
 }
 
+/*!
+    Starts the torrent if it is stopped. Calling this function will put the
+    torrent in one of four states:
+
+    gearbox::Torrent::Status::DownloadWait
+
+    gearbox::Torrent::Status::Download
+
+    gearbox::Torrent::Status::SeedWait
+
+    gearbox::Torrent::Status::Seed
+
+    This method is thread-safe.
+*/
 Error Torrent::start()
 {
     Error error;
@@ -175,6 +253,20 @@ Error Torrent::start()
     return error;
 }
 
+/*!
+    Starts the torrent if it is stopped, ignoring the queue. Calling this
+    function will put the torrent in one of two states:
+
+    gearbox::Torrent::Status::Download
+
+    gearbox::Torrent::Status::Seed
+
+    Calling this method depends on the fact that the gearbox::Session that
+    returned it is still available, otherwise it will return
+    gearbox::Error::Code::GearboxSessionInvalid.
+
+    This method is thread-safe.
+*/
 Error Torrent::startNow()
 {
     Error error;
@@ -204,6 +296,16 @@ Error Torrent::startNow()
     return error;
 }
 
+/*!
+    Stops an active torrent. The resulting state will be
+    gearbox::Torrent::Status::Stopped.
+
+    Calling this method depends on the fact that the gearbox::Session that
+    returned it is still available, otherwise it will return
+    gearbox::Error::Code::GearboxSessionInvalid.
+
+    This method is thread-safe.
+*/
 Error Torrent::stop()
 {
     Error error;
@@ -233,6 +335,15 @@ Error Torrent::stop()
     return error;
 }
 
+/*!
+    Verifies the integrity of the downloaded data.
+
+    Calling this method depends on the fact that the gearbox::Session that
+    returned it is still available, otherwise it will return
+    gearbox::Error::Code::GearboxSessionInvalid.
+
+    This method is thread-safe.
+*/
 Error Torrent::verify()
 {
     Error error;
@@ -262,6 +373,16 @@ Error Torrent::verify()
     return error;
 }
 
+/*!
+    Normally after a period of time Transmission will ask the associated tracker
+    for more peers. This forces this action to happen immediately.
+
+    Calling this method depends on the fact that the gearbox::Session that
+    returned it is still available, otherwise it will return
+    gearbox::Error::Code::GearboxSessionInvalid.
+
+    This method is thread-safe.
+*/
 Error Torrent::askForMorePeers()
 {
     Error error;
@@ -291,6 +412,17 @@ Error Torrent::askForMorePeers()
     return error;
 }
 
+/*!
+    Removes the torrent from the server. By default the downloaded files will be
+    kept. This behavior can be changed by passing
+    gearbox::Torrent::LocalDataAction::DeleteFiles.
+
+    Calling this method depends on the fact that the gearbox::Session that
+    returned it is still available, otherwise it will return
+    gearbox::Error::Code::GearboxSessionInvalid.
+
+    This method is thread-safe.
+*/
 Error Torrent::remove(LocalDataAction action)
 {
     Error error;
@@ -321,6 +453,15 @@ Error Torrent::remove(LocalDataAction action)
     return error;
 }
 
+/*!
+    Moves up the torrent, by one, in the queue.
+
+    Calling this method depends on the fact that the gearbox::Session that
+    returned it is still available, otherwise it will return
+    gearbox::Error::Code::GearboxSessionInvalid.
+
+    This method is thread-safe.
+*/
 Error Torrent::queueMoveUp()
 {
     Error error;
@@ -350,6 +491,15 @@ Error Torrent::queueMoveUp()
     return error;
 }
 
+/*!
+    Moves down the torrent, by one, in the queue.
+
+    Calling this method depends on the fact that the gearbox::Session that
+    returned it is still available, otherwise it will return
+    gearbox::Error::Code::GearboxSessionInvalid.
+
+    This method is thread-safe.
+*/
 Error Torrent::queueMoveDown()
 {
     Error error;
@@ -379,6 +529,15 @@ Error Torrent::queueMoveDown()
     return error;
 }
 
+/*!
+    Moves the torrent to the beginning of the queue.
+
+    Calling this method depends on the fact that the gearbox::Session that
+    returned it is still available, otherwise it will return
+    gearbox::Error::Code::GearboxSessionInvalid.
+
+    This method is thread-safe.
+*/
 Error Torrent::queueMoveTop()
 {
     Error error;
@@ -408,6 +567,15 @@ Error Torrent::queueMoveTop()
     return error;
 }
 
+/*!
+    Moves the torrent to the end of the queue.
+
+    Calling this method depends on the fact that the gearbox::Session that
+    returned it is still available, otherwise it will return
+    gearbox::Error::Code::GearboxSessionInvalid.
+
+    This method is thread-safe.
+*/
 Error Torrent::queueMoveBottom()
 {
     Error error;
@@ -437,6 +605,15 @@ Error Torrent::queueMoveBottom()
     return error;
 }
 
+/*!
+    Updates the torrent's cached data.
+
+    Calling this method depends on the fact that the gearbox::Session that
+    returned it is still available, otherwise it will return
+    gearbox::Error::Code::GearboxSessionInvalid.
+
+    This method is thread-safe.
+*/
 Error Torrent::update()
 {
     Error error;
@@ -483,6 +660,15 @@ Error Torrent::update()
     return error;
 }
 
+/*!
+    Sets the files that are to be downloaded as a part of this torrent.
+
+    Calling this method depends on the fact that the gearbox::Session that
+    returned it is still available, otherwise it will return
+    gearbox::Error::Code::GearboxSessionInvalid.
+
+    This method is thread-safe.
+*/
 Error Torrent::setWantedFiles(const std::vector<std::reference_wrapper<const File>> &files)
 {
     Error error;
@@ -518,6 +704,15 @@ Error Torrent::setWantedFiles(const std::vector<std::reference_wrapper<const Fil
     return error;
 }
 
+/*!
+    Sets the files that are to be skipped as a part of this torrent.
+
+    Calling this method depends on the fact that the gearbox::Session that
+    returned it is still available, otherwise it will return
+    gearbox::Error::Code::GearboxSessionInvalid.
+
+    This method is thread-safe.
+*/
 Error Torrent::setSkippedFiles(const std::vector<std::reference_wrapper<const File>> &files)
 {
     Error error;
@@ -553,57 +748,120 @@ Error Torrent::setSkippedFiles(const std::vector<std::reference_wrapper<const Fi
     return error;
 }
 
+/*!
+    Returns the unique identifier for the torrent. This value is mostly for
+    internal use.
+
+    If the torrent is not gearbox::Torrent::valid() returns -1.
+*/
 int32_t Torrent::id() const
 {
     return valid() ? priv_->get_id() : -1;
 }
 
+/*!
+    Returns the name of torrent.
+
+    If the torrent is not gearbox::Torrent::valid() returns an empty string.
+*/
 std::string Torrent::name() const
 {
     return valid() ? priv_->get_name() : "";
 }
 
+/*!
+    Returns the amount of downloaded data in bytes.
+
+    If the torrent is not gearbox::Torrent::valid() returns 0.
+*/
 uint64_t Torrent::bytesDownloaded() const
 {
     return valid() ? priv_->get_haveValid() : 0;
 }
 
+/*!
+    Returns how much has been downloaded of the wanted
+    (gearbox::Torrent::setWantedFiles(), gearbox::Torrent::setSkippedFiles()),
+    files.
+
+    If the torrent is not gearbox::Torrent::valid() returns 0.
+*/
 double Torrent::percentDone() const
 {
     /* Workaround misterious bug where double values end up being truncated */
     return valid() ? static_cast<double>(priv_->get_haveValid()) / priv_->get_totalSize() : 0;
 }
 
+/*!
+    Returns the amount of uploaded data devided by the amount of uploaded data
+    as a value between 0.0 and 1.0.
+
+    If the torrent is not gearbox::Torrent::valid() returns 0.
+*/
 double Torrent::uploadRatio() const
 {
     return valid() ? priv_->get_uploadRatio() : 0;
 }
 
+/*!
+    Returns the amount of uploaded data in bytes.
+
+    If the torrent is not gearbox::Torrent::valid() returns 0.
+*/
 std::uint64_t Torrent::bytesUploaded() const
 {
     return valid() ? priv_->get_uploadedEver() : 0;
 }
 
+/*!
+    Returns the speed at which the torrent is downloading in bytes/s.
+
+    If the torrent is not gearbox::Torrent::valid() returns 0.
+*/
 uint64_t Torrent::downloadSpeed() const
 {
     return valid() ? priv_->get_rateDownload() : 0;
 }
 
+/*!
+    Returns the speed at which the torrent is uploading in bytes/s.
+
+    If the torrent is not gearbox::Torrent::valid() returns 0.
+*/
 uint64_t Torrent::uploadSpeed() const
 {
     return valid() ? priv_->get_rateUpload() : 0;
 }
 
+/*!
+    Returns current status of the torrent.
+
+    If the torrent is not gearbox::Torrent::valid() returns
+    gearbox::Torrent::Status::Invalid.
+*/
 Torrent::Status Torrent::status() const
 {
     return valid() ? static_cast<Torrent::Status>(priv_->get_status()) : Torrent::Status::Invalid;
 }
 
+/*!
+    Returns occupied space by the data once download completes.
+
+    If the torrent is not gearbox::Torrent::valid() returns 0.
+*/
 uint64_t Torrent::size() const
 {
     return valid() ? priv_->get_totalSize() : 0;
 }
 
+/*!
+    Returns "estimated time of arrival" for the torrent. If the torrent is
+    downloading, estimated number of seconds left until the torrent is done.
+    If the torrent is seeding, estimated number of seconds left until seed
+    ratio is reached.
+
+    If the torrent is not gearbox::Torrent::valid() returns 0.
+*/
 int32_t Torrent::eta() const
 {
     return valid() ? priv_->get_eta() : 0;
@@ -612,9 +870,18 @@ int32_t Torrent::eta() const
 /*!
     Returns the root folder of the torrent.
 
-    The lifetime and validity of the returned folder
-    is not tied in any way to the lifetime of the torrent, but the former should be considered
-    invalid/stale if the torrent is removed from the server.
+    In it's current incarnation this method can be expensive to call since it
+    creates the tree structure, on the client-side, for each subsequent call.
+
+    The lifetime and validity of the returned folder is not tied in any way to
+    the lifetime of the torrent, but the former should be considered invalid or,
+    at the very least, stale if the torrent is removed from the server.
+
+    Calling this method depends on the fact that the gearbox::Session that
+    returned it is still available, otherwise it will return
+    gearbox::Error::Code::GearboxSessionInvalid.
+
+    This method is thread-safe.
 */
 ReturnType<Folder> Torrent::content() const
 {
@@ -683,6 +950,22 @@ ReturnType<Folder> Torrent::content() const
     };
 }
 
+/*!
+    Returns a list of files that the torrent can download.
+
+    Each file will be in the form of
+    `<gearbox::Torrent::name>/subfolder/../file_name.ext`
+
+    The lifetime and validity of the returned files is not tied in any way to
+    the lifetime of the torrent, but the former should be considered invalid or,
+    at the very least, stale if the torrent is removed from the server.
+
+    Calling this method depends on the fact that the gearbox::Session that
+    returned it is still available, otherwise it will return
+    gearbox::Error::Code::GearboxSessionInvalid.
+
+    This method is thread-safe.
+*/
 ReturnType<std::vector<File>> Torrent::files() const
 {
     std::vector<File> result;
@@ -751,11 +1034,33 @@ ReturnType<std::vector<File>> Torrent::files() const
     );
 }
 
+/*!
+    Returns the position in the queue for this torrent.
+
+    This value will be between 0 and
+    gearbox::Session::Statistics::totalTorrentCount since all torrents have a
+    queue position even if they aren't queued.
+
+    If the torrent is not gearbox::Torrent::valid() returns -1.
+*/
 int32_t Torrent::queuePosition() const
 {
     return valid() ? priv_->get_queuePosition() : -1;
 }
 
+/*!
+    Sets the position, in the queue, for the torrent.
+
+    The supplied value should be no larger than
+    gearbox::Session::Statistics::totalTorrentCount and no smaller than 0.
+    Passing a value not in thsi range leads to undefined behaviour.
+
+    Calling this method depends on the fact that the gearbox::Session that
+    returned it is still available, otherwise it will return
+    gearbox::Error::Code::GearboxSessionInvalid.
+
+    This method is thread-safe.
+*/
 Error Torrent::setQueuePosition(int32_t position)
 {
     Error error;
@@ -786,11 +1091,25 @@ Error Torrent::setQueuePosition(int32_t position)
     return error;
 }
 
+/*!
+    Returns the target directory for the torrent.
+
+    If the torrent is not gearbox::Torrent::valid() returns an empty string.
+*/
 std::string Torrent::downloadDir() const
 {
     return valid() ? priv_->get_downloadDir() : "";
 }
 
+/*!
+    Sets the target directory for the torrent.
+
+    Calling this method depends on the fact that the gearbox::Session that
+    returned it is still available, otherwise it will return
+    gearbox::Error::Code::GearboxSessionInvalid.
+
+    This method is thread-safe.
+*/
 Error Torrent::setDownloadDir(const std::string &path, MoveType move)
 {
     Error error;
