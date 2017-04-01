@@ -3,6 +3,8 @@
 #define private public
 #include <libgearbox_session.h>
 #include <libgearbox_session.cpp>
+#include <libgearbox_torrent.h>
+#include <libgearbox_torrent_p.h>
 
 TEST_CASE("Test libgearbox_session", "[session]")
 {
@@ -259,6 +261,60 @@ TEST_CASE("Test libgearbox_session", "[session]")
                 REQUIRE((impl.password() == password));
                 REQUIRE((impl.timeout() == http::milliseconds_t{ DEFAULT_TIMEOUT }));
             }
+        }
+    }
+
+    {
+        Session test(
+            "http://localhost",
+            gearbox::Session::DEFAULT_PATH,
+            9999,
+            Session::Authentication::Required,
+            "username",
+            "password"
+        );
+
+        SECTION(("gearbox::Session::statistics() const"))
+        {
+            auto stats = test.statistics();
+
+            REQUIRE((!stats.error));
+            REQUIRE((stats.value.activeTorrentCount == 42));
+            REQUIRE((stats.value.downloadSpeed == 42));
+            REQUIRE((stats.value.pausedTorrentCount == 42));
+            REQUIRE((stats.value.totalTorrentCount == 42));
+            REQUIRE((stats.value.uploadSpeed == 42));
+        }
+
+        SECTION(("gearbox::Session::torrents() const"))
+        {
+            auto torrents = test.torrents();
+
+            REQUIRE((!torrents.error));
+            REQUIRE((torrents.value.size() == 1));
+            auto &t = torrents.value.at(0);
+            REQUIRE((t.valid()));
+            REQUIRE((t.id() == 0));
+            REQUIRE((t.name() == "torrent"));
+            REQUIRE((t.bytesDownloaded() == 1234));
+            REQUIRE((t.percentDone() == 0.8));
+            REQUIRE((t.uploadRatio() == 1.2));
+            REQUIRE((t.bytesUploaded() == 1234567));
+            REQUIRE((t.downloadSpeed() == 12345));
+            REQUIRE((t.uploadSpeed() == 1234));
+            REQUIRE((static_cast<int>(t.status()) == 4));
+            REQUIRE((t.size() == 123456));
+            REQUIRE((t.downloadDir() == "/path/to/downloads"));
+            REQUIRE((t.eta() == 12345));
+            REQUIRE((t.queuePosition() == 0));
+        }
+
+        SECTION(("gearbox::Session::recentlyRemoved() const"))
+        {
+        }
+
+        SECTION(("gearbox::Session::updateTorrentStats(std::vector<std::reference_wrapper<gearbox::Torrent>> &)"))
+        {
         }
     }
 

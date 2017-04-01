@@ -788,8 +788,7 @@ uint64_t Torrent::bytesDownloaded() const
 */
 double Torrent::percentDone() const
 {
-    /* Workaround misterious bug where double values end up being truncated */
-    return valid() ? static_cast<double>(priv_->get_haveValid()) / priv_->get_totalSize() : 0;
+    return valid() ? priv_->get_percentDone() : 0;
 }
 
 /*!
