@@ -39,10 +39,14 @@
 #   pragma warning Unknown dynamic link import/export semantics.
 #endif
 
+#ifndef LIBGEARBOX_NO_IMPORT_SEMANTICS
 #if defined(GEARBOX_LIB)
 #   define GEARBOX_API    EXPORT_SYMBOL
 #else
 #   define GEARBOX_API    IMPORT_SYMBOL
+#endif
+#else
+#   define GEARBOX_API
 #endif
 
 #define DISABLE_COPY(klass) \

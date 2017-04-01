@@ -14,6 +14,7 @@ option (GEARBOX_ALLOW_UNSUPPORTED_COMPILER "Allow compilation using an unsupport
 option (GEARBOX_ALLOW_UNSUPPORTED_PLATFORM "Allow compilation on an unsupported platform." OFF)
 option (GEARBOX_ENABLE_TESTS "Build tests." OFF)
 option (GEARBOX_BUILD_DOCUMENTATION "Build documentation." OFF)
+option (GEARBOX_BUILD_BINDING_LAYER "Build binding helper library." OFF)
 
 list (APPEND CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(LinuxConfig)
@@ -66,6 +67,7 @@ if (GEARBOX_DEBUG_LOGS)
 endif ()
 
 if (GEARBOX_STATIC_LIB)
+    add_definitions (-DLIBGEARBOX_NO_IMPORT_SEMANTICS)
     add_library (gearbox STATIC ${LIBGEARBOX_SOURCES})
     message (STATUS "Building static library")
 else ()
@@ -95,4 +97,8 @@ install (
 
 if (GEARBOX_ENABLE_TESTS)
     add_subdirectory (tests)
-endif()
+endif ()
+
+if (GEARBOX_BUILD_BINDING_LAYER)
+    add_subdirectory (bind)
+endif ()
