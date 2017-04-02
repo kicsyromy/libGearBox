@@ -1,84 +1,41 @@
 /*!
-\mainpage libGearBox
+\mainpage Documentation
+## Getting started
 
-C++ library used for interacting with a remote [Transmission](https://transmissionbt.com/) server.
+The library offers a simple interface to query for data from a Transmission RPC
+server. The two main components are gearbox::Session and gearbox::Torrent.
 
-## Building
-### Dependencies
-The following combination of operating system and compiler are officially supported:
- * Windows (MinGW 4.9+, Microsoft Visual Studio 2015+)
- * Linux (GCC 4.9+, clang 3.8.1+) + cURL development libraries (libcurl4-openssl-dev on Ubuntu)
- * macOS (GCC 4.9+, clang 3.8.1+)
+The session component offers the ability to query for general statistics and
+information that is generaly valid for the server as a whole, while the
+torrent component offers information about one particular torrent.
 
-The project comes with all required (unless otherwise noted) dependencies as [git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules). In adition to these [CMake](https://cmake.org/) is required to perform the actual build. Make sure that the cmake binary is in your `PATH`.
+All objects returned by any of the methods are owned by the calee and their
+lifetime is subjective to the scope in which these objects were created.
 
-### Extra dependencies
-Tests:
- * Python (min v3.4) libraries
+The first thing an application developer, that wishes to use the library, needs
+to to is connect to the appropriate server by creating a gearbox::Session
+instance and setting the appropriate parameters for the connection. See the API
+documentation on gearbox::Session for and example on how this can be done.
 
-Code coverage:
- * gcov
- * lcov
- * GCC/Clang/MinGW compiler
- 
-Documentation:
- * Doxygen
+Calling gearbox::Session::torrents() yields the list of all torrents present on
+the server completely unfiltered. The state of each torrent can be queried
+using gearbox::Torrent's appropriate methods. For example if the torrent is
+gearbox::Torrent::Status::Stopped it can be started using the
+gearbox::Torrent::start() method.
 
-### Build steps
-Clone the repository:
-```
-git clone https://github.com/kicsyromy/libGearBox.git
-git submodule update --init
-```
-**Note:** Since CMake supports several Makefile formats, based on the target platform, I am not going to cover all of them here. Feel free to use the Visual Studio generator on Windows, or XCode generator on macOS. If a specific generator doesn't work for you please file a bug report.
+The list of files, again unfiltered, can be obtained via the
+gearbox::Torrent::files() method call, or if a tree-like structure for the
+downloaded content is desired the gearbox::Torrent::content() can be called
+instead.
 
-**All platforms**
-```
-cd libGearBox
-mkdir build
-cd build
-```
+Each gearbox::File has a set of basic properties, like a name, how much of
+the file is actually downloaded, whether it is to be downloaded at all. A handy
+property is the gearbox::File::type() which is the MIME type of the file in
+question. Based on this information an application developer could, for
+example, set appropriate icon in the user interface.
 
-**Windows**
-```
-cmake .. -G "NMake Makefiles"
-nmake
-```
-
-**Linux**
-```
-cmake .. -G "Unix Makefiles"
-make -j $(grep -c ^processor /proc/cpuinfo)
-```
-
-**macOS**
-```
-cmake .. -G "Unix Makefiles"
-make
-```
-
-The output of the build should be a static library called `libgearbox` with the appropriate extension (.lib on Windows, .a on Linux and macOS).
-
-### Build options
-libGearBox supports some [CMake options](https://cmake.org/cmake/help/v3.7/command/option.html) for a customized build. These are as follows:
-
-`GEARBOX_STATIC_LIB` Build static library if set to ON otherwise build shared library. Defaults to ON.
-
-`GEARBOX_DEBUG_LOGS` Build with additional debug logs. CAUTION: Do not use in production. Defaults to OFF.
-
-`GEARBOX_ALLOW_UNSUPPORTED_COMPILER` Allow compilation using an unsupported compiler. Defaults to OFF.
-
-`GEARBOX_ALLOW_UNSUPPORTED_PLATFORM` Allow compilation on an unsupported platform. Defaults to OFF.
-
-`GEARBOX_ENABLE_TESTS` Build tests. Defaults to OFF.
-
-`GEARBOX_TESTS_ENABLE_CODE_COVERAGE` Only available when building with tests. Enables code coverage generation using gcov/lcov.
-
-`GEARBOX_BUILD_DOCUMENTATION` Build HTML documentation, also builds manpages when building under Linux. Defaults to OFF.
-
-## Roadmap
-TBD
-
-## Contributing
-Contributions are welcome, documentation, tests, code fixes etc. For a guideline on how contributions work on GitHub visit https://help.github.com/articles/working-with-forks/ and https://help.github.com/articles/proposing-changes-to-your-work-with-pull-requests/
+All method calls are synchronous which means they will block the main thread of
+the application. It is recommended to call functions that make RPC calls on a
+different thread than main. These methods are implemented in a thread-safe
+manner.
 */
