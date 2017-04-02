@@ -507,6 +507,7 @@ Error Session::updateTorrentStats(std::vector<std::reference_wrapper<Torrent>> &
                     auto torrent = new TorrentPrivate(std::move(torrentPriv));
                     torrent->session_ = this->priv_;
                     t.priv_.reset(torrent);
+                    found = true;
                     break;
                 }
             }

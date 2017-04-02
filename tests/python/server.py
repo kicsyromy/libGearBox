@@ -7,20 +7,25 @@ session_id = 'dGVzdGhlZHNnZGpraGtkamhha2ZjZ3dlODN3aXVkc2hhZm4n'
 
 stats = None
 torrents = None
+recently_active = None
 
 with open(os.path.join(os.path.dirname(__file__), 'json/stats.json')) as stats_json:
     stats = json.load(stats_json)
-
-with open(os.path.join(os.path.dirname(__file__), 'json/torrents.json')) as torrents_json:
-    torrents = json.load(torrents_json)
-
 def get_statistics(request):
     stats['tag'] = request['tag']
     return json.dumps(stats) + '\n'
 
+with open(os.path.join(os.path.dirname(__file__), 'json/torrents.json')) as torrents_json:
+    torrents = json.load(torrents_json)
+with open(os.path.join(os.path.dirname(__file__), 'json/recently_active.json')) as recently_active_json:
+    recently_active = json.load(recently_active_json)
 def get_torrents(request):
-    torrents['tag'] = request['tag']
-    return json.dumps(torrents) + '\n'
+    if 'ids' in request['arguments'] and request['arguments']['ids'] == 'recently-active':
+        recently_active['tag'] = request['tag']
+        return json.dumps(recently_active) + '\n'
+    else:
+        torrents['tag'] = request['tag']
+        return json.dumps(torrents) + '\n'
 
 def test_send_request(request):
     result = {

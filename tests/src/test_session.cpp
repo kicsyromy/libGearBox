@@ -311,10 +311,47 @@ TEST_CASE("Test libgearbox_session", "[session]")
 
         SECTION(("gearbox::Session::recentlyRemoved() const"))
         {
+            auto removed = test.recentlyRemoved();
+            REQUIRE((!removed.error));
+            REQUIRE((removed.value.size() == 1));
+            REQUIRE((removed.value.at(0) == 1));
         }
 
         SECTION(("gearbox::Session::updateTorrentStats(std::vector<std::reference_wrapper<gearbox::Torrent>> &)"))
         {
+
+            auto priv = new TorrentPrivate();
+            std::get<0> (priv->attributes) = 0;
+            std::get<2> (priv->attributes) = 0;
+            std::get<3> (priv->attributes) = 0;
+            std::get<4> (priv->attributes) = 0;
+            std::get<5> (priv->attributes) = 0;
+            std::get<6> (priv->attributes) = 0;
+            std::get<7> (priv->attributes) = 0;
+            std::get<8> (priv->attributes) = 0;
+            std::get<9> (priv->attributes) = 0;
+            std::get<11>(priv->attributes) = 0;
+            std::get<12>(priv->attributes) = 0;
+            Torrent t(priv);
+            std::vector<std::reference_wrapper<Torrent>> torrents = { t };
+            test.updateTorrentStats(torrents);
+
+            REQUIRE((torrents.size() == 1));
+            REQUIRE((t.priv_.get() != priv));
+            REQUIRE((t.valid()));
+            REQUIRE((t.id() == 0));
+            REQUIRE((t.name() == "torrent"));
+            REQUIRE((t.bytesDownloaded() == 1234));
+            REQUIRE((t.percentDone() == 0.8));
+            REQUIRE((t.uploadRatio() == 1.2));
+            REQUIRE((t.bytesUploaded() == 1234567));
+            REQUIRE((t.downloadSpeed() == 12345));
+            REQUIRE((t.uploadSpeed() == 1234));
+            REQUIRE((static_cast<int>(t.status()) == 4));
+            REQUIRE((t.size() == 123456));
+            REQUIRE((t.downloadDir() == "/path/to/downloads"));
+            REQUIRE((t.eta() == 12345));
+            REQUIRE((t.queuePosition() == 0));
         }
     }
 
