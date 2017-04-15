@@ -418,7 +418,7 @@ void CocoaHttp::setHost(const std::string &hostname)
 void CocoaHttp::setHost(std::string &&hostname)
 {
     hostname_ = std::move(hostname);
-    [impl_ setHost:hostname];
+    [impl_ setHost:hostname_];
 }
 
 CocoaHttp::http_port_t CocoaHttp::port() const
@@ -446,7 +446,7 @@ void CocoaHttp::setPath(const std::string &path)
 void CocoaHttp::setPath(std::string &&path)
 {
     path_ = std::move(path);
-    [impl_ setPath:path];
+    [impl_ setPath:path_];
 }
 
 bool CocoaHttp::authenticationRequired() const
@@ -482,7 +482,7 @@ void CocoaHttp::setUsername(std::string &&username)
 {
     authenticationEnabled_ = true;
     authentication_.username = std::move(username);
-    [impl_ setUsername:username];
+    [impl_ setUsername:authentication_.username];
 }
 
 const std::string &CocoaHttp::password() const
@@ -501,7 +501,7 @@ void CocoaHttp::setPassword(std::string &&password)
 {
     authenticationEnabled_ = true;
     authentication_.password = std::move(password);
-    [impl_ setPassword:password];
+    [impl_ setPassword:authentication_.password];
 }
 
 void CocoaHttp::setSSLErrorHandling(http_ssl_error_handling_t value)
