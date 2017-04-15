@@ -1,10 +1,10 @@
-#include <catch.hpp>
-
 #define private public
 #include <libgearbox_session.h>
 #include <libgearbox_session.cpp>
 #include <libgearbox_torrent.h>
 #include <libgearbox_torrent_p.h>
+
+#include <catch.hpp>
 
 TEST_CASE("Test libgearbox_session", "[session]")
 {

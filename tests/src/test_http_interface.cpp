@@ -1,8 +1,8 @@
-#include <catch.hpp>
-
 #define private public
 #include <libgearbox_http_interface_p.h>
 #include <libgearbox_http_interface.cpp>
+
+#include <catch.hpp>
 
 class TestHttpImplementation
 {

@@ -1,9 +1,9 @@
 #ifdef PLATFORM_LINUX
-#include <catch.hpp>
-
 #define private public
 #include <libgearbox_http_linux_p.h>
 #include <libgearbox_http_linux.cpp>
+
+#include <catch.hpp>
 
 TEST_CASE("Test libgearbox_http_linux", "[http]")
 {

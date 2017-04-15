@@ -1,11 +1,11 @@
-#include <catch.hpp>
-
-#include <cstring>
-
 #define private public
 #include <libgearbox_file_p.h>
 #include <libgearbox_file.h>
 #include <libgearbox_file.cpp>
+
+#include <catch.hpp>
+
+#include <cstring>
 
 TEST_CASE("Test librt_file_p and librt_file", "[file]")
 {
