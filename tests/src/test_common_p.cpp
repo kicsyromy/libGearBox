@@ -1,7 +1,7 @@
+#include <catch.hpp>
+
 #include <libgearbox_common_p.h>
 #include <libgearbox_common.cpp>
-
-#include <catch.hpp>
 
 TEST_CASE("Test librt_common_p", "[common]")
 {

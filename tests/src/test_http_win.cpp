@@ -1,9 +1,9 @@
 #ifdef PLATFORM_WINDOWS
+#include <catch.hpp>
+
 #define private public
 #include <libgearbox_http_win_p.h>
 #include <libgearbox_http_win.cpp>
-
-#include <catch.hpp>
 
 #define CHECK_OPTION_STR(handle, option, value)            \
     do {                                                   \
