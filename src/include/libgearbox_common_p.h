@@ -28,8 +28,8 @@
 #include <string>
 #include <type_traits>
 
-/* For whatever reason clang refuses to compile this code */
-#ifndef __clang__
+/* For whatever reason clang on macOS refuses to compile this code */
+#ifndef PLATFORM_MACOS
 #define TYPE_HAS_METHOD(type_name, method_name, signature)                     \
     template <typename T> struct has_##method_name                             \
     {                                                                          \

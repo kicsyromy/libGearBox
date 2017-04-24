@@ -47,8 +47,8 @@ namespace gearbox
 
     public:
         explicit CUrlHttp(const std::string &userAgent);
-        CUrlHttp(CUrlHttp &&) noexcept(true) = default;
-        CUrlHttp &operator=(CUrlHttp &&) noexcept(true) = default;
+        CUrlHttp(CUrlHttp &&) noexcept(true);
+        CUrlHttp &operator=(CUrlHttp &&) noexcept(true);
         ~CUrlHttp();
 
     public:
@@ -84,8 +84,8 @@ namespace gearbox
         {
         public:
             Request(CURL *handle);
-            Request(Request &&) noexcept(true) = default;
-            Request &operator=(Request &&) noexcept(true) = default;
+            Request(Request &&) noexcept(true);
+            Request &operator=(Request &&) noexcept(true);
             ~Request();
 
         public:

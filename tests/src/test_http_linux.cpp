@@ -34,22 +34,22 @@ TEST_CASE("Test libgearbox_http_linux", "[http]")
         headerCallback(data_ptr, size, nmemb, &result);
         REQUIRE((result.empty()));
 
-        header = { "key1: value1\r\n" };
+        header = "key1: value1\r\n";
         size = header.size();
         data_ptr = const_cast<char *>(header.data());
         headerCallback(data_ptr, size, nmemb, &result);
 
-        header = { "key2: value2\r\n" };
+        header = "key2: value2\r\n";
         size = header.size();
         data_ptr = const_cast<char *>(header.data());
         headerCallback(data_ptr, size, nmemb, &result);
 
-        header = { "key3: value3\r\n" };
+        header = "key3: value3\r\n";
         size = header.size();
         data_ptr = const_cast<char *>(header.data());
         headerCallback(data_ptr, size, nmemb, &result);
 
-        header = { "key4: value4\r\n" };
+        header = "key4: value4\r\n";
         size = header.size();
         data_ptr = const_cast<char *>(header.data());
         headerCallback(data_ptr, size, nmemb, &result);

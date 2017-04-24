@@ -197,7 +197,10 @@ CUrlHttp::CUrlHttp(const std::string &userAgent)
     }
 }
 
-gearbox::CUrlHttp::~CUrlHttp()
+CUrlHttp::CUrlHttp(CUrlHttp &&) noexcept(true) = default;
+CUrlHttp &CUrlHttp::operator=(CUrlHttp &&) noexcept(true) = default;
+
+CUrlHttp::~CUrlHttp()
 {
     if (handle_ != nullptr)
     {
@@ -288,6 +291,10 @@ void CUrlHttp::setTimeout(milliseconds_t value)
 }
 
 CUrlHttp::Request::Request(CURL *handle) : handle_(handle), headers_() {}
+
+CUrlHttp::Request::Request(Request &&) noexcept(true) = default;
+CUrlHttp::Request &CUrlHttp::Request::operator=(Request &&) noexcept(true) =
+    default;
 
 CUrlHttp::Request::~Request()
 {
