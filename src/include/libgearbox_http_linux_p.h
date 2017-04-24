@@ -48,7 +48,7 @@ namespace gearbox
     public:
         explicit CUrlHttp(const std::string &userAgent);
         CUrlHttp(CUrlHttp &&) noexcept(true) = default;
-        CUrlHttp &operator =(CUrlHttp &&) noexcept(true) = default;
+        CUrlHttp &operator=(CUrlHttp &&) noexcept(true) = default;
         ~CUrlHttp();
 
     public:
@@ -85,7 +85,7 @@ namespace gearbox
         public:
             Request(CURL *handle);
             Request(Request &&) noexcept(true) = default;
-            Request &operator =(Request &&) noexcept(true) = default;
+            Request &operator=(Request &&) noexcept(true) = default;
             ~Request();
 
         public:
@@ -110,7 +110,11 @@ namespace gearbox
         http_port_t port_;
         std::string path_;
         bool authenticationEnabled_;
-        struct { std::string username; std::string password; } authentication_;
+        struct
+        {
+            std::string username;
+            std::string password;
+        } authentication_;
         bool sslErrorHandlingEnabled_;
         milliseconds_t timeout_;
 
@@ -122,4 +126,4 @@ namespace gearbox
     };
 }
 
-#endif // LIBGEARBOX_HTTP_WIN_P_H 
+#endif // LIBGEARBOX_HTTP_WIN_P_H

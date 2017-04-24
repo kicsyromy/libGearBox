@@ -27,8 +27,8 @@
 
 #include <vector>
 
-#include <sequential.h>
 #include <json.hpp>
+#include <sequential.h>
 
 #include "libgearbox_http_interface_p.h"
 #if defined(PLATFORM_WINDOWS)
@@ -57,10 +57,16 @@ namespace gearbox
             ATTRIBUTE(std::uint16_t, tag)
             INIT_ATTRIBUTES(arguments, method, tag)
 
-            template<typename ...Args>
-            Request(const Args &... args) : attributes(args...) {}
+            template <typename... Args>
+            Request(const Args &... args) : attributes(args...)
+            {
+            }
             Request() : attributes() {}
-            Request &operator =(Request &&other) { attributes = std::move(other.attributes); return *this; }
+            Request &operator=(Request &&other)
+            {
+                attributes = std::move(other.attributes);
+                return *this;
+            }
         };
 
         struct Response
@@ -71,13 +77,15 @@ namespace gearbox
             INIT_ATTRIBUTES(arguments, result, tag)
 
             Response() : attributes(), error() {}
-            Response(Response &&other) :
-                attributes(std::move(other.attributes)),
+            Response(Response &&other)
+              : attributes(std::move(other.attributes)),
                 error(std::move(other.error))
-            {}
-            Response &operator =(Response &&other)
             {
-                attributes = std::move(other.attributes); return *this;
+            }
+            Response &operator=(Response &&other)
+            {
+                attributes = std::move(other.attributes);
+                return *this;
                 error = std::move(other.error);
             }
 
@@ -91,7 +99,11 @@ namespace gearbox
             ATTRIBUTE(std::int32_t, pausedTorrentCount)
             ATTRIBUTE(std::int32_t, torrentCount)
             ATTRIBUTE(std::int32_t, uploadSpeed)
-            INIT_ATTRIBUTES(activeTorrentCount, downloadSpeed, pausedTorrentCount, torrentCount, uploadSpeed)
+            INIT_ATTRIBUTES(activeTorrentCount,
+                            downloadSpeed,
+                            pausedTorrentCount,
+                            torrentCount,
+                            uploadSpeed)
         };
     }
 
@@ -115,7 +127,9 @@ namespace gearbox
                        std::string &&password);
 
     public:
-        session::Response sendRequest(const std::string &method, nlohmann::json arguments = nlohmann::json());
+        session::Response sendRequest(
+            const std::string &method,
+            nlohmann::json arguments = nlohmann::json());
 
     private:
         std::string sessionId_;

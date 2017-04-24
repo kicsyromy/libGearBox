@@ -84,22 +84,24 @@
 #include <string>
 #include <utility>
 
-#include <formats/json_format.h>
 #include <fmt/format.h>
+#include <formats/json_format.h>
 
+#include "libgearbox_logger_p.h"
 #include "libgearbox_session_p.h"
 #include "libgearbox_torrent_p.h"
-#include "libgearbox_logger_p.h"
 
 using nlohmann::json;
 using namespace gearbox;
 
 namespace
 {
-    constexpr std::uint16_t SESSION_TAG     { 33872 };
-    constexpr std::int32_t  DEFAULT_TIMEOUT {  5000 };
-    constexpr std::int32_t  RETRY_COUNT     {     5 };
-    constexpr const char    USER_AGENT[17]  { "libGearbox/" LIBGEARBOX_VERISION_STR };
+    constexpr std::uint16_t SESSION_TAG{ 33872 };
+    constexpr std::int32_t DEFAULT_TIMEOUT{ 5000 };
+    constexpr std::int32_t RETRY_COUNT{ 5 };
+    constexpr const char USER_AGENT[17]{
+        "libGearbox/" LIBGEARBOX_VERISION_STR
+    };
 }
 
 SessionPrivate::SessionPrivate(const std::string &host,
@@ -107,9 +109,8 @@ SessionPrivate::SessionPrivate(const std::string &host,
                                std::int32_t port,
                                bool authenticationRequired,
                                const std::string &username,
-                               const std::string &password) :
-    sessionId_("dummy"),
-    http_(USER_AGENT)
+                               const std::string &password)
+  : sessionId_("dummy"), http_(USER_AGENT)
 {
     http_.setHost(host);
     http_.setPath(path);
@@ -117,8 +118,7 @@ SessionPrivate::SessionPrivate(const std::string &host,
     http_.setUsername(username);
     http_.setPassword(password);
     http_.setTimeout(std::chrono::milliseconds(DEFAULT_TIMEOUT));
-    if (!authenticationRequired)
-        http_.disableAuthentication();
+    if (!authenticationRequired) http_.disableAuthentication();
 }
 
 SessionPrivate::SessionPrivate(std::string &&host,
@@ -126,9 +126,8 @@ SessionPrivate::SessionPrivate(std::string &&host,
                                std::int32_t port,
                                bool authenticationRequired,
                                std::string &&username,
-                               std::string &&password) :
-    sessionId_("dummy"),
-    http_(USER_AGENT)
+                               std::string &&password)
+  : sessionId_("dummy"), http_(USER_AGENT)
 {
     http_.setHost(std::move(host));
     http_.setPath(std::move(path));
@@ -136,13 +135,13 @@ SessionPrivate::SessionPrivate(std::string &&host,
     http_.setUsername(std::move(username));
     http_.setPassword(std::move(password));
     http_.setTimeout(std::chrono::milliseconds(DEFAULT_TIMEOUT));
-    if (!authenticationRequired)
-        http_.disableAuthentication();
+    if (!authenticationRequired) http_.disableAuthentication();
 }
 
-session::Response SessionPrivate::sendRequest(const std::string &method, nlohmann::json arguments)
+session::Response SessionPrivate::sendRequest(const std::string &method,
+                                              nlohmann::json arguments)
 {
-    session::Request  request(arguments, method, SESSION_TAG);
+    session::Request request(arguments, method, SESSION_TAG);
     session::Response response;
     JsonFormat jsonFormat;
     sequential::to_format(jsonFormat, request);
@@ -169,7 +168,9 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
         if (result.error)
         {
             LOG_DEBUG("Error: {}", static_cast<std::string>(result.error));
-            response.error = Error(static_cast<Error::Code>(result.error.errorCode), result.error.message);
+            response.error =
+                Error(static_cast<Error::Code>(result.error.errorCode),
+                      result.error.message);
             break;
         }
 
@@ -188,29 +189,29 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
             auto &result = response.get_result();
             if (result != "success" && !result.empty())
             {
-                response.error = std::make_pair(Error::Code::UnknownError, std::move(result));
+                response.error = std::make_pair(Error::Code::UnknownError,
+                                                std::move(result));
             }
 
             break;
         }
         else
         {
-            response.error = std::make_pair(static_cast<Error::Code>(result.status.code()), result.status.name());
+            response.error =
+                std::make_pair(static_cast<Error::Code>(result.status.code()),
+                               result.status.name());
             break;
         }
     }
 
     if (response.error)
-        LOG_ERROR("Error '{} {}' while issuing method call '{}' with arguments\n'{}'",
-                  static_cast<int>(response.error.errorCode()),
-                  response.error.message(),
-                  method,
-                  arguments.dump(4));
+        LOG_ERROR(
+            "Error '{} {}' while issuing method call '{}' with arguments\n'{}'",
+            static_cast<int>(response.error.errorCode()),
+            response.error.message(), method, arguments.dump(4));
     else
-        LOG_DEBUG("Method call '{}' result '{}' for tag '{}':\n{}",
-                  method,
-                  response.get_result(),
-                  response.get_tag(),
+        LOG_DEBUG("Method call '{}' result '{}' for tag '{}':\n{}", method,
+                  response.get_result(), response.get_tag(),
                   response.get_arguments().dump(4));
 
     return response;
@@ -261,7 +262,6 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
     seeding, queued.
 */
 
-
 /*!
     \var gearbox::Session::Statistics::activeTorrentCount
     
@@ -289,25 +289,22 @@ session::Response SessionPrivate::sendRequest(const std::string &method, nlohman
 /*!
     Constructs an empty gearbox::Session
 */
-Session::Session() :
-    priv_(new SessionPrivate("", DEFAULT_PATH, -1,  false, "", ""))
+Session::Session()
+  : priv_(new SessionPrivate("", DEFAULT_PATH, -1, false, "", ""))
 {
 }
 
 /*!
     Move constructor
 */
-Session::Session(Session &&other) :
-    priv_(std::move(other.priv_))
-{
-}
+Session::Session(Session &&other) : priv_(std::move(other.priv_)) {}
 
 /*!
     Move asignment operator
 */
-Session &Session::operator =(Session &&other)
+Session &Session::operator=(Session &&other)
 {
-    priv_= std::move(other.priv_);
+    priv_ = std::move(other.priv_);
 
     return *this;
 }
@@ -335,8 +332,13 @@ Session::Session(const std::string &host,
                  std::int32_t port,
                  Authentication authentication,
                  const std::string &username,
-                 const std::string &password) :
-    priv_(new SessionPrivate(host, path, port, authentication ==  Authentication::Required, username, password))
+                 const std::string &password)
+  : priv_(new SessionPrivate(host,
+                             path,
+                             port,
+                             authentication == Authentication::Required,
+                             username,
+                             password))
 {
 }
 
@@ -366,8 +368,13 @@ Session::Session(std::string &&host,
                  std::int32_t port,
                  Authentication authentication,
                  std::string &&username,
-                 std::string &&password) :
-    priv_(new SessionPrivate(host, path, port, authentication ==  Authentication::Required, username, password))
+                 std::string &&password)
+  : priv_(new SessionPrivate(host,
+                             path,
+                             port,
+                             authentication == Authentication::Required,
+                             username,
+                             password))
 {
 }
 
@@ -385,19 +392,13 @@ ReturnType<Session::Statistics> Session::statistics() const
         session::Statistics stats;
         JsonFormat jsonFormat(response.get_arguments());
         sequential::from_format(jsonFormat, stats);
-        retValue = {
-            stats.get_torrentCount(),
-            stats.get_activeTorrentCount(),
-            stats.get_pausedTorrentCount(),
-            stats.get_downloadSpeed(),
-            stats.get_uploadSpeed()
-        };
+        retValue = { stats.get_torrentCount(), stats.get_activeTorrentCount(),
+                     stats.get_pausedTorrentCount(), stats.get_downloadSpeed(),
+                     stats.get_uploadSpeed() };
     }
 
-    return ReturnType<Session::Statistics>(
-        std::move(response.error),
-        std::move(retValue)
-    );
+    return ReturnType<Session::Statistics>(std::move(response.error),
+                                           std::move(retValue));
 }
 
 /*!
@@ -417,7 +418,8 @@ ReturnType<std::vector<Torrent>> Session::torrents() const
     const auto &fields = TorrentPrivate::attribute_names();
     nlohmann::json requestValues;
     requestValues["fields"] = fields;
-    session::Response response(priv_->sendRequest("torrent-get", requestValues));
+    session::Response response(
+        priv_->sendRequest("torrent-get", requestValues));
 
     if (!response.error)
     {
@@ -425,7 +427,7 @@ ReturnType<std::vector<Torrent>> Session::torrents() const
         jsonFormat.fromJson(response.get_arguments());
         sequential::from_format(jsonFormat, torrentResponse);
         torrents = torrentResponse.get_torrents();
-        for (TorrentPrivate &torrentPriv: torrents)
+        for (TorrentPrivate &torrentPriv : torrents)
         {
             auto torrent = new TorrentPrivate(std::move(torrentPriv));
             torrent->session_ = this->priv_;
@@ -433,10 +435,8 @@ ReturnType<std::vector<Torrent>> Session::torrents() const
         }
     }
 
-    return ReturnType<std::vector<Torrent>>(
-        std::move(response.error),
-        std::move(retValue)
-    );
+    return ReturnType<std::vector<Torrent>>(std::move(response.error),
+                                            std::move(retValue));
 }
 
 /*!
@@ -454,7 +454,8 @@ ReturnType<std::vector<std::int32_t>> Session::recentlyRemoved() const
     nlohmann::json requestValues;
     requestValues["ids"] = "recently-active";
     requestValues["fields"] = fields;
-    session::Response response(priv_->sendRequest("torrent-get", requestValues));
+    session::Response response(
+        priv_->sendRequest("torrent-get", requestValues));
 
     if (!response.error)
     {
@@ -464,10 +465,8 @@ ReturnType<std::vector<std::int32_t>> Session::recentlyRemoved() const
         ids = torrentResponse.get_removed();
     }
 
-    return ReturnType<std::vector<std::int32_t>>(
-        std::move(response.error),
-        std::move(ids)
-    );
+    return ReturnType<std::vector<std::int32_t>>(std::move(response.error),
+                                                 std::move(ids));
 }
 
 /*!
@@ -475,12 +474,12 @@ ReturnType<std::vector<std::int32_t>> Session::recentlyRemoved() const
 
     This method is thread-safe.
 */
-Error Session::updateTorrentStats(std::vector<std::reference_wrapper<Torrent>> &torrents)
+Error Session::updateTorrentStats(
+    std::vector<std::reference_wrapper<Torrent>> &torrents)
 {
     std::vector<std::int32_t> ids;
     ids.reserve(torrents.size());
-    for (Torrent &t: torrents)
-        ids.push_back(t.id());
+    for (Torrent &t : torrents) ids.push_back(t.id());
 
     TorrentPrivate::Response torrentResponse;
 
@@ -488,7 +487,8 @@ Error Session::updateTorrentStats(std::vector<std::reference_wrapper<Torrent>> &
     nlohmann::json requestValues;
     requestValues["ids"] = ids;
     requestValues["fields"] = fields;
-    session::Response response(priv_->sendRequest("torrent-get", requestValues));
+    session::Response response(
+        priv_->sendRequest("torrent-get", requestValues));
 
     if (!response.error)
     {
@@ -497,10 +497,10 @@ Error Session::updateTorrentStats(std::vector<std::reference_wrapper<Torrent>> &
         sequential::from_format(jsonFormat, torrentResponse);
 
         auto &updatedTorrents = torrentResponse.get_torrents();
-        for (Torrent &t: torrents)
+        for (Torrent &t : torrents)
         {
             bool found = false;
-            for (auto &torrentPriv: updatedTorrents)
+            for (auto &torrentPriv : updatedTorrents)
             {
                 if (torrentPriv.get_id() == t.id())
                 {
@@ -511,8 +511,7 @@ Error Session::updateTorrentStats(std::vector<std::reference_wrapper<Torrent>> &
                     break;
                 }
             }
-            if (!found)
-                t.priv_.reset();
+            if (!found) t.priv_.reset();
         }
     }
 
@@ -525,10 +524,7 @@ Error Session::updateTorrentStats(std::vector<std::reference_wrapper<Torrent>> &
     On Windows this does not contain the associated protocol string i.e.
     `http://` or `https://`.
 */
-const std::string &Session::host() const
-{
-    return priv_->http_.host();
-}
+const std::string &Session::host() const { return priv_->http_.host(); }
 
 /*!
     Sets the host for future requests. Does not affect any ongoing requests.
@@ -537,10 +533,7 @@ const std::string &Session::host() const
     `http(s)://<ip-address>` without a terminating \c /. If the protocol is
     ommited HTTP is assumed.
 */
-void Session::setHost(const std::string &url)
-{
-    priv_->http_.setHost(url);
-}
+void Session::setHost(const std::string &url) { priv_->http_.setHost(url); }
 
 /*!
     Sets the host for future requests. Does not affect any ongoing requests.
@@ -557,10 +550,7 @@ void Session::setHost(std::string &&url)
 /*!
     Returns the path associated with the session.
 */
-const std::string &Session::path() const
-{
-    return priv_->http_.path();
-}
+const std::string &Session::path() const { return priv_->http_.path(); }
 
 /*!
     Sets the path that forms the final URL when making requests to the server.
@@ -571,10 +561,7 @@ const std::string &Session::path() const
     /my/transmission/daemon will form the final URL as: \c
     http://192.168.0.50/my/transmission/daemon
 */
-void Session::setPath(const std::string &path)
-{
-    priv_->http_.setPath(path);
-}
+void Session::setPath(const std::string &path) { priv_->http_.setPath(path); }
 
 /*!
     Sets the path that forms the final URL when making requests to the server.
@@ -593,10 +580,7 @@ void Session::setPath(std::string &&path)
 /*!
     Returns the port associated with the session.
 */
-std::int32_t Session::port() const
-{
-    return priv_->http_.port();
-}
+std::int32_t Session::port() const { return priv_->http_.port(); }
 
 /*!
     Sets the port used when making requests to the server.
@@ -604,10 +588,7 @@ std::int32_t Session::port() const
     If gearbox::Session::PORT_AUTODETECT is used then the port is detected
     automatically based on the host.
 */
-void Session::setPort(std::int32_t port)
-{
-    priv_->http_.setPort(port);
-}
+void Session::setPort(std::int32_t port) { priv_->http_.setPort(port); }
 
 /*!
     Returns whether the session is set up to use authentication information.
@@ -635,10 +616,7 @@ void Session::setAuthentication(Session::Authentication authentication)
 /*!
     Returns the username used when making requests.
 */
-const std::string &Session::username() const
-{
-    return priv_->http_.username();
-}
+const std::string &Session::username() const { return priv_->http_.username(); }
 
 /*!
     Sets the username that is to be used when making requests.
@@ -665,10 +643,7 @@ void Session::setUsername(std::string &&username)
 /*!
     Returns the password used when making requests.
 */
-const std::string &Session::password() const
-{
-    return priv_->http_.password();
-}
+const std::string &Session::password() const { return priv_->http_.password(); }
 
 /*!
     Sets the password that is to be used when making requests.
@@ -719,5 +694,6 @@ void Session::setTimeout(std::int32_t value)
 */
 void Session::setSSLErrorHandling(Session::SSLErrorHandling value)
 {
-    priv_->http_.setSSLErrorHandling(static_cast<gearbox::http::SSLErrorHandling>(value));
+    priv_->http_.setSSLErrorHandling(
+        static_cast<gearbox::http::SSLErrorHandling>(value));
 }

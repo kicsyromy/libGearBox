@@ -296,34 +296,28 @@ using namespace gearbox;
 /*!
     Constructs an instance of gearbox::Error
 */
-Error::Error() :
-    errorCode_(Error::Code::Ok),
-    message_()
-{
-}
+Error::Error() : errorCode_(Error::Code::Ok), message_() {}
 
 /*!
     Constructs an instance of gearbox::Error with the supplied gearbox::Error::Code and message
 */
-Error::Error(Error::Code errorCode, std::string &&message) :
-    errorCode_(errorCode),
-    message_(message)
+Error::Error(Error::Code errorCode, std::string &&message)
+  : errorCode_(errorCode), message_(message)
 {
 }
 
 /*!
     Move constructor
 */
-Error::Error(Error &&other) :
-    errorCode_(other.errorCode_),
-    message_(std::move(other.message_))
+Error::Error(Error &&other)
+  : errorCode_(other.errorCode_), message_(std::move(other.message_))
 {
 }
 
 /*!
     Move asignment operator
 */
-Error &Error::operator =(Error &&other)
+Error &Error::operator=(Error &&other)
 {
     errorCode_ = other.errorCode_;
     message_ = std::move(other.message_);
@@ -334,7 +328,7 @@ Error &Error::operator =(Error &&other)
 /*!
     Initializes an existing instance of gearbox::Error from a pair of gearbox::Error::Code and a message
 */
-Error &Error::operator =(std::pair<Error::Code, std::string> &&other)
+Error &Error::operator=(std::pair<Error::Code, std::string> &&other)
 {
     errorCode_ = other.first;
     message_ = std::move(other.second);
@@ -345,18 +339,12 @@ Error &Error::operator =(std::pair<Error::Code, std::string> &&other)
 /*!
     Returns the gearbox::Error::Code from the instance of gearbox::Error
 */
-Error::Code Error::errorCode() const
-{
-    return errorCode_;
-}
+Error::Code Error::errorCode() const { return errorCode_; }
 
 /*!
     Returns a human readable message from the instance of gearbox::Error, that describes the error
 */
-const std::string &Error::message() const
-{
-    return message_;
-}
+const std::string &Error::message() const { return message_; }
 
 /*!
     \fn gearbox::Error::operator bool() const

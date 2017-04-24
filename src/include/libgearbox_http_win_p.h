@@ -52,7 +52,7 @@ namespace gearbox
     public:
         explicit WinHttp(const std::string &userAgent);
         WinHttp(WinHttp &&other) noexcept(true);
-        WinHttp &operator =(WinHttp &&) noexcept(true) = default;
+        WinHttp &operator=(WinHttp &&) noexcept(true) = default;
         ~WinHttp();
 
     public:
@@ -91,10 +91,11 @@ namespace gearbox
                     const std::string &path,
                     DWORD connectionFlags,
                     DWORD_PTR &requestId);
-            Request(const Request &);             /* Visual Studio thinks it needs this */
-            Request &operator =(const Request &); /* Visual Studio thinks it needs this */
+            Request(const Request &); /* Visual Studio thinks it needs this */
+            Request &operator=(
+                const Request &); /* Visual Studio thinks it needs this */
             Request(Request &&) noexcept(true) = default;
-            Request &operator =(Request &&) noexcept(true) = default;
+            Request &operator=(Request &&) noexcept(true) = default;
             ~Request();
 
         public:
@@ -125,7 +126,11 @@ namespace gearbox
         http_port_t port_;
         std::string path_;
         bool authenticationEnabled_;
-        struct { std::string username; std::string password; } authentication_;
+        struct
+        {
+            std::string username;
+            std::string password;
+        } authentication_;
         bool sslErrorHandlingEnabled_;
         milliseconds_t timeout_;
 
@@ -142,4 +147,4 @@ namespace gearbox
     };
 }
 
-#endif // LIBGEARBOX_HTTP_WIN_P_H 
+#endif // LIBGEARBOX_HTTP_WIN_P_H

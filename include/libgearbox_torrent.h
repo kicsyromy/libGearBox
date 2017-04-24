@@ -26,10 +26,10 @@
 #define LIBGEARBOX_TORRENT_H
 
 #include <cstdint>
-#include <vector>
 #include <map>
-#include <string>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include <libgearbox_file.h>
 #include <libgearbox_folder.h>
@@ -46,14 +46,14 @@ namespace gearbox
     public:
         enum class Status
         {
-            Stopped        = 0,
-            CheckWait      = 1,
-            Check          = 2,
-            DownloadWait   = 3,
-            Download       = 4,
-            SeedWait       = 5,
-            Seed           = 6,
-            Invalid        = 255
+            Stopped = 0,
+            CheckWait = 1,
+            Check = 2,
+            DownloadWait = 3,
+            Download = 4,
+            SeedWait = 5,
+            Seed = 6,
+            Invalid = 255
         };
 
         enum class MoveType
@@ -75,8 +75,8 @@ namespace gearbox
         ~Torrent() noexcept(true);
 
     public:
-        bool operator ==(const Torrent &other) const;
-        bool operator  <(const Torrent &other) const;
+        bool operator==(const Torrent &other) const;
+        bool operator<(const Torrent &other) const;
 
     public:
         bool valid() const;
@@ -93,8 +93,10 @@ namespace gearbox
         Error queueMoveTop();
         Error queueMoveBottom();
         Error update();
-        Error setWantedFiles(const std::vector<std::reference_wrapper<const File>> &files);
-        Error setSkippedFiles(const std::vector<std::reference_wrapper<const File>> &files);
+        Error setWantedFiles(
+            const std::vector<std::reference_wrapper<const File>> &files);
+        Error setSkippedFiles(
+            const std::vector<std::reference_wrapper<const File>> &files);
 
     public:
         std::int32_t id() const;
@@ -115,7 +117,8 @@ namespace gearbox
         Error setQueuePosition(std::int32_t position);
 
         std::string downloadDir() const;
-        Error setDownloadDir(const std::string &path, MoveType move = MoveType::SearchForExistingFiles);
+        Error setDownloadDir(const std::string &path,
+                             MoveType move = MoveType::SearchForExistingFiles);
 
     private:
         std::unique_ptr<TorrentPrivate> priv_;

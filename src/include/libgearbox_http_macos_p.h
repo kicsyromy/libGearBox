@@ -49,7 +49,7 @@ namespace gearbox
     public:
         explicit CocoaHttp(const std::string &userAgent);
         CocoaHttp(CocoaHttp &&) = default;
-        CocoaHttp &operator =(CocoaHttp &&) = default;
+        CocoaHttp &operator=(CocoaHttp &&) = default;
         ~CocoaHttp();
 
     public:
@@ -86,7 +86,7 @@ namespace gearbox
         public:
             Request(NSMutableURLRequest *request);
             Request(Request &&) noexcept(true);
-            Request &operator =(Request &&) noexcept(true);
+            Request &operator=(Request &&) noexcept(true);
             ~Request() noexcept(true);
 
         public:
@@ -100,7 +100,7 @@ namespace gearbox
         private:
             NSMutableURLRequest *request_;
             NSURLSession *session_;
-            
+
         private:
             DISABLE_COPY(Request);
         };
@@ -111,10 +111,14 @@ namespace gearbox
         http_port_t port_;
         std::string path_;
         bool authenticationEnabled_;
-        struct { std::string username; std::string password; } authentication_;
+        struct
+        {
+            std::string username;
+            std::string password;
+        } authentication_;
         bool sslErrorHandlingEnabled_;
         milliseconds_t timeout_;
-        
+
     private:
         librtCocoaHttpPrivate *impl_;
     };

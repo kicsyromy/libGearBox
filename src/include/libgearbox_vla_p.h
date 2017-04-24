@@ -33,13 +33,13 @@
 #include <malloc.h>
 #endif
 
-#define make_vla_impl(type, size) new(static_cast<type*>(alloca(sizeof(type) * size))) type[size], size
-#define make_vla(type, size) ::gearbox::Array<type>(make_vla_impl(type, size)) 
+#define make_vla_impl(type, size)                                              \
+    new (static_cast<type *>(alloca(sizeof(type) * size))) type[size], size
+#define make_vla(type, size) ::gearbox::Array<type>(make_vla_impl(type, size))
 
 namespace gearbox
 {
-    template <typename T>
-    class Array
+    template <typename T> class Array
     {
     public:
         Array() : array_(nullptr), size_(0) {}
@@ -53,10 +53,10 @@ namespace gearbox
         }
 
         Array(const Array &) = delete;
-        Array &operator =(const Array &) = delete;
+        Array &operator=(const Array &) = delete;
 
         Array(Array &&) noexcept(true) = default;
-        Array &operator =(Array &&) noexcept(true) = default;
+        Array &operator=(Array &&) noexcept(true) = default;
 
     public:
         inline operator T *() { return array_; }

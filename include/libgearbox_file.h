@@ -47,15 +47,18 @@ namespace gearbox
         struct MIMEType
         {
             int id;
-            const char * const name;
-            inline bool operator ==(const MIMEType &other) const { return id == other.id; }
+            const char *const name;
+            inline bool operator==(const MIMEType &other) const
+            {
+                return id == other.id;
+            }
             inline bool isValid() const { return id >= 0; }
         };
 
     public:
         File(File &&) = default;
         ~File() = default;
-        File &operator =(File &&) = default;
+        File &operator=(File &&) = default;
 
     public:
         const std::string &name() const;
@@ -73,6 +76,7 @@ namespace gearbox
              std::uint64_t bytesTotal,
              bool wanted,
              Priority priority);
+
     private:
         std::size_t id_;
         std::string name_;

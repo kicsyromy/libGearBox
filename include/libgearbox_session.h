@@ -25,13 +25,13 @@
 #ifndef LIBGEARBOX_SESSION_H
 #define LIBGEARBOX_SESSION_H
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include <libgearbox_global.h>
 
-#include <libgearbox_torrent.h>
 #include <libgearbox_return_type.h>
+#include <libgearbox_torrent.h>
 
 namespace gearbox
 {
@@ -40,8 +40,8 @@ namespace gearbox
     class GEARBOX_API Session
     {
     public:
-        static constexpr const char * DEFAULT_PATH { "/transmission/rpc" };
-        static constexpr const std::int32_t PORT_AUTODETECT { -1 };
+        static constexpr const char *DEFAULT_PATH{ "/transmission/rpc" };
+        static constexpr const std::int32_t PORT_AUTODETECT{ -1 };
 
     public:
         enum class Authentication
@@ -68,7 +68,7 @@ namespace gearbox
     public:
         Session();
         Session(Session &&other);
-        Session &operator =(Session &&other);
+        Session &operator=(Session &&other);
 
         Session(const std::string &host,
                 const std::string &path = DEFAULT_PATH,
@@ -88,7 +88,8 @@ namespace gearbox
         ReturnType<Statistics> statistics() const;
         ReturnType<std::vector<gearbox::Torrent>> torrents() const;
         ReturnType<std::vector<std::int32_t>> recentlyRemoved() const;
-        Error updateTorrentStats(std::vector<std::reference_wrapper<Torrent>> &torrents);
+        Error updateTorrentStats(
+            std::vector<std::reference_wrapper<Torrent>> &torrents);
 
     public:
         const std::string &host() const;

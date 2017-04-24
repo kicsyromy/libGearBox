@@ -57,34 +57,29 @@
 
 #include <formats/json_format.h>
 
-#include "libgearbox_torrent_p.h"
-#include "libgearbox_session_p.h"
 #include "libgearbox_folder.h"
 #include "libgearbox_folder_p.h"
 #include "libgearbox_logger_p.h"
+#include "libgearbox_session_p.h"
+#include "libgearbox_torrent_p.h"
 
 using namespace gearbox;
 
 namespace
 {
-    constexpr const char *INVALID_SESSION { "Invalid session" };
-    constexpr const char *INVALID_TORRENT { "Invalid torrent" };
+    constexpr const char *INVALID_SESSION{ "Invalid session" };
+    constexpr const char *INVALID_TORRENT{ "Invalid torrent" };
 }
 
-TorrentPrivate::TorrentPrivate() :
-    attributes(),
-    session_()
-{
-}
+TorrentPrivate::TorrentPrivate() : attributes(), session_() {}
 
-TorrentPrivate::TorrentPrivate(TorrentPrivate &&other) :
-    attributes(std::move(other.attributes)),
-    session_(other.session_)
+TorrentPrivate::TorrentPrivate(TorrentPrivate &&other)
+  : attributes(std::move(other.attributes)), session_(other.session_)
 {
     other.session_.reset();
 }
 
-TorrentPrivate &TorrentPrivate::operator =(TorrentPrivate &&other)
+TorrentPrivate &TorrentPrivate::operator=(TorrentPrivate &&other)
 {
     attributes = std::move(other.attributes);
     session_ = other.session_;
@@ -93,13 +88,12 @@ TorrentPrivate &TorrentPrivate::operator =(TorrentPrivate &&other)
     return *this;
 }
 
-TorrentPrivate::TorrentPrivate(const TorrentPrivate &other) :
-    attributes(other.attributes),
-    session_(other.session_)
+TorrentPrivate::TorrentPrivate(const TorrentPrivate &other)
+  : attributes(other.attributes), session_(other.session_)
 {
 }
 
-TorrentPrivate &TorrentPrivate::operator =(const TorrentPrivate &other)
+TorrentPrivate &TorrentPrivate::operator=(const TorrentPrivate &other)
 {
     attributes = other.attributes;
     session_ = other.session_;
@@ -166,10 +160,7 @@ TorrentPrivate &TorrentPrivate::operator =(const TorrentPrivate &other)
     Constructs an instance based on \c priv parameter. Only used internally
     by gearbox::Session.
 */
-Torrent::Torrent(TorrentPrivate *priv) :
-    priv_(priv)
-{
-}
+Torrent::Torrent(TorrentPrivate *priv) : priv_(priv) {}
 
 /*!
     Move contructor
@@ -186,7 +177,7 @@ Torrent::~Torrent() noexcept(true) = default;
 /*!
     Comparison operator
  */
-bool Torrent::operator ==(const Torrent &other) const
+bool Torrent::operator==(const Torrent &other) const
 {
     return valid() ? (priv_->get_id() == other.priv_->get_id()) : false;
 }
@@ -194,9 +185,11 @@ bool Torrent::operator ==(const Torrent &other) const
 /*!
     Less than operator
  */
-bool Torrent::operator <(const Torrent &other) const
+bool Torrent::operator<(const Torrent &other) const
 {
-    return valid() ? (priv_->get_queuePosition() < other.priv_->get_queuePosition()) : false;
+    return valid() ?
+               (priv_->get_queuePosition() < other.priv_->get_queuePosition()) :
+               false;
 }
 
 /*!
@@ -205,10 +198,7 @@ bool Torrent::operator <(const Torrent &other) const
     Validity of a torrent is mostly an implementation detail and could be
     removed from the public interface in the future.
 */
-bool Torrent::valid() const
-{
-    return static_cast<bool>(priv_);
-}
+bool Torrent::valid() const { return static_cast<bool>(priv_); }
 
 /*!
     Starts the torrent if it is stopped. Calling this function will put the
@@ -240,14 +230,18 @@ Error Torrent::start()
         }
         else
         {
-            LOG_ERROR("Invalid session while requesting \"torrent-start\" for id '{}'", this->id());
-            error = std::make_pair(Error::Code::GearboxSessionInvalid, INVALID_SESSION);
+            LOG_ERROR("Invalid session while requesting \"torrent-start\" for "
+                      "id '{}'",
+                      this->id());
+            error = std::make_pair(Error::Code::GearboxSessionInvalid,
+                                   INVALID_SESSION);
         }
     }
     else
     {
         LOG_ERROR("Invalid torrent while requesting \"torrent-start\"");
-        error = std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
+        error =
+            std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
     }
 
     return error;
@@ -283,14 +277,18 @@ Error Torrent::startNow()
         }
         else
         {
-            LOG_ERROR("Invalid session while requesting \"torrent-start-now\" for id '{}'", this->id());
-            error = std::make_pair(Error::Code::GearboxSessionInvalid, INVALID_SESSION);
+            LOG_ERROR("Invalid session while requesting \"torrent-start-now\" "
+                      "for id '{}'",
+                      this->id());
+            error = std::make_pair(Error::Code::GearboxSessionInvalid,
+                                   INVALID_SESSION);
         }
     }
     else
     {
         LOG_ERROR("Invalid torrent while requesting \"torrent-start-now\"");
-        error = std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
+        error =
+            std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
     }
 
     return error;
@@ -322,14 +320,18 @@ Error Torrent::stop()
         }
         else
         {
-            LOG_ERROR("Invalid session while requesting \"torrent-stop\" for id '{}'", this->id());
-            error = std::make_pair(Error::Code::GearboxSessionInvalid, INVALID_SESSION);
+            LOG_ERROR(
+                "Invalid session while requesting \"torrent-stop\" for id '{}'",
+                this->id());
+            error = std::make_pair(Error::Code::GearboxSessionInvalid,
+                                   INVALID_SESSION);
         }
     }
     else
     {
         LOG_ERROR("Invalid torrent while requesting \"torrent-stop\"");
-        error = std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
+        error =
+            std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
     }
 
     return error;
@@ -360,14 +362,18 @@ Error Torrent::verify()
         }
         else
         {
-            LOG_ERROR("Invalid session while requesting \"torrent-verify\" for id '{}'", this->id());
-            error = std::make_pair(Error::Code::GearboxSessionInvalid, INVALID_SESSION);
+            LOG_ERROR("Invalid session while requesting \"torrent-verify\" for "
+                      "id '{}'",
+                      this->id());
+            error = std::make_pair(Error::Code::GearboxSessionInvalid,
+                                   INVALID_SESSION);
         }
     }
     else
     {
         LOG_ERROR("Invalid torrent while requesting \"torrent-verify\"");
-        error = std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
+        error =
+            std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
     }
 
     return error;
@@ -399,14 +405,18 @@ Error Torrent::askForMorePeers()
         }
         else
         {
-            LOG_ERROR("Invalid session while requesting \"torrent-reannounce\" for id '{}'", this->id());
-            error = std::make_pair(Error::Code::GearboxSessionInvalid, INVALID_SESSION);
+            LOG_ERROR("Invalid session while requesting \"torrent-reannounce\" "
+                      "for id '{}'",
+                      this->id());
+            error = std::make_pair(Error::Code::GearboxSessionInvalid,
+                                   INVALID_SESSION);
         }
     }
     else
     {
         LOG_ERROR("Invalid torrent while requesting \"torrent-reannounce\"");
-        error = std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
+        error =
+            std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
     }
 
     return error;
@@ -440,14 +450,18 @@ Error Torrent::remove(LocalDataAction action)
         }
         else
         {
-            LOG_ERROR("Invalid session while requesting \"torrent-remove\" for id '{}'", this->id());
-            error = std::make_pair(Error::Code::GearboxSessionInvalid, INVALID_SESSION);
+            LOG_ERROR("Invalid session while requesting \"torrent-remove\" for "
+                      "id '{}'",
+                      this->id());
+            error = std::make_pair(Error::Code::GearboxSessionInvalid,
+                                   INVALID_SESSION);
         }
     }
     else
     {
         LOG_ERROR("Invalid torrent while requesting \"torrent-remove\"");
-        error = std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
+        error =
+            std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
     }
 
     return error;
@@ -478,14 +492,18 @@ Error Torrent::queueMoveUp()
         }
         else
         {
-            LOG_ERROR("Invalid session while requesting \"queue-move-up\" for id '{}'", this->id());
-            error = std::make_pair(Error::Code::GearboxSessionInvalid, INVALID_SESSION);
+            LOG_ERROR("Invalid session while requesting \"queue-move-up\" for "
+                      "id '{}'",
+                      this->id());
+            error = std::make_pair(Error::Code::GearboxSessionInvalid,
+                                   INVALID_SESSION);
         }
     }
     else
     {
         LOG_ERROR("Invalid torrent while requesting \"queue-move-up\"");
-        error = std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
+        error =
+            std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
     }
 
     return error;
@@ -516,14 +534,18 @@ Error Torrent::queueMoveDown()
         }
         else
         {
-            LOG_ERROR("Invalid session while requesting \"queue-move-down\" for id '{}'", this->id());
-            error = std::make_pair(Error::Code::GearboxSessionInvalid, INVALID_SESSION);
+            LOG_ERROR("Invalid session while requesting \"queue-move-down\" "
+                      "for id '{}'",
+                      this->id());
+            error = std::make_pair(Error::Code::GearboxSessionInvalid,
+                                   INVALID_SESSION);
         }
     }
     else
     {
         LOG_ERROR("Invalid torrent while requesting \"queue-move-down\"");
-        error = std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
+        error =
+            std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
     }
 
     return error;
@@ -554,14 +576,18 @@ Error Torrent::queueMoveTop()
         }
         else
         {
-            LOG_ERROR("Invalid session while requesting \"queue-move-top\" for id '{}'", this->id());
-            error = std::make_pair(Error::Code::GearboxSessionInvalid, INVALID_SESSION);
+            LOG_ERROR("Invalid session while requesting \"queue-move-top\" for "
+                      "id '{}'",
+                      this->id());
+            error = std::make_pair(Error::Code::GearboxSessionInvalid,
+                                   INVALID_SESSION);
         }
     }
     else
     {
         LOG_ERROR("Invalid torrent while requesting \"queue-move-top\"");
-        error = std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
+        error =
+            std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
     }
 
     return error;
@@ -592,14 +618,18 @@ Error Torrent::queueMoveBottom()
         }
         else
         {
-            LOG_ERROR("Invalid session while requesting \"queue-move-bottom\" for id '{}'", this->id());
-            error = std::make_pair(Error::Code::GearboxSessionInvalid, INVALID_SESSION);
+            LOG_ERROR("Invalid session while requesting \"queue-move-bottom\" "
+                      "for id '{}'",
+                      this->id());
+            error = std::make_pair(Error::Code::GearboxSessionInvalid,
+                                   INVALID_SESSION);
         }
     }
     else
     {
         LOG_ERROR("Invalid torrent while requesting \"queue-move-top\"");
-        error = std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
+        error =
+            std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
     }
 
     return error;
@@ -637,7 +667,7 @@ Error Torrent::update()
                 jsonFormat.fromJson(response.get_arguments());
                 sequential::from_format(jsonFormat, torrentResponse);
                 torrents = torrentResponse.get_torrents();
-                for (TorrentPrivate &torrentPriv: torrents)
+                for (TorrentPrivate &torrentPriv : torrents)
                 {
                     auto torrent = new TorrentPrivate(std::move(torrentPriv));
                     torrent->session_ = priv_->session_;
@@ -647,14 +677,17 @@ Error Torrent::update()
         }
         else
         {
-            LOG_ERROR("Invalid session while requesting update for id '{}'", this->id());
-            error = std::make_pair(Error::Code::GearboxSessionInvalid, INVALID_SESSION);
+            LOG_ERROR("Invalid session while requesting update for id '{}'",
+                      this->id());
+            error = std::make_pair(Error::Code::GearboxSessionInvalid,
+                                   INVALID_SESSION);
         }
     }
     else
     {
         LOG_ERROR("Invalid torrent while requesting update");
-        error = std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
+        error =
+            std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
     }
 
     return error;
@@ -669,7 +702,8 @@ Error Torrent::update()
 
     This method is thread-safe.
 */
-Error Torrent::setWantedFiles(const std::vector<std::reference_wrapper<const File>> &files)
+Error Torrent::setWantedFiles(
+    const std::vector<std::reference_wrapper<const File>> &files)
 {
     Error error;
 
@@ -678,8 +712,7 @@ Error Torrent::setWantedFiles(const std::vector<std::reference_wrapper<const Fil
         std::vector<std::size_t> indices;
         indices.reserve(files.size());
 
-        for (const File &f: files)
-            indices.push_back(f.id_);
+        for (const File &f : files) indices.push_back(f.id_);
 
         nlohmann::json request;
         request["ids"] = { this->id() };
@@ -691,14 +724,17 @@ Error Torrent::setWantedFiles(const std::vector<std::reference_wrapper<const Fil
         }
         else
         {
-            LOG_ERROR("Invalid session while updating wanted files for id '{}'", this->id());
-            error = std::make_pair(Error::Code::GearboxSessionInvalid, INVALID_SESSION);
+            LOG_ERROR("Invalid session while updating wanted files for id '{}'",
+                      this->id());
+            error = std::make_pair(Error::Code::GearboxSessionInvalid,
+                                   INVALID_SESSION);
         }
     }
     else
     {
         LOG_ERROR("Invalid torrent while updating wanted files");
-        error = std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
+        error =
+            std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
     }
 
     return error;
@@ -713,7 +749,8 @@ Error Torrent::setWantedFiles(const std::vector<std::reference_wrapper<const Fil
 
     This method is thread-safe.
 */
-Error Torrent::setSkippedFiles(const std::vector<std::reference_wrapper<const File>> &files)
+Error Torrent::setSkippedFiles(
+    const std::vector<std::reference_wrapper<const File>> &files)
 {
     Error error;
 
@@ -722,8 +759,7 @@ Error Torrent::setSkippedFiles(const std::vector<std::reference_wrapper<const Fi
         std::vector<std::size_t> indices;
         indices.reserve(files.size());
 
-        for (const File &f: files)
-            indices.push_back(f.id_);
+        for (const File &f : files) indices.push_back(f.id_);
 
         nlohmann::json request;
         request["ids"] = { this->id() };
@@ -735,14 +771,18 @@ Error Torrent::setSkippedFiles(const std::vector<std::reference_wrapper<const Fi
         }
         else
         {
-            LOG_ERROR("Invalid session while updating unwanted files for id '{}'", this->id());
-            error = std::make_pair(Error::Code::GearboxSessionInvalid, INVALID_SESSION);
+            LOG_ERROR(
+                "Invalid session while updating unwanted files for id '{}'",
+                this->id());
+            error = std::make_pair(Error::Code::GearboxSessionInvalid,
+                                   INVALID_SESSION);
         }
     }
     else
     {
         LOG_ERROR("Invalid torrent while updating unwanted files");
-        error = std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
+        error =
+            std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
     }
 
     return error;
@@ -754,20 +794,14 @@ Error Torrent::setSkippedFiles(const std::vector<std::reference_wrapper<const Fi
 
     If the torrent is not gearbox::Torrent::valid() returns -1.
 */
-int32_t Torrent::id() const
-{
-    return valid() ? priv_->get_id() : -1;
-}
+int32_t Torrent::id() const { return valid() ? priv_->get_id() : -1; }
 
 /*!
     Returns the name of torrent.
 
     If the torrent is not gearbox::Torrent::valid() returns an empty string.
 */
-std::string Torrent::name() const
-{
-    return valid() ? priv_->get_name() : "";
-}
+std::string Torrent::name() const { return valid() ? priv_->get_name() : ""; }
 
 /*!
     Returns the amount of downloaded data in bytes.
@@ -840,7 +874,8 @@ uint64_t Torrent::uploadSpeed() const
 */
 Torrent::Status Torrent::status() const
 {
-    return valid() ? static_cast<Torrent::Status>(priv_->get_status()) : Torrent::Status::Invalid;
+    return valid() ? static_cast<Torrent::Status>(priv_->get_status()) :
+                     Torrent::Status::Invalid;
 }
 
 /*!
@@ -848,10 +883,7 @@ Torrent::Status Torrent::status() const
 
     If the torrent is not gearbox::Torrent::valid() returns 0.
 */
-uint64_t Torrent::size() const
-{
-    return valid() ? priv_->get_totalSize() : 0;
-}
+uint64_t Torrent::size() const { return valid() ? priv_->get_totalSize() : 0; }
 
 /*!
     Returns "estimated time of arrival" for the torrent. If the torrent is
@@ -861,10 +893,7 @@ uint64_t Torrent::size() const
 
     If the torrent is not gearbox::Torrent::valid() returns 0.
 */
-int32_t Torrent::eta() const
-{
-    return valid() ? priv_->get_eta() : 0;
-}
+int32_t Torrent::eta() const { return valid() ? priv_->get_eta() : 0; }
 
 /*!
     Returns the root folder of the torrent.
@@ -893,21 +922,22 @@ ReturnType<Folder> Torrent::content() const
         TorrentPrivate::Files::Response torrentResponse;
 
         TorrentPrivate::Files::Request fileRequest;
-        fileRequest.set_ids({this->id()});
+        fileRequest.set_ids({ this->id() });
         JsonFormat jsonFileRequest;
         sequential::to_format(jsonFileRequest, fileRequest);
 
         if (auto session = priv_->session_.lock())
         {
-            session::Response response(session->sendRequest("torrent-get", jsonFileRequest.output()));
+            session::Response response(
+                session->sendRequest("torrent-get", jsonFileRequest.output()));
 
             if (!response.error)
             {
                 JsonFormat jsonFormat;
                 jsonFormat.fromJson(response.get_arguments());
                 sequential::from_format(jsonFormat, torrentResponse);
-                torrentFiles  = torrentResponse.get_torrents();
-                for (TorrentPrivate::Files &tf: torrentFiles)
+                torrentFiles = torrentResponse.get_torrents();
+                for (TorrentPrivate::Files &tf : torrentFiles)
                 {
                     const auto &files = tf.get_files();
                     const auto &fileStats = tf.get_fileStats();
@@ -916,13 +946,12 @@ ReturnType<Folder> Torrent::content() const
                     for (std::size_t it = 0; it < length; ++it)
                     {
                         result.priv_->addPath(
-                            files.at(it).get_name(),
-                            it,
+                            files.at(it).get_name(), it,
                             files.at(it).get_bytesCompleted(),
                             files.at(it).get_length(),
                             fileStats.at(it).get_wanted(),
-                            static_cast<File::Priority>(fileStats.at(it).get_priority())
-                        );
+                            static_cast<File::Priority>(
+                                fileStats.at(it).get_priority()));
                     }
                 }
             }
@@ -933,20 +962,20 @@ ReturnType<Folder> Torrent::content() const
         }
         else
         {
-            LOG_ERROR("Invalid session while requesting file list for id '{}'", this->id());
-            error = std::make_pair(Error::Code::GearboxSessionInvalid, INVALID_SESSION);
+            LOG_ERROR("Invalid session while requesting file list for id '{}'",
+                      this->id());
+            error = std::make_pair(Error::Code::GearboxSessionInvalid,
+                                   INVALID_SESSION);
         }
     }
     else
     {
         LOG_ERROR("Invalid torrent while requesting file list");
-        error = std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
+        error =
+            std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
     }
 
-    return ReturnType<Folder> {
-        std::move(error),
-        std::move(result)
-    };
+    return ReturnType<Folder>{ std::move(error), std::move(result) };
 }
 
 /*!
@@ -976,21 +1005,22 @@ ReturnType<std::vector<File>> Torrent::files() const
         TorrentPrivate::Files::Response torrentResponse;
 
         TorrentPrivate::Files::Request fileRequest;
-        fileRequest.set_ids({this->id()});
+        fileRequest.set_ids({ this->id() });
         JsonFormat jsonFileRequest;
         sequential::to_format(jsonFileRequest, fileRequest);
 
         if (auto session = priv_->session_.lock())
         {
-            session::Response response(session->sendRequest("torrent-get", jsonFileRequest.output()));
+            session::Response response(
+                session->sendRequest("torrent-get", jsonFileRequest.output()));
 
             if (!response.error)
             {
                 JsonFormat jsonFormat;
                 jsonFormat.fromJson(response.get_arguments());
                 sequential::from_format(jsonFormat, torrentResponse);
-                torrentFiles  = torrentResponse.get_torrents();
-                for (TorrentPrivate::Files &tf: torrentFiles)
+                torrentFiles = torrentResponse.get_torrents();
+                for (TorrentPrivate::Files &tf : torrentFiles)
                 {
                     auto &files = tf.get_files();
                     const auto &fileStats = tf.get_fileStats();
@@ -998,12 +1028,13 @@ ReturnType<std::vector<File>> Torrent::files() const
 
                     for (std::size_t it = 0; it < length; ++it)
                     {
-                        File f {
+                        File f{
                             std::move(files.at(it).get_name()),
                             files.at(it).get_bytesCompleted(),
                             files.at(it).get_length(),
                             fileStats.at(it).get_wanted(),
-                            static_cast<File::Priority>(fileStats.at(it).get_priority()),
+                            static_cast<File::Priority>(
+                                fileStats.at(it).get_priority()),
                         };
                         f.id_ = it;
                         result.push_back(std::move(f));
@@ -1017,20 +1048,20 @@ ReturnType<std::vector<File>> Torrent::files() const
         }
         else
         {
-            LOG_ERROR("Invalid session while requesting file list for id '{}'", this->id());
-            error = std::make_pair(Error::Code::GearboxSessionInvalid, INVALID_SESSION);
+            LOG_ERROR("Invalid session while requesting file list for id '{}'",
+                      this->id());
+            error = std::make_pair(Error::Code::GearboxSessionInvalid,
+                                   INVALID_SESSION);
         }
     }
     else
     {
         LOG_ERROR("Invalid torrent while requesting file list");
-        error = std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
+        error =
+            std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
     }
 
-    return ReturnType<std::vector<File>>(
-        std::move(error),
-        std::move(result)
-    );
+    return ReturnType<std::vector<File>>(std::move(error), std::move(result));
 }
 
 /*!
@@ -1077,14 +1108,20 @@ Error Torrent::setQueuePosition(int32_t position)
         }
         else
         {
-            LOG_ERROR("Invalid session while requesting \"torrent-set\" for id '{}'", this->id());
-            error = std::make_pair(Error::Code::GearboxSessionInvalid, INVALID_SESSION);
+            LOG_ERROR(
+                "Invalid session while requesting \"torrent-set\" for id '{}'",
+                this->id());
+            error = std::make_pair(Error::Code::GearboxSessionInvalid,
+                                   INVALID_SESSION);
         }
     }
     else
     {
-        LOG_ERROR("Invalid torrent while requesting \"torrent-set\" with queue-position '{}'", position);
-        error = std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
+        LOG_ERROR("Invalid torrent while requesting \"torrent-set\" with "
+                  "queue-position '{}'",
+                  position);
+        error =
+            std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
     }
 
     return error;
@@ -1117,26 +1154,34 @@ Error Torrent::setDownloadDir(const std::string &path, MoveType move)
     {
         JsonFormat jsonFormat;
         TorrentPrivate::MoveRequest moveRequest;
-        moveRequest.set_ids({this->id()});
+        moveRequest.set_ids({ this->id() });
         moveRequest.set_location(path);
-        moveRequest.set_move((move == Torrent::MoveType::MoveToNewLocation) ? true : false);
+        moveRequest.set_move(
+            (move == Torrent::MoveType::MoveToNewLocation) ? true : false);
         sequential::to_format(jsonFormat, moveRequest);
 
         if (auto session = priv_->session_.lock())
         {
-            auto response = session->sendRequest("torrent-set-location", jsonFormat.output());
+            auto response = session->sendRequest("torrent-set-location",
+                                                 jsonFormat.output());
             error = std::move(response.error);
         }
         else
         {
-            LOG_ERROR("Invalid session while requesting \"torrent-set-location\" for id '{}'", this->id());
-            error = std::make_pair(Error::Code::GearboxSessionInvalid, INVALID_SESSION);
+            LOG_ERROR("Invalid session while requesting "
+                      "\"torrent-set-location\" for id '{}'",
+                      this->id());
+            error = std::make_pair(Error::Code::GearboxSessionInvalid,
+                                   INVALID_SESSION);
         }
     }
     else
     {
-        LOG_ERROR("Invalid torrent while requesting \"torrent-set-location\" to '{}'", path);
-        error = std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
+        LOG_ERROR(
+            "Invalid torrent while requesting \"torrent-set-location\" to '{}'",
+            path);
+        error =
+            std::make_pair(Error::Code::GearboxTorrentInvalid, INVALID_TORRENT);
     }
 
     return error;

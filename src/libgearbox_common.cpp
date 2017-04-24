@@ -25,8 +25,8 @@
 #include "libgearbox_common_p.h"
 
 #include <algorithm>
-#include <cstring>
 #include <cctype>
+#include <cstring>
 
 #ifndef PLATFORM_WINDOWS
 #include <strings.h>
@@ -34,11 +34,14 @@
 
 using namespace gearbox::common;
 
-bool CaseInsensitiveCompare::operator()(const std::string &s1, const std::string &s2) const
+bool CaseInsensitiveCompare::operator()(const std::string &s1,
+                                        const std::string &s2) const
 {
     return std::lexicographical_compare(
         s1.begin(), s1.end(), s2.begin(), s2.end(),
-        [](const auto &c1, const auto &c2) { return std::tolower(c1) < std::tolower(c2); });
+        [](const auto &c1, const auto &c2) {
+            return std::tolower(c1) < std::tolower(c2);
+        });
 }
 
 bool CaseInsensitiveCompare::operator()(const char *s1, const char *s2) const

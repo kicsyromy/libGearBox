@@ -25,18 +25,17 @@
 #ifndef LIBGEARBOX_RETURN_TYPE_H
 #define LIBGEARBOX_RETURN_TYPE_H
 
-#include <libgearbox_global.h>
 #include <libgearbox_error.h>
+#include <libgearbox_global.h>
 
 namespace gearbox
 {
-    template <typename T>
-    struct ReturnType
+    template <typename T> struct ReturnType
     {
-        ReturnType(Error &&error, T &&value) :
-            error(std::move(error)),
-            value(std::move(value))
-        {}
+        ReturnType(Error &&error, T &&value)
+          : error(std::move(error)), value(std::move(value))
+        {
+        }
 
         ReturnType(ReturnType &&other)
         {
@@ -44,7 +43,7 @@ namespace gearbox
             value = std::move(other.value);
         }
 
-        ReturnType &operator =(ReturnType &&other) noexcept(true)
+        ReturnType &operator=(ReturnType &&other) noexcept(true)
         {
             error = std::move(other.error);
             value = std::move(other.value);

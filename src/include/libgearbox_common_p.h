@@ -30,27 +30,29 @@
 
 /* For whatever reason clang refuses to compile this code */
 #ifndef __clang__
-#define TYPE_HAS_METHOD(type_name, method_name, signature)                        \
-    template<typename T>                                                          \
-    struct has_##method_name {                                                    \
-        static_assert(std::integral_constant<T, false>::value, "");               \
-    };                                                                            \
-    template <typename Ret, typename ...Args>                                     \
-    struct has_##method_name<Ret(Args...)> {                                      \
-    private:                                                                      \
-        template<typename T>                                                      \
-        static constexpr auto check(T*)                                           \
-        -> typename                                                               \
-            std::is_same<                                                         \
-                decltype(std::declval<T>().method_name(std::declval<Args>()...)), \
-                Ret                                                               \
-            >::type;                                                              \
-        template<typename> static constexpr std::false_type check(...);           \
-        typedef decltype(check<typename type_name>(0)) type;                      \
-    public: static constexpr bool value = type::value; };                         \
-    static constexpr const bool has_##method_name##_v = has_##method_name<signature>::value
+#define TYPE_HAS_METHOD(type_name, method_name, signature)                     \
+    template <typename T> struct has_##method_name                             \
+    {                                                                          \
+        static_assert(std::integral_constant<T, false>::value, "");            \
+    };                                                                         \
+    template <typename Ret, typename... Args>                                  \
+    struct has_##method_name<Ret(Args...)>                                     \
+    {                                                                          \
+    private:                                                                   \
+        template <typename T>                                                  \
+        static constexpr auto check(T *) -> typename std::is_same<             \
+            decltype(std::declval<T>().method_name(std::declval<Args>()...)),  \
+            Ret>::type;                                                        \
+        template <typename> static constexpr std::false_type check(...);       \
+        typedef decltype(check<typename type_name>(0)) type;                   \
+                                                                               \
+    public:                                                                    \
+        static constexpr bool value = type::value;                             \
+    };                                                                         \
+    static constexpr const bool has_##method_name##_v =                        \
+        has_##method_name<signature>::value
 #else
-#define TYPE_HAS_METHOD(type_name, method_name, signature) \
+#define TYPE_HAS_METHOD(type_name, method_name, signature)                     \
     static constexpr const bool has_##method_name##_v = true
 #endif
 

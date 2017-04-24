@@ -25,9 +25,9 @@
 #ifndef LIBGEARBOX_FOLDER_P_H
 #define LIBGEARBOX_FOLDER_P_H
 
-#include <unordered_map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include <libgearbox_file.h>
 
@@ -38,8 +38,10 @@ namespace gearbox
     class FolderPrivate
     {
     public:
-        using folder_array_t = std::unordered_map<std::string, std::unique_ptr<Folder>>;
-        using file_array_t   = std::unordered_map<std::string, std::unique_ptr<File>>;
+        using folder_array_t =
+            std::unordered_map<std::string, std::unique_ptr<Folder>>;
+        using file_array_t =
+            std::unordered_map<std::string, std::unique_ptr<File>>;
 
     public:
         FolderPrivate(std::string &&name, Folder &folder);
@@ -57,9 +59,12 @@ namespace gearbox
         File *insert(File &&file);
 
     public:
-        void addPath(const std::string &path, std::size_t id,
-                     std::uint64_t bytesCompleted, std::uint64_t length,
-                     bool wanted, File::Priority priority);
+        void addPath(const std::string &path,
+                     std::size_t id,
+                     std::uint64_t bytesCompleted,
+                     std::uint64_t length,
+                     bool wanted,
+                     File::Priority priority);
 
     private:
         Folder &folder_;

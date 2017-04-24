@@ -31,16 +31,16 @@
     gearbox::Torrent::content() const on a valid instance.
 */
 
-#include "libgearbox_folder_p.h"
 #include "libgearbox_folder.h"
+#include "libgearbox_folder_p.h"
 #include "libgearbox_vla_p.h"
 
-#include <vector>
 #include <cstring>
+#include <vector>
 
 #ifdef _MSC_VER
 /* Disable warning about strncpy not being safe */
-#pragma warning(disable: 4996)
+#pragma warning(disable : 4996)
 #endif // _MSC_VER
 
 using namespace gearbox;
@@ -48,7 +48,7 @@ using namespace gearbox;
 namespace
 {
     /* Perform a search in 'string', from the end, and return the address of the last character */
-    /* that matches 'wanted'                                                                    */      
+    /* that matches 'wanted'                                                                    */
     inline char *rfind_char(char *string, const std::size_t size, char wanted)
     {
         char *c = nullptr;
@@ -84,26 +84,24 @@ namespace
         std::vector<std::string> folders;
         while (separatorPtr > fullyQualifiedName)
         {
-            std::size_t indexOfSeparator = static_cast<std::size_t>(separatorPtr - fullyQualifiedName);
+            std::size_t indexOfSeparator =
+                static_cast<std::size_t>(separatorPtr - fullyQualifiedName);
             separatorPtr[0] = '\0';
             folders.push_back(&fullyQualifiedName[indexOfSeparator + 1]);
-            separatorPtr = rfind_char(fullyQualifiedName, indexOfSeparator, separator);
+            separatorPtr =
+                rfind_char(fullyQualifiedName, indexOfSeparator, separator);
         }
 
         return folders;
     }
 }
 
-
-FolderPrivate::FolderPrivate(std::string &&name, Folder &folder) :
-    folder_(folder),
-    name_(std::move(name))
-{}
-
-const std::string &FolderPrivate::name() const
+FolderPrivate::FolderPrivate(std::string &&name, Folder &folder)
+  : folder_(folder), name_(std::move(name))
 {
-    return name_;
 }
+
+const std::string &FolderPrivate::name() const { return name_; }
 
 const FolderPrivate::folder_array_t &FolderPrivate::subfolders() const
 {
@@ -119,8 +117,7 @@ Folder *FolderPrivate::find(const std::string &name)
 {
     Folder *f = nullptr;
     auto node = subfolders_.find(name);
-    if (node != subfolders_.end())
-        f = (node->second).get();
+    if (node != subfolders_.end()) f = (node->second).get();
     return f;
 }
 
@@ -128,12 +125,15 @@ Folder *FolderPrivate::insert(std::string folder)
 {
     Folder *f = nullptr;
     std::unique_ptr<Folder> value(new Folder(std::move(folder)));
-    auto pair = subfolders_.insert(std::make_pair(value->name(), std::move(value)));
+    auto pair =
+        subfolders_.insert(std::make_pair(value->name(), std::move(value)));
 
     if (pair.second)
         f = pair.first->second.get();
     else
-        throw std::runtime_error("Failed to add folder to unordered_map. Are you sure that the node does not already exist?");
+        throw std::runtime_error("Failed to add folder to unordered_map. Are "
+                                 "you sure that the node does not already "
+                                 "exist?");
 
     return f;
 }
@@ -144,15 +144,17 @@ File *FolderPrivate::insert(File &&file)
     auto value = std::make_unique<File>(std::move(file));
     auto pair = files_.insert(std::make_pair(value->name(), std::move(value)));
 
-    if (pair.second)
-        f = pair.first->second.get();
+    if (pair.second) f = pair.first->second.get();
 
     return f;
 }
 
-void FolderPrivate::addPath(const std::string &path, std::size_t id,
-                            std::uint64_t bytesCompleted, std::uint64_t length,
-                            bool wanted, File::Priority priority)
+void FolderPrivate::addPath(const std::string &path,
+                            std::size_t id,
+                            std::uint64_t bytesCompleted,
+                            std::uint64_t length,
+                            bool wanted,
+                            File::Priority priority)
 {
     auto names = rsplit(path, '/');
     Folder *node = &folder_;
@@ -164,12 +166,13 @@ void FolderPrivate::addPath(const std::string &path, std::size_t id,
             newNode = node->priv_->insert(std::move(names.at(it)));
         node = newNode;
     }
-    File *f = node->priv_->insert(File(std::move(names.at(0)), bytesCompleted, length, wanted, priority));
+    File *f = node->priv_->insert(
+        File(std::move(names.at(0)), bytesCompleted, length, wanted, priority));
     f->id_ = id;
 }
 
-Folder::Folder(std::string &&name) :
-    priv_(new FolderPrivate(std::forward<std::string>(name), *this))
+Folder::Folder(std::string &&name)
+  : priv_(new FolderPrivate(std::forward<std::string>(name), *this))
 {
 }
 
@@ -189,25 +192,20 @@ Folder::~Folder() noexcept(true) = default;
     Move asignment operator
 */
 
-Folder::Folder() :
-    priv_(nullptr)
-{
-}
+Folder::Folder() : priv_(nullptr) {}
 
 /*!
     Returns the \c name of the folder.
 */
-const std::string &Folder::name() const
-{
-    return priv_->name();
-}
+const std::string &Folder::name() const { return priv_->name(); }
 
 /*!
     Returns a list of subfolders from the current folder.
 
     Subfolders are valid as long as the folder on which this function was called is valid.
 */
-const std::vector<std::reference_wrapper<const Folder>> Folder::subfolders() const
+const std::vector<std::reference_wrapper<const Folder>> Folder::subfolders()
+    const
 {
     std::vector<std::reference_wrapper<const Folder>> subfolders;
     subfolders.reserve(priv_->subfolders().size());

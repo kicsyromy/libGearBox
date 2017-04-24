@@ -26,9 +26,9 @@
 #define LIBGEARBOX_TORRENT_P_H
 
 #include <cstdint>
-#include <vector>
-#include <string>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include <sequential.h>
 
@@ -52,21 +52,19 @@ namespace gearbox
         ATTRIBUTE(std::string, downloadDir)
         ATTRIBUTE(std::int32_t, eta)
         ATTRIBUTE(std::int32_t, queuePosition)
-        INIT_ATTRIBUTES(
-                id,
-                name,
-                haveValid,
-                percentDone,
-                uploadRatio,
-                uploadedEver,
-                rateDownload,
-                rateUpload,
-                status,
-                totalSize,
-                downloadDir,
-                eta,
-                queuePosition
-        )
+        INIT_ATTRIBUTES(id,
+                        name,
+                        haveValid,
+                        percentDone,
+                        uploadRatio,
+                        uploadedEver,
+                        rateDownload,
+                        rateUpload,
+                        status,
+                        totalSize,
+                        downloadDir,
+                        eta,
+                        queuePosition)
     public:
         struct Files
         {
@@ -83,8 +81,8 @@ namespace gearbox
                 Request()
                 {
                     sequential::attribute::set_value<Request::fields>(
-                        *this, ::gearbox::TorrentPrivate::Files::attribute_names()
-                    );
+                        *this,
+                        ::gearbox::TorrentPrivate::Files::attribute_names());
                 }
             };
 
@@ -114,9 +112,9 @@ namespace gearbox
     public:
         TorrentPrivate();
         TorrentPrivate(TorrentPrivate &&other);
-        TorrentPrivate &operator =(TorrentPrivate &&other);
+        TorrentPrivate &operator=(TorrentPrivate &&other);
         TorrentPrivate(const TorrentPrivate &other);
-        TorrentPrivate &operator =(const TorrentPrivate &other);
+        TorrentPrivate &operator=(const TorrentPrivate &other);
 
     public:
         std::weak_ptr<SessionPrivate> session_;

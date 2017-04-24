@@ -25,13 +25,13 @@
 #ifndef LIBGEARBOX_FOLDER_H
 #define LIBGEARBOX_FOLDER_H
 
+#include <functional>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
-#include <functional>
 
-#include <libgearbox_global.h>
 #include <libgearbox_file.h>
+#include <libgearbox_global.h>
 
 namespace gearbox
 {
@@ -43,12 +43,13 @@ namespace gearbox
     public:
         Folder(); /* make gearbox::ReturnType happy */
         Folder(Folder &&) noexcept(true);
-        Folder &operator =(Folder &&) noexcept(true);
+        Folder &operator=(Folder &&) noexcept(true);
         ~Folder() noexcept(true);
 
     public:
         const std::string &name() const;
-        const std::vector<std::reference_wrapper<const Folder>> subfolders() const;
+        const std::vector<std::reference_wrapper<const Folder>> subfolders()
+            const;
         const std::vector<std::reference_wrapper<const File>> files() const;
 
     private:

@@ -49,13 +49,16 @@ using namespace gearbox::common;
 
 namespace
 {
-    const std::map<const char *, File::MIMEType, CaseInsensitiveCompare> mimeTypes {{
-        #include "libgearbox_mimetypes_p.h"
-    }};
+    const std::map<const char *, File::MIMEType, CaseInsensitiveCompare>
+        mimeTypes{ {
+#include "libgearbox_mimetypes_p.h"
+        } };
 
     /* Perform a search in 'string', from the end, and return the address of the last character */
     /* that matches 'wanted'                                                                    */
-    inline const char *rfind_char(const char *string, const std::size_t size, char wanted)
+    inline const char *rfind_char(const char *string,
+                                  const std::size_t size,
+                                  char wanted)
     {
         const char *c = nullptr;
         if (size > 0)
@@ -132,13 +135,9 @@ File::File(std::string &&name,
            std::uint64_t bytesCompleted,
            std::uint64_t bytesTotal,
            bool wanted,
-           File::Priority priority) :
-    id_(0),
-    name_(std::move(name)),
-    bytesCompleted_(bytesCompleted),
-    bytesTotal_(bytesTotal),
-    wanted_(wanted),
-    priority_(priority),
+           File::Priority priority)
+  : id_(0), name_(std::move(name)), bytesCompleted_(bytesCompleted),
+    bytesTotal_(bytesTotal), wanted_(wanted), priority_(priority),
     type_(mimeType(name_))
 {
 }
@@ -146,50 +145,32 @@ File::File(std::string &&name,
 /*!
     Returns the name of the file as a path or a base name
 */
-const std::string &File::name() const
-{
-    return name_;
-}
+const std::string &File::name() const { return name_; }
 
 /*!
     The amount of downloaded data in bytes
 */
-uint64_t File::bytesCompleted() const
-{
-    return bytesCompleted_;
-}
+uint64_t File::bytesCompleted() const { return bytesCompleted_; }
 
 /*!
     Total size of the file in bytes
 */
-uint64_t File::bytesTotal() const
-{
-    return bytesTotal_;
-}
+uint64_t File::bytesTotal() const { return bytesTotal_; }
 
 /*!
     A flag that determines if the file is being downloaded of not
 */
-bool File::wanted() const
-{
-    return wanted_;
-}
+bool File::wanted() const { return wanted_; }
 
 /*!
     Returns the priority of the file relative to the torrent
 */
-File::Priority File::priority() const
-{
-    return priority_;
-}
+File::Priority File::priority() const { return priority_; }
 
 /*!
     Returns the mimeType of the file based on the file's extension
 */
-File::MIMEType File::type() const
-{
-    return type_;
-}
+File::MIMEType File::type() const { return type_; }
 
 /*!
     \class gearbox::File::MIMEType
