@@ -23,7 +23,7 @@
  */
 
 /* ATTENTION: This header is used only in libgearbox_file.cpp, please keep it that way */
-
+/* clang-format off */
 {".323",                    { __LINE__ - 27, "text/h323" } },
 {".3g2",                    { __LINE__ - 27, "video/3gpp2" } },
 {".3gp",                    { __LINE__ - 27, "video/3gpp" } },
@@ -623,3 +623,4 @@
 {".xwd",                    { __LINE__ - 27, "image/x-xwindowdump" } },
 {".z",                      { __LINE__ - 27, "application/x-compress" } },
 {".zip",                    { __LINE__ - 27, "application/zip" } }
+/* clang-format on */

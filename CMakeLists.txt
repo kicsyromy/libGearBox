@@ -21,6 +21,7 @@ include(LinuxConfig)
 include(macOSConfig)
 include(WindowsConfig)
 include(TestCompilerSupport)
+include (ClangFormat)
 
 if (NOT GEARBOX_PLATFORM_OK)
     message (WARNING "Building on unsupported platform")
