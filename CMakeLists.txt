@@ -10,17 +10,15 @@ add_definitions (-DLIBGEARBOX_VERISION_STR="${libgearbox_VERSION_MAJOR}.${libgea
 
 option (GEARBOX_STATIC_LIB "Build static library if set to ON otherwise build shared library." ON)
 option (GEARBOX_DEBUG_LOGS "Build with additional debug logs. CAUTION: Do not use in production." OFF)
-option (GEARBOX_ALLOW_UNSUPPORTED_COMPILER "Allow compilation using an unsupported compiler." OFF)
 option (GEARBOX_ALLOW_UNSUPPORTED_PLATFORM "Allow compilation on an unsupported platform." OFF)
 option (GEARBOX_ENABLE_TESTS "Build tests." OFF)
 option (GEARBOX_BUILD_DOCUMENTATION "Build documentation." OFF)
 option (GEARBOX_BUILD_BINDING_LAYER "Build binding helper library." OFF)
 
 list (APPEND CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-include(LinuxConfig)
-include(macOSConfig)
-include(WindowsConfig)
-include(TestCompilerSupport)
+include (LinuxConfig)
+include (macOSConfig)
+include (WindowsConfig)
 include (ClangFormat)
 
 if (NOT GEARBOX_PLATFORM_OK)
@@ -78,10 +76,12 @@ endif ()
 
 target_link_libraries (gearbox ${GEARBOX_LIBS})
 set_target_properties (
-    gearbox       PROPERTIES
-    COMPILE_FLAGS "${GEARBOX_COMPILER_FLAGS}"
-    VERSION       ${libgearbox_VERSION_MAJOR}.${libgearbox_VERSION_MINOR}.${libgearbox_VERSION_PATCH}
-    SOVERSION     ${libgearbox_VERSION_MAJOR}
+    gearbox               PROPERTIES
+    COMPILE_FLAGS         "${GEARBOX_COMPILER_FLAGS}"
+    CXX_STANDARD          14
+    CXX_STANDARD_REQUIRED YES
+    VERSION               ${libgearbox_VERSION_MAJOR}.${libgearbox_VERSION_MINOR}.${libgearbox_VERSION_PATCH}
+    SOVERSION             ${libgearbox_VERSION_MAJOR}
 )
 
 install (
