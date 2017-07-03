@@ -36,8 +36,9 @@ add_custom_target (private_headers SOURCES ${PRIVATE_HEADERS})
 
 ## PUBLIC HEADERS ##
 include_directories ("${PROJECT_SOURCE_DIR}/include")
+include_directories ("${PROJECT_BINARY_DIR}/config")
 set (libgearbox_PUBLIC_HEADERS  "${PROJECT_SOURCE_DIR}/include")
-file (GLOB_RECURSE PUBLIC_HEADERS "${libgearbox_PUBLIC_HEADERS}/*.h")
+file (GLOB_RECURSE PUBLIC_HEADERS "${libgearbox_PUBLIC_HEADERS}/*.h" "${PROJECT_BINARY_DIR}/config/libgearbox_config.h")
 add_custom_target (public_headers SOURCES ${PUBLIC_HEADERS})
 
 ## NLOHMANN JSON ##
@@ -66,13 +67,15 @@ if (GEARBOX_DEBUG_LOGS)
 endif ()
 
 if (GEARBOX_STATIC_LIB)
-    add_definitions (-DLIBGEARBOX_NO_IMPORT_SEMANTICS)
+    set (LIBGEARBOX_USE_IMPORT_SEMANTICS 0)
     add_library (gearbox STATIC ${LIBGEARBOX_SOURCES})
     message (STATUS "Building static library")
 else ()
+    set (LIBGEARBOX_USE_IMPORT_SEMANTICS 1)
     add_library (gearbox SHARED ${LIBGEARBOX_SOURCES})
     message (STATUS "Building shared library")
 endif ()
+configure_file ("${libgearbox_PUBLIC_HEADERS}/libgearbox_config.h.in" "${PROJECT_BINARY_DIR}/config/libgearbox_config.h" @ONLY)
 
 target_link_libraries (gearbox ${GEARBOX_LIBS})
 set_target_properties (
