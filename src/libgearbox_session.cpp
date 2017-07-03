@@ -599,7 +599,7 @@ bool Session::authenticationRequired() const
 }
 
 /*!
-    Sets whether the session should use aouthentication when making requests.
+    Sets whether the session should use authentication when making requests.
 */
 void Session::setAuthentication(Session::Authentication authentication)
 {
@@ -679,7 +679,8 @@ std::int32_t Session::timeout() const
     Sets the timeout value that is to be used when making requests.
 
     If any request takes longer, for any reason, than this value an error value
-    of gearbox::Error::Code::RequestOperationTimedOut will be returned.
+    of gearbox::Error::Code::RequestOperationTimedOut will be returned. This
+    value defaults to 0ms which means infinite timeout.
 */
 void Session::setTimeout(std::int32_t value)
 {
@@ -687,10 +688,12 @@ void Session::setTimeout(std::int32_t value)
 }
 
 /*!
-    Sets the timeout value that is to be used when making requests.
+    Sets wether invalid certificates (self-signed, expired, etc.) should be
+    allowed.
 
-    If any request takes longer, for any reason, than this value an error value
-    of gearbox::Error::Code::RequestOperationTimedOut will be returned.
+    Setting this to Session::SSLErrorHandling::Ignore could potentially put
+    the end-user to risk of information leakage. This option defaults to
+    Session::SSLErrorHandling::Acknowledge.
 */
 void Session::setSSLErrorHandling(Session::SSLErrorHandling value)
 {
