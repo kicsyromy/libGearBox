@@ -6,17 +6,18 @@ list (APPEND CMAKE_MODULE_PATH 1 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(PythonConfig)
 
 ## TEST HEADERS ##
-include_directories ("${PROJECT_SOURCE_DIR}/src/include")
-set (LIBGEARBOX_TEST_HEADERS_DIR "${PROJECT_SOURCE_DIR}/src/include")
-file (GLOB_RECURSE LIBGEARBOX_TEST_HEADERS "${LIBGEARBOX_TEST_HEADERS_DIR}/*.h")
-add_custom_target (libgearbox_test_headers SOURCES ${LIBGEARBOX_TEST_HEADERS})
+set (LIBGEARBOX_TEST_HEADERS_PATH "${PROJECT_SOURCE_DIR}/src/include")
+file (GLOB_RECURSE LIBGEARBOX_TEST_HEADERS "${LIBGEARBOX_TEST_HEADERS_PATH}/*.h")
+include_directories ("${LIBGEARBOX_TEST_HEADERS_PATH}")
+source_group ("Header Files" FILES ${LIBGEARBOX_TEST_HEADERS})
 
 ## PYTHON TEST SERVER SOURCES ##
 set (LIBGEARBOX_TEST_SERVER_DIR "${PROJECT_SOURCE_DIR}/python")
 file (GLOB_RECURSE LIBGEARBOX_TEST_SERVER_SOURCES "${LIBGEARBOX_TEST_SERVER_DIR}/*.py")
 file (GLOB_RECURSE LIBGEARBOX_TEST_SERVER_JSON "${LIBGEARBOX_TEST_SERVER_DIR}/json/*.json")
-add_custom_target (libgearbox_test_server SOURCES ${LIBGEARBOX_TEST_SERVER_SOURCES} ${LIBGEARBOX_TEST_SERVER_JSON})
 add_definitions (-DGEARBOX_PYTHON_MODULE_PATH="${LIBGEARBOX_TEST_SERVER_DIR}")
+source_group ("Server Files\\Python" FILES ${LIBGEARBOX_TEST_SERVER_SOURCES})
+source_group ("Server Files\\Json"   FILES ${LIBGEARBOX_TEST_SERVER_JSON})
 
 ## CATCH ##
 include_directories ("${PROJECT_SOURCE_DIR}/3rdparty/catch")
@@ -35,10 +36,20 @@ if (GEARBOX_TESTS_ENABLE_CODE_COVERAGE)
     include (Coverage)
 endif ()
 
-add_executable (${PROJECT_NAME} ${LIBGEARBOX_TEST_SOURCES})
-target_link_libraries (${PROJECT_NAME} ${GEARBOX_LIBS} ${GEARBOX_PY_LIBS} ${GEARBOX_TESTS_COVERAGE_LIBRARIES})
+add_executable (
+    ${PROJECT_NAME}
+    ${LIBGEARBOX_TEST_SOURCES} ${LIBGEARBOX_TEST_HEADERS}
+    ${LIBGEARBOX_TEST_SERVER_SOURCES} ${LIBGEARBOX_TEST_SERVER_JSON}
+)
+target_link_libraries (
+    ${PROJECT_NAME}
+    ${GEARBOX_LIBS} ${GEARBOX_PY_LIBS} ${GEARBOX_TESTS_COVERAGE_LIBRARIES}
+)
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    target_link_libraries (${PROJECT_NAME} -lpthread)
+    target_link_libraries (
+        ${PROJECT_NAME}
+        -lpthread
+    )
 endif()
 
 set_target_properties (

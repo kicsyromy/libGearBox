@@ -29,17 +29,17 @@ if (NOT GEARBOX_PLATFORM_OK)
 endif ()
 
 ## PRIVATE HEADERS ##
-include_directories ("${PROJECT_SOURCE_DIR}/src/include")
-set (libgearbox_PRIVATE_HEADERS "${PROJECT_SOURCE_DIR}/src/include")
-file (GLOB_RECURSE PRIVATE_HEADERS "${libgearbox_PRIVATE_HEADERS}/*.h")
-add_custom_target (private_headers SOURCES ${PRIVATE_HEADERS})
+set (LIBGEARBOX_PRIVATE_HEADERS_PATH "${PROJECT_SOURCE_DIR}/src/include")
+file (GLOB_RECURSE LIBGEARBOX_PRIVATE_HEADERS "${LIBGEARBOX_PRIVATE_HEADERS_PATH}/*.h")
+include_directories ("${LIBGEARBOX_PRIVATE_HEADERS_PATH}")
+source_group ("Header Files\\Private" FILES ${LIBGEARBOX_PRIVATE_HEADERS})
 
 ## PUBLIC HEADERS ##
-include_directories ("${PROJECT_SOURCE_DIR}/include")
+set (LIBGEARBOX_PUBLIC_HEADERS_PATH "${PROJECT_SOURCE_DIR}/include")
+file (GLOB_RECURSE LIBGEARBOX_PUBLIC_HEADERS "${LIBGEARBOX_PUBLIC_HEADERS_PATH}/*.h")
+include_directories ("${LIBGEARBOX_PUBLIC_HEADERS_PATH}")
 include_directories ("${PROJECT_BINARY_DIR}/config")
-set (libgearbox_PUBLIC_HEADERS  "${PROJECT_SOURCE_DIR}/include")
-file (GLOB_RECURSE PUBLIC_HEADERS "${libgearbox_PUBLIC_HEADERS}/*.h" "${PROJECT_BINARY_DIR}/config/libgearbox_config.h")
-add_custom_target (public_headers SOURCES ${PUBLIC_HEADERS})
+source_group ("Header Files\\Public" FILES ${LIBGEARBOX_PUBLIC_HEADERS})
 
 ## NLOHMANN JSON ##
 include_directories ("${PROJECT_SOURCE_DIR}/3rdparty/json/src")
@@ -68,14 +68,25 @@ endif ()
 
 if (GEARBOX_STATIC_LIB)
     set (LIBGEARBOX_USE_IMPORT_SEMANTICS 0)
-    add_library (gearbox STATIC ${LIBGEARBOX_SOURCES})
+    add_library (
+        gearbox STATIC
+        ${LIBGEARBOX_SOURCES} ${LIBGEARBOX_PUBLIC_HEADERS} ${LIBGEARBOX_PRIVATE_HEADERS}
+    )
     message (STATUS "Building static library")
 else ()
     set (LIBGEARBOX_USE_IMPORT_SEMANTICS 1)
-    add_library (gearbox SHARED ${LIBGEARBOX_SOURCES})
+    add_library (
+        gearbox SHARED
+        ${LIBGEARBOX_SOURCES} ${LIBGEARBOX_PUBLIC_HEADERS} ${LIBGEARBOX_PRIVATE_HEADERS}
+    )
     message (STATUS "Building shared library")
 endif ()
-configure_file ("${libgearbox_PUBLIC_HEADERS}/libgearbox_config.h.in" "${PROJECT_BINARY_DIR}/config/libgearbox_config.h" @ONLY)
+
+configure_file (
+    "${LIBGEARBOX_PUBLIC_HEADERS_PATH}/libgearbox_config.h.in"
+    "${PROJECT_BINARY_DIR}/config/libgearbox_config.h"
+    @ONLY
+)
 
 target_link_libraries (gearbox ${GEARBOX_LIBS})
 set_target_properties (
@@ -95,7 +106,7 @@ install (
 )
 
 install (
-    DIRECTORY ${libgearbox_PUBLIC_HEADERS}/
+    DIRECTORY ${LIBGEARBOX_PUBLIC_HEADERS_PATH}/
     DESTINATION include/gearbox
 )
 
