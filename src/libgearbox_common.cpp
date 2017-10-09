@@ -28,7 +28,7 @@
 #include <cctype>
 #include <cstring>
 
-#ifndef PLATFORM_WINDOWS
+#if !defined(PLATFORM_WINDOWS) && !defined(PLATFORM_UWP)
 #include <strings.h>
 #endif
 
@@ -46,7 +46,7 @@ bool CaseInsensitiveCompare::operator()(const std::string &s1,
 
 bool CaseInsensitiveCompare::operator()(const char *s1, const char *s2) const
 {
-#ifdef PLATFORM_WINDOWS
+#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_UWP)
     return (_stricmp(s1, s2) < 0);
 #else
     return (strcasecmp(s1, s2) < 0);

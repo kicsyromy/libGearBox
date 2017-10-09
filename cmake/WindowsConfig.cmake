@@ -1,4 +1,11 @@
-if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+if (${CMAKE_SYSTEM_NAME} MATCHES "WindowsStore")
+	add_definitions (-DPLATFORM_UWP)
+    set (GEARBOX_PLATFORM_OK TRUE)
+	set (GEARBOX_INCLUDE_DIRS "")
+    set (GEARBOX_LIB_DIRS "")
+    set (GEARBOX_LIBS "")
+    set (GEARBOX_GENERATE_MANPAGE "NO")
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     add_definitions (-DPLATFORM_WINDOWS)
     set (GEARBOX_PLATFORM_OK TRUE)
 

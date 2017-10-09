@@ -27,10 +27,10 @@
 
 #include <cstddef>
 
-#ifndef PLATFORM_WINDOWS
-#include <alloca.h>
-#else
+#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_UWP)
 #include <malloc.h>
+#else
+#include <alloca.h>
 #endif
 
 #define make_vla_impl(type, size)                                              \

@@ -40,6 +40,9 @@ using HttpRequestHandler = gearbox::http::Interface<gearbox::CUrlHttp>;
 #elif defined(PLATFORM_MACOS)
 #include "libgearbox_http_macos_p.h"
 using HttpRequestHandler = gearbox::http::Interface<gearbox::CocoaHttp>;
+#elif defined(PLATFORM_UWP)
+#include "libgearbox_http_uwp_p.h"
+using HttpRequestHandler = gearbox::http::Interface<gearbox::HttpUWP>;
 #else
 #error "Unsupported platform"
 #endif
