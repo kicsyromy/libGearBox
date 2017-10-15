@@ -87,6 +87,7 @@
 #include <fmt/format.h>
 #include <formats/json_format.h>
 
+#include "libgearbox_global.h"
 #include "libgearbox_logger_p.h"
 #include "libgearbox_session_p.h"
 #include "libgearbox_torrent_p.h"
@@ -99,9 +100,7 @@ namespace
     constexpr std::uint16_t SESSION_TAG{ 33872 };
     constexpr std::int32_t DEFAULT_TIMEOUT{ 5000 };
     constexpr std::int32_t RETRY_COUNT{ 5 };
-    constexpr const char USER_AGENT[17]{
-        "libGearbox/" LIBGEARBOX_VERISION_STR
-    };
+    constexpr const char USER_AGENT[]{ "libGearbox/" LIBGEARBOX_VERSION_STR };
 }
 
 SessionPrivate::SessionPrivate(const std::string &host,

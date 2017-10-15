@@ -72,7 +72,7 @@
         std::terminate();                                                      \
     } while (0)
 
-#ifdef GEARBOX_LOG_DEBUG
+#ifdef LIBGEARBOX_LOG_DEBUG
 #define LOG_DEBUG(...)                                                         \
     do                                                                         \
     {                                                                          \

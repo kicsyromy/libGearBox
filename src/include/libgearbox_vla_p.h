@@ -27,7 +27,7 @@
 
 #include <cstddef>
 
-#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_UWP)
+#ifdef PLATFORM_WINDOWS
 #include <malloc.h>
 #else
 #include <alloca.h>

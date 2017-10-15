@@ -22,7 +22,7 @@
  * Author: Romeo Calota
  */
 
-#ifdef PLATFORM_WINDOWS
+#ifdef PLATFORM_WIN32
 #include "libgearbox_http_win_p.h"
 
 #include <array>

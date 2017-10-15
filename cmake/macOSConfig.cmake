@@ -1,12 +1,23 @@
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    add_definitions (-DPLATFORM_MACOS)
-    set (GEARBOX_PLATFORM_OK TRUE)
+    function (libgearbox_compile_definitions RESULT)
+        set (${RESULT} "-DPLATFORM_MACOS" PARENT_SCOPE)
+    endfunction ()
 
-    # Enable Objective C++ and ARC
-    set (GEARBOX_COMPILER_FLAGS "${GEARBOX_COMPILER_FLAGS} -x objective-c++ -fobjc-arc")
+    function (libgearbox_compiler_flags RESULT)
+        set (COMPILER_FLAGS "")
+        list (APPEND COMPILER_FLAGS "-x objective-c++")
+        list (APPEND COMPILER_FLAGS "-fobjc-arc")
 
-    set (GEARBOX_INCLUDE_DIRS "")
-    set (GEARBOX_LIB_DIRS "")
-    set (GEARBOX_LIBS "-framework Cocoa")
-	set (GEARBOX_GENERATE_MANPAGE "NO")
+        set (${RESULT} ${COMPILER_FLAGS} PARENT_SCOPE)
+    endfunction ()
+
+    function (libgearbox_include_dirs RESULT)
+        set (${RESULT} "" PARENT_SCOPE)
+    endfunction ()
+
+    function (libgearbox_libs RESULT)
+        set (${RESULT} "-framework Cocoa" PARENT_SCOPE)
+    endfunction ()
+        
+    set (LIBGEARBOX_GENERATE_MANPAGE "NO")
 endif ()

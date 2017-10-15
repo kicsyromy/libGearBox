@@ -286,8 +286,10 @@ namespace
 
         NSHTTPURLResponse *httpResponse =
             static_cast<NSHTTPURLResponse *>(response);
-        return {[httpResponse statusCode], [httpResponse allHeaderFields], data,
-                error };
+        return { [httpResponse statusCode],
+                 [httpResponse allHeaderFields],
+                 data,
+                 error };
     };
 }
 
@@ -564,9 +566,9 @@ void CocoaHttp::Request::setBody(const std::string &data)
         NSString *postString = [NSString stringWithUTF8String:data.c_str()];
         NSData *postData = [postString dataUsingEncoding:NSUTF8StringEncoding];
         [request_ setValue:[@"" stringByAppendingFormat:@"%lu",
-                                                         static_cast<
-                                                             unsigned long>(
-                                                             [postData length])]
+                                                        static_cast<
+                                                            unsigned long>(
+                                                            [postData length])]
             forHTTPHeaderField:@"Content-Length"];
         [request_ setHTTPBody:postData];
     }

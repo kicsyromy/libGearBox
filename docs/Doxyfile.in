@@ -32,13 +32,13 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = "libGearBox"
+PROJECT_NAME           = @PROJECT_NAME@
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = @libgearbox_VERSION_MAJOR@.@libgearbox_VERSION_MINOR@.@libgearbox_VERSION_PATCH@
+PROJECT_NUMBER         = @LIBGEARBOX_VERSION_MAJOR@.@LIBGEARBOX_VERSION_MINOR@.@LIBGEARBOX_VERSION_PATCH@
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -790,7 +790,7 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = @libgearbox_PUBLIC_HEADERS@ @GEARBOX_SOURCES@ @GEARBOX_DOC_FILES@
+INPUT                  = @LIBGEARBOX_PUBLIC_HEADERS_PATH@ @LIBGEARBOX_SOURCES_PATH@ @LIBGEARBOX_DOC_FILES@
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -1149,7 +1149,7 @@ HTML_STYLESHEET        =
 # list). For an example see the documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_STYLESHEET  = @GEARBOX_STYLE_SHEET@
+HTML_EXTRA_STYLESHEET  = @LIBGEARBOX_STYLE_SHEET@
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
@@ -1859,7 +1859,7 @@ RTF_SOURCE_CODE        = NO
 # classes and files.
 # The default value is: NO.
 
-GENERATE_MAN           = @GEARBOX_GENERATE_MANPAGE@
+GENERATE_MAN           = @LIBGEARBOX_GENERATE_MANPAGE@
 
 # The MAN_OUTPUT tag is used to specify where the man pages will be put. If a
 # relative path is entered the value of OUTPUT_DIRECTORY will be put in front of
@@ -2038,7 +2038,7 @@ SEARCH_INCLUDES        = YES
 # preprocessor.
 # This tag requires that the tag SEARCH_INCLUDES is set to YES.
 
-INCLUDE_PATH           = @libgearbox_PUBLIC_HEADERS@ @libgearbox_PRIVATE_HEADERS@
+INCLUDE_PATH           = @LIBGEARBOX_PUBLIC_HEADERS_PATH@ @LIBGEARBOX_PRIVATE_HEADERS_PATH@
 
 # You can use the INCLUDE_FILE_PATTERNS tag to specify one or more wildcard
 # patterns (like *.h and *.hpp) to filter out the header-files in the

@@ -1,16 +1,26 @@
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    add_definitions (-DPLATFORM_LINUX)
-    set (GEARBOX_PLATFORM_OK TRUE)
+    function (libgearbox_compile_definitions RESULT)
+        set (${RESULT} "-DPLATFORM_LINUX" PARENT_SCOPE)
+    endfunction ()
 
-    set (GEARBOX_COMPILER_FLAGS "${GEARBOX_COMPILER_FLAGS} -fPIC")
-
-    # Add CURL dependency
     find_package (PkgConfig QUIET REQUIRED)
     pkg_search_module (CURL REQUIRED libcurl)
-    set (GEARBOX_INCLUDE_DIRS ${CURL_LIBRARIES})
-    set (GEARBOX_LIB_DIRS ${CURL_LIBRARY_DIRS})
-    set (GEARBOX_LIBS ${CURL_LIBRARIES})
-    set (GEARBOX_COMPILER_FLAGS "${GEARBOX_COMPILER_FLAGS} ${CURL_CFLAGS}")
-    set (GEARBOX_GENERATE_MANPAGE "YES")
-endif ()
 
+    function (libgearbox_compiler_flags RESULT)
+        set (COMPILER_FLAGS "-fPIC")
+
+        list (APPEND COMPILER_FLAGS "${CURL_CFLAGS}")
+
+        set (${RESULT} ${COMPILER_FLAGS} PARENT_SCOPE)
+    endfunction ()
+
+    function (libgearbox_include_dirs RESULT)
+        set (${RESULT} ${CURL_INCLUDE_DIRS} PARENT_SCOPE)
+    endfunction ()
+
+    function (libgearbox_libs RESULT)
+        set (${RESULT} ${CURL_LIBRARIES} PARENT_SCOPE)
+    endfunction ()
+        
+    set (LIBGEARBOX_GENERATE_MANPAGE "YES")
+endif ()

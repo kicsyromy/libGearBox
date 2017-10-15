@@ -31,7 +31,7 @@
 #include <sequential.h>
 
 #include "libgearbox_http_interface_p.h"
-#if defined(PLATFORM_WINDOWS)
+#if defined(PLATFORM_WIN32)
 #include "libgearbox_http_win_p.h"
 using HttpRequestHandler = gearbox::http::Interface<gearbox::WinHttp>;
 #elif defined(PLATFORM_LINUX)

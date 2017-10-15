@@ -1,8 +1,11 @@
 find_package (Doxygen)
 if (DOXYGEN_FOUND)
-    set (GEARBOX_DOC_FILES "${PROJECT_SOURCE_DIR}/docs/")
-    set (GEARBOX_STYLE_SHEET "${GEARBOX_DOC_FILES}/style.css")
-    configure_file ("${GEARBOX_DOC_FILES}/Doxyfile.in" "${PROJECT_BINARY_DIR}/Doxyfile" @ONLY)
+    set (LIBGEARBOX_PUBLIC_HEADERS_PATH  "${PROJECT_SOURCE_DIR}/include")
+    set (LIBGEARBOX_PRIVATE_HEADERS_PATH "${PROJECT_SOURCE_DIR}/src/include")
+    set (LIBGEARBOX_SOURCES_PATH         "${PROJECT_SOURCE_DIR}/src")
+    set (LIBGEARBOX_DOC_FILES            "${PROJECT_SOURCE_DIR}/docs")
+    set (LIBGEARBOX_STYLE_SHEET          "${LIBGEARBOX_DOC_FILES}/style.css")
+    configure_file ("${LIBGEARBOX_DOC_FILES}/Doxyfile.in" "${PROJECT_BINARY_DIR}/Doxyfile" @ONLY)
     add_custom_target (
         docs ALL
         ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
