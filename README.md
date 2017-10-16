@@ -60,19 +60,15 @@ The output of the build should be a static library called `libgearbox` with the 
 ### Build options
 libGearBox supports some [CMake options](https://cmake.org/cmake/help/v3.7/command/option.html) for a customized build. These are as follows:
 
-`GEARBOX_STATIC_LIB` Build static library if set to ON otherwise build shared library. Defaults to ON.
+`LIBGEARBOX_STATIC_LIB` Build static library if set to ON otherwise build shared library. Defaults to ON.
 
-`GEARBOX_DEBUG_LOGS` Build with additional debug logs. CAUTION: Do not use in production. Defaults to OFF.
+`LIBGEARBOX_DEBUG_LOGS` Build with additional debug logs. CAUTION: Do not use in production. Defaults to OFF.
 
-`GEARBOX_ALLOW_UNSUPPORTED_COMPILER` Allow compilation using an unsupported compiler. Defaults to OFF.
+`LIBGEARBOX_ENABLE_TESTS` Build tests. Defaults to OFF.
 
-`GEARBOX_ALLOW_UNSUPPORTED_PLATFORM` Allow compilation on an unsupported platform. Defaults to OFF.
+`LIBGEARBOX_TESTS_ENABLE_CODE_COVERAGE` Only available when building with tests. Enables code coverage generation using gcov/lcov.
 
-`GEARBOX_ENABLE_TESTS` Build tests. Defaults to OFF.
-
-`GEARBOX_TESTS_ENABLE_CODE_COVERAGE` Only available when building with tests. Enables code coverage generation using gcov/lcov.
-
-`GEARBOX_BUILD_DOCUMENTATION` Build HTML documentation, also builds manpages when building under Linux. Defaults to OFF.
+`LIBGEARBOX_BUILD_DOCUMENTATION` Build HTML documentation, also builds manpages when building under Linux. Defaults to OFF.
 
 ## Roadmap
 TBD
