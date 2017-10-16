@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Package
+    xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+    xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+    xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+    IgnorableNamespaces="uap mp">
+
+    <Identity
+        Name="com.@LIBGEARBOX_TEST_ORGANIZATION@.@PROJECT_NAME@"
+        Publisher="CN=@LIBGEARBOX_TEST_ORGANIZATION@"
+        Version="@LIBGEARBOX_VERSION_MAJOR@.@LIBGEARBOX_VERSION_MINOR@.@LIBGEARBOX_VERSION_PATCH@.0" />
+
+    <mp:PhoneIdentity
+        PhoneProductId="4637F6CF-1D74-34AF-B93A-030AFFD73157"
+        PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+
+    <Properties>
+        <DisplayName>@LIBGEARBOX_TEST_APPLICATION_TITLE@</DisplayName>
+        <PublisherDisplayName>@LIBGEARBOX_TEST_ORGANIZATION@</PublisherDisplayName>
+        <Logo>resources\StoreLogo.png</Logo>
+    </Properties>
+
+    <Dependencies>
+        <TargetDeviceFamily
+            Name="Windows.Universal"
+            MinVersion="10.0.0.0"
+            MaxVersionTested="10.0.0.0" />
+    </Dependencies>
+
+    <Resources>
+        <Resource Language="x-generate" />
+    </Resources>
+
+    <Applications>
+        <Application
+            Id="@PROJECT_NAME@"
+            Executable="@PROJECT_NAME@.exe"
+            EntryPoint="gearbox.test.Application">
+
+            <uap:VisualElements
+                DisplayName="@LIBGEARBOX_TEST_APPLICATION_TITLE@"
+                Description="@LIBGEARBOX_TEST_APPLICATION_DESCRIPTION@"
+                BackgroundColor="#336699"
+                Square150x150Logo="resources\Logo.png"
+                Square44x44Logo="resources\SmallLogo44x44.png">
+                <uap:DefaultTile
+                    Wide310x150Logo="resources\Wide310x150Logo.png">
+                </uap:DefaultTile>
+                <uap:SplashScreen Image="resources\SplashScreen.png" />
+            </uap:VisualElements>
+        </Application>
+    </Applications>
+
+    <Capabilities>
+        <Capability Name="internetClient" />
+    </Capabilities>
+</Package>

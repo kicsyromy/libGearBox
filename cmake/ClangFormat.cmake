@@ -1,4 +1,4 @@
-find_program(CLANG_FORMAT clang-format NAMES clang-format clang-format-3.8 clang-format-3.9)
+find_program (CLANG_FORMAT clang-format NAMES clang-format clang-format-3.8 clang-format-3.9)
 if (NOT CLANG_FORMAT MATCHES "CLANG_FORMAT-NOTFOUND")
     add_custom_target (
         clangformat

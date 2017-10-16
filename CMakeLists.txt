@@ -1,5 +1,6 @@
 cmake_minimum_required (VERSION 3.0)
 project (libgearbox)
+list (APPEND CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set (LIBGEARBOX_VERSION_MAJOR 0)
 set (LIBGEARBOX_VERSION_MINOR 1)
@@ -23,7 +24,6 @@ source_group ("Header Files\\Public" FILES ${LIBGEARBOX_PUBLIC_HEADERS})
 file (GLOB_RECURSE LIBGEARBOX_SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 source_group ("Source Files" FILES ${LIBGEARBOX_SOURCES})
 
-list (APPEND CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include (LinuxConfig)
 include (macOSConfig)
 include (WindowsConfig)

@@ -1,6 +1,8 @@
 #include "http_server.h"
 
 #include <thread>
+
+#ifndef PLATFORM_UWP
 #include <mutex>
 #include <condition_variable>
 #include <cmath>
@@ -116,3 +118,9 @@ void gearbox::test::stopHttpServer()
     Py_AddPendingCall(quit, nullptr);
     stopSemaphore.wait();
 }
+#else
+void gearbox::test::startHttpServer() { }
+void gearbox::test::stopHttpServer() { }
+#endif // !PLATFORM_UWP
+
+

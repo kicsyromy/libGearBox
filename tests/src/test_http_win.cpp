@@ -1,4 +1,4 @@
-#ifdef PLATFORM_WINDOWS
+#ifdef PLATFORM_WIN32
 #include <catch.hpp>
 
 #define private public
@@ -274,4 +274,4 @@ TEST_CASE("Test libgearbox_http_win", "[http]")
     }
 }
 
-#endif // PLATFORM_WINDOWS
+#endif // PLATFORM_WIN32

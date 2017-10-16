@@ -20,6 +20,12 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows" OR ${CMAKE_SYSTEM_NAME} MATCHES "Wind
             list (APPEND COMPILER_FLAGS "/wd4251")
         endif ()
 
+        if (${CMAKE_SYSTEM_NAME} MATCHES "WindowsStore")
+            list (APPEND COMPILER_FLAGS "/FI")
+            list (APPEND COMPILER_FLAGS "/ZW")
+        endif ()
+
+        string (REPLACE ";" " " COMPILER_FLAGS "${COMPILER_FLAGS}")
         set (${RESULT} ${COMPILER_FLAGS} PARENT_SCOPE)
     endfunction ()
 

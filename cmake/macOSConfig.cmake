@@ -8,6 +8,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
         list (APPEND COMPILER_FLAGS "-x objective-c++")
         list (APPEND COMPILER_FLAGS "-fobjc-arc")
 
+        string (REPLACE ";" " " COMPILER_FLAGS "${COMPILER_FLAGS}")
         set (${RESULT} ${COMPILER_FLAGS} PARENT_SCOPE)
     endfunction ()
 
