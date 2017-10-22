@@ -68,7 +68,21 @@ libGearBox supports some [CMake options](https://cmake.org/cmake/help/v3.7/comma
 
 `LIBGEARBOX_TESTS_ENABLE_CODE_COVERAGE` Only available when building with tests. Enables code coverage generation using gcov/lcov.
 
-`LIBGEARBOX_BUILD_DOCUMENTATION` Build HTML documentation, also builds manpages when building under Linux. Defaults to OFF.
+`LIBGEARBOX_GENERATE_DOCUMENTATION` Generate HTML documentation, also builds manpages when building under Linux. Defaults to OFF.
+
+### Using as a build dependency for a bigger project
+The easiest way to use the library for a bigger project is to add this repository as a git submodule and including the CMakeLists.txt file of this project as a subdirectory in your own CMakeLists.txt and adding a dependency to your own target to `libgearbox`.
+```
+...
+add_subdirectory(libgearbox)
+add_executable (myapp main.cpp src1.cpp src2.cpp)
+target_link_libraries (myapp libgearbox)
+...
+```
+Please be aware that while some effort was put into not polluting the global CMake namespace with all sorts of intermediary variables the following are still present in the global namespace:
+ - The options mentined above
+ - `LIBGEARBOX_VERSION_MAJOR`, `LIBGEARBOX_VERSION_MINOR`, `LIBGEARBOX_VERSION_PATCH`
+ - `LIBGEARBOX_PRIVATE_HEADERS`, `LIBGEARBOX_PUBLIC_HEADERS`, `LIBGEARBOX_SOURCES`
 
 ## Roadmap
 TBD
