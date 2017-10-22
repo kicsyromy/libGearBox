@@ -1,6 +1,13 @@
 cmake_minimum_required (VERSION 3.0)
-project (libgearboxtest)
+project (libgearboxtest CXX)
+
 list (APPEND CMAKE_MODULE_PATH 1 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include (LinuxConfig)
+include (macOSConfig)
+include (WindowsConfig)
+include (Platform)
+include (Resources)
+include (Python)
 
 option (GEARBOX_TESTS_ENABLE_CODE_COVERAGE "Generate test coverage report." OFF)
 
@@ -19,7 +26,6 @@ source_group ("Server Files" FILES ${LIBGEARBOX_TEST_SERVER_SOURCES})
 source_group ("Server Files\\Json"   FILES ${LIBGEARBOX_TEST_SERVER_JSON})
 
 ## RESOURCES ##
-include (Resources)
 libgearbox_test_configure_resources (LIBGEARBOX_TEST_RESOURCES)
 
 if (GEARBOX_TESTS_ENABLE_CODE_COVERAGE)
@@ -33,6 +39,7 @@ add_executable (
     ${LIBGEARBOX_TEST_RESOURCES}
 )
 
+libgearbox_compile_definitions (LIBGEARBOX_COMPILE_DEFINITIONS)
 foreach (DEFINITION IN LISTS LIBGEARBOX_COMPILE_DEFINITIONS)
     target_compile_definitions (${PROJECT_NAME} PRIVATE "${DEFINITION}")
 endforeach ()
@@ -62,26 +69,25 @@ target_compile_definitions (${PROJECT_NAME} PRIVATE "-DFMT_HEADER_ONLY")
 target_include_directories (${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/../3rdparty/fmt")
 
 ## PYTHON ##
-include (Python)
 libgearbox_test_find_python_binary (LIBGEARBOX_TEST_PY_BIN)
 libgearbox_test_find_python_include_dirs (LIBGEARBOX_TEST_PY_INCLUDE_DIRS)
 libgearbox_test_find_python_libraries (LIBGEARBOX_TEST_PY_LIBRARIES)
 
 target_include_directories (${PROJECT_NAME} PRIVATE ${LIBGEARBOX_TEST_PY_INCLUDE_DIRS})
 
+libgearbox_libs (LIBGEARBOX_LIBS)
 target_link_libraries (
     ${PROJECT_NAME}
     ${LIBGEARBOX_LIBS} ${LIBGEARBOX_TEST_PY_LIBRARIES} ${GEARBOX_TESTS_COVERAGE_LIBRARIES}
 )
 
-include (Platform)
 libgearbox_test_platform_libraries (LIBGEARBOX_TEST_PLATFORM_LIBRARIES)
-
 target_link_libraries (
     ${PROJECT_NAME}
     ${LIBGEARBOX_TEST_PLATFORM_LIBRARIES}
 )
 
+libgearbox_compiler_flags (LIBGEARBOX_COMPILER_FLAGS)
 set_target_properties (
     ${PROJECT_NAME}       PROPERTIES
     CXX_STANDARD          14
